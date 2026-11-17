@@ -57,9 +57,8 @@
 
     <!-- 1. HOME TAB -->
     <section id="homeTab" class="flex-1 pb-16">
-      <!-- Top Navbar -->
       <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 px-4 py-2.5 flex items-center justify-between">
-        <button onclick="openCreateModal('post')" class="text-2xl font-light leading-none p-1" title="Create">+</button>
+        <button onclick="openCreateModal('post')" class="text-2xl font-light leading-none p-1">+</button>
         <span class="brand-font text-3xl tracking-wide text-slate-900">ZestUp</span>
         <button onclick="switchTab('activityTab')" class="relative p-1">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
@@ -68,9 +67,7 @@
       </header>
 
       <!-- Stories Row -->
-      <div id="storiesRow" class="flex items-center gap-3.5 px-3 py-3 overflow-x-auto no-scrollbar border-b border-slate-100">
-        <!-- Populated dynamically -->
-      </div>
+      <div id="storiesRow" class="flex items-center gap-3.5 px-3 py-3 overflow-x-auto no-scrollbar border-b border-slate-100"></div>
 
       <!-- Feed Posts -->
       <div id="feedContainer" class="divide-y divide-slate-100">
@@ -92,7 +89,7 @@
     <!-- 3. MESSAGES / CHAT TAB -->
     <section id="chatTab" class="hidden flex-1 flex flex-col pb-16 h-screen">
       <header class="sticky top-0 z-40 bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between">
-        <span id="chatHeaderUser" class="font-bold text-base">Messages</span>
+        <span id="chatHeaderUser" class="font-bold text-base flex items-center gap-1">Messages</span>
         <span class="text-xs text-emerald-500 font-semibold">● Community Live</span>
       </header>
       <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50"></div>
@@ -102,33 +99,38 @@
       </div>
     </section>
 
-    <!-- 4. SEARCH & EXPLORE TAB -->
+    <!-- 4. SEARCH & ACCOUNTS TAB -->
     <section id="searchTab" class="hidden flex-1 pb-16">
-      <div class="sticky top-0 z-40 bg-white p-3 border-b border-slate-100">
+      <div class="sticky top-0 z-40 bg-white p-3 border-b border-slate-100 space-y-2.5">
         <div class="relative">
-          <input id="searchInput" type="text" placeholder="Search" class="w-full bg-slate-100 text-sm pl-9 pr-4 py-2 rounded-xl focus:outline-none" />
+          <input id="searchInput" type="text" placeholder="Search accounts or posts..." class="w-full bg-slate-100 text-sm pl-9 pr-4 py-2 rounded-xl focus:outline-none" />
           <span class="absolute left-3 top-2.5 text-slate-400 text-xs">🔍</span>
         </div>
+        <div class="flex gap-2 text-xs font-semibold">
+          <button id="filterAllBtn" onclick="setSearchFilter('all')" class="px-3 py-1 rounded-lg bg-slate-900 text-white">For you</button>
+          <button id="filterAccountsBtn" onclick="setSearchFilter('accounts')" class="px-3 py-1 rounded-lg bg-slate-100 text-slate-700">Accounts</button>
+        </div>
       </div>
+      <div id="searchAccountsBox" class="divide-y divide-slate-100"></div>
       <div id="exploreGrid" class="grid grid-cols-3 gap-0.5 pt-0.5"></div>
     </section>
 
-    <!-- 5. PROFILE TAB (Exact Instagram Layout) -->
+    <!-- 5. PROFILE TAB -->
     <section id="profileTab" class="hidden flex-1 pb-16">
-      <!-- Profile Top Bar -->
       <header class="sticky top-0 z-40 bg-white px-4 py-3 flex items-center justify-between border-b border-slate-100">
         <button onclick="openCreateModal('post')" class="text-2xl font-light leading-none">+</button>
         <div class="flex items-center gap-1 font-bold text-base">
           <span id="profUsernameTop">username</span>
-          <span class="w-2 h-2 bg-rose-500 rounded-full"></span>
+          <span id="profTopBadge"></span>
         </div>
-        <button id="logoutBtn" class="text-xs font-semibold text-rose-500 border border-rose-200 px-2.5 py-1 rounded-md">Logout</button>
+        <!-- Hamburger Menu -> Opens Settings and activity -->
+        <button onclick="openSettings()" class="p-1.5 text-slate-900" title="Settings and activity">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
       </header>
 
-      <!-- Profile Header Info -->
       <div class="px-4 pt-4 pb-3">
         <div class="flex items-center justify-between">
-          <!-- Avatar with Note Bubble -->
           <div class="relative">
             <div class="story-ring rounded-full p-0.5">
               <img id="profAvatarImg" src="" class="w-20 h-20 rounded-full object-cover bg-slate-200 border-2 border-white" />
@@ -136,7 +138,6 @@
             <button onclick="openEditProfile()" class="absolute bottom-0 right-0 w-6 h-6 bg-slate-900 text-white rounded-full text-xs flex items-center justify-center border-2 border-white">+</button>
           </div>
 
-          <!-- Stats -->
           <div class="flex-1 flex justify-around text-center ml-4">
             <div>
               <p id="statPosts" class="font-bold text-base">0</p>
@@ -153,19 +154,26 @@
           </div>
         </div>
 
-        <!-- Name & Bio -->
         <div class="mt-3 space-y-0.5">
-          <p id="profFullName" class="font-bold text-sm flex items-center gap-1">User <span class="text-sky-500 text-xs">✔</span></p>
+          <p id="profFullName" class="font-bold text-sm flex items-center gap-1">User</p>
           <p id="profBio" class="text-xs text-slate-700 whitespace-pre-line">Digital Creator on ZestUp ✨</p>
         </div>
 
-        <!-- Edit & Share Buttons -->
-        <div class="grid grid-cols-2 gap-2 mt-4">
+        <!-- Professional Dashboard Shortcut Card (Like Instagram Screenshot) -->
+        <div onclick="openSubSetting('dashboard')" class="mt-3 bg-slate-100 rounded-xl px-3.5 py-2.5 cursor-pointer hover:bg-slate-200/70 transition">
+          <p class="text-xs font-bold text-slate-900">Your dashboard</p>
+          <p id="dashboardSummaryText" class="text-[11px] text-slate-500">↗ 0 engagements in the last 30 days.</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 mt-3">
           <button onclick="openEditProfile()" class="py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Edit profile</button>
           <button onclick="shareProfile()" class="py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Share profile</button>
         </div>
 
-        <!-- Highlights Row -->
+        <button id="adminPanelBtn" onclick="openAdminModal()" class="hidden w-full mt-2.5 py-2 rounded-lg bg-sky-50 border border-sky-200 text-sky-600 font-bold text-xs flex items-center justify-center gap-1.5">
+          <span>🛡️ Founder Admin: Manage Blue Ticks</span>
+        </button>
+
         <div class="flex items-center gap-4 mt-4 overflow-x-auto no-scrollbar">
           <div onclick="openCreateModal('story')" class="flex flex-col items-center gap-1 cursor-pointer">
             <div class="w-14 h-14 rounded-full border border-slate-300 flex items-center justify-center text-xl font-light">+</div>
@@ -174,7 +182,6 @@
         </div>
       </div>
 
-      <!-- Grid Tabs -->
       <div class="grid grid-cols-2 border-t border-b border-slate-200 mt-2">
         <button class="py-2.5 flex justify-center border-b-2 border-slate-900 text-slate-900">
           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 3h7v7H3V3zm11 0h7v7h-7V3zM3 14h7v7H3v-7zm11 0h7v7h-7v-7z"/></svg>
@@ -184,48 +191,184 @@
         </button>
       </div>
 
-      <!-- 3-Column Photo Grid -->
       <div id="profileGrid" class="grid grid-cols-3 gap-0.5 pt-0.5"></div>
     </section>
 
-    <!-- ACTIVITY / NOTIFICATIONS TAB -->
+    <!-- 6. SETTINGS AND ACTIVITY FULLSCREEN PAGE (Matches User Screenshots) -->
+    <section id="settingsPage" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col overflow-y-auto">
+      <header class="sticky top-0 z-20 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
+        <button onclick="closeSettings()" class="text-xl font-bold leading-none">←</button>
+        <h2 class="font-bold text-base">Settings and activity</h2>
+      </header>
+
+      <!-- Search Settings -->
+      <div class="p-3 border-b border-slate-100">
+        <div class="relative">
+          <input id="settingsSearchInput" type="text" placeholder="Search" class="w-full bg-slate-100 text-sm pl-9 pr-4 py-2 rounded-xl focus:outline-none" />
+          <span class="absolute left-3 top-2.5 text-slate-400 text-xs">🔍</span>
+        </div>
+      </div>
+
+      <div id="settingsListContainer" class="divide-y divide-slate-100 pb-10">
+        <!-- Section: Your account -->
+        <div class="p-4 space-y-3 settings-group">
+          <p class="text-xs font-semibold text-slate-500">Your account</p>
+          <div onclick="closeSettings(); openEditProfile();" class="settings-item flex items-center justify-between py-1 cursor-pointer">
+            <div class="flex items-center gap-3">
+              <span class="text-lg">👤</span>
+              <div>
+                <p class="text-sm font-semibold">Accounts Center</p>
+                <p class="text-[11px] text-slate-400">Password, security, personal details</p>
+              </div>
+            </div>
+            <span class="text-slate-400">›</span>
+          </div>
+        </div>
+
+        <!-- Section: How you use ZestUp -->
+        <div class="p-4 space-y-3.5 settings-group">
+          <p class="text-xs font-semibold text-slate-500">How you use ZestUp</p>
+          <div onclick="openSubSetting('saved')" class="settings-item flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3"><span class="text-lg">🔖</span><span class="text-sm">Saved</span></div>
+            <span class="text-slate-400 text-xs" id="savedCountBadge">0 ›</span>
+          </div>
+          <div onclick="openSubSetting('archive')" class="settings-item flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3"><span class="text-lg">🕒</span><span class="text-sm">Archive</span></div>
+            <span class="text-slate-400">›</span>
+          </div>
+          <div onclick="openSubSetting('activity')" class="settings-item flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3"><span class="text-lg">📈</span><span class="text-sm">Your activity</span></div>
+            <span class="text-slate-400">›</span>
+          </div>
+          <div onclick="toggleSettingPref('notificationsEnabled')" class="settings-item flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3"><span class="text-lg">🔔</span><span class="text-sm">Notifications</span></div>
+            <span id="pref_notificationsEnabled" class="text-xs font-bold text-sky-500">On ›</span>
+          </div>
+          <div onclick="openSubSetting('timemanagement')" class="settings-item flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3"><span class="text-lg">⏱️</span><span class="text-sm">Time management</span></div>
+            <span class="text-slate-400">›</span>
+          </div>
+        </div>
+
+        <!-- Section: Your insights and tools -->
+        <div class="p-4 space-y-3.5 settings-group">
+          <p class="text-xs font-semibold text-slate-500">Your insights and tools</p>
+          <div onclick="openSubSetting('dashboard')" class="settings-item flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3"><span class="text-lg">📊</span><span class="text-sm">Professional dashboard</span></div>
+            <span class="text-slate-400">›</span>
+          </div>
+          <div onclick="openSubSetting('creator')" class="settings-item flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3"><span class="text-lg">🛠️</span><span class="text-sm">Profile type and tools</span></div>
+            <span class="text-xs text-slate-400">Creator ›</span>
+          </div>
+        </div>
+
+        <!-- Section: Who can see your content -->
+        <div class="p-4 space-y-3.5 settings-group">
+          <p class="text-xs font-semibold text-slate-500">Who can see your content</p>
+          <div onclick="toggleSettingPref('isPrivate')" class="settings-item flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3"><span class="text-lg">🔒</span><span class="text-sm">Profile privacy</span></div>
+            <span id="pref_isPrivate" class="text-xs font-semibold text-slate-500">Public ›</span>
+          </div>
+          <div onclick="openSubSetting('closefriends')" class="settings-item flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3"><span class="text-lg">⭐</span><span class="text-sm">Close Friends</span></div>
+            <span class="text-xs text-slate-400">0 ›</span>
+          </div>
+          <div onclick="openSubSetting('blocked')" class="settings-item flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3"><span class="text-lg">🚫</span><span class="text-sm">Blocked</span></div>
+            <span id="blockedCountBadge" class="text-xs text-slate-400">0 ›</span>
+          </div>
+        </div>
+
+        <!-- Section: How others can interact with you -->
+        <div class="p-4 space-y-3.5 settings-group">
+          <p class="text-xs font-semibold text-slate-500">How others can interact with you</p>
+          <div onclick="toggleSettingPref('allowComments')" class="settings-item flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3"><span class="text-lg">💬</span><span class="text-sm">Comments</span></div>
+            <span id="pref_allowComments" class="text-xs font-bold text-sky-500">Everyone ›</span>
+          </div>
+          <div onclick="toggleSettingPref('allowSharing')" class="settings-item flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3"><span class="text-lg">🔄</span><span class="text-sm">Sharing and reuse</span></div>
+            <span id="pref_allowSharing" class="text-xs font-bold text-sky-500">On ›</span>
+          </div>
+        </div>
+
+        <!-- Section: Your app and media -->
+        <div class="p-4 space-y-3.5 settings-group">
+          <p class="text-xs font-semibold text-slate-500">Your app and media</p>
+          <div onclick="toggleSettingPref('highQualityMedia')" class="settings-item flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3"><span class="text-lg">📶</span><span class="text-sm">Data usage and media quality</span></div>
+            <span id="pref_highQualityMedia" class="text-xs font-bold text-sky-500">HD ›</span>
+          </div>
+          <div onclick="openSubSetting('language')" class="settings-item flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3"><span class="text-lg">🌐</span><span class="text-sm">Language and translations</span></div>
+            <span class="text-xs text-slate-400">English / বাংলা ›</span>
+          </div>
+        </div>
+
+        <!-- Section: More info and support -->
+        <div class="p-4 space-y-3.5 settings-group">
+          <p class="text-xs font-semibold text-slate-500">More info and support</p>
+          <div onclick="openSubSetting('profilestatus')" class="settings-item flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3"><span class="text-lg">🛡️</span><span class="text-sm">Profile status</span></div>
+            <span class="text-slate-400">›</span>
+          </div>
+          <div onclick="openSubSetting('about')" class="settings-item flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3"><span class="text-lg">ℹ️</span><span class="text-sm">About</span></div>
+            <span class="text-slate-400">›</span>
+          </div>
+        </div>
+
+        <!-- Section: Login (Log out) -->
+        <div class="p-4 space-y-3 settings-group">
+          <p class="text-xs font-semibold text-slate-500">Login</p>
+          <button id="logoutBtn" class="settings-item w-full text-left text-sm font-bold text-rose-500 py-1">Log out</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUB-SETTING DETAIL VIEW MODAL -->
+    <div id="subSettingModal" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col">
+      <header class="sticky top-0 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
+        <button onclick="document.getElementById('subSettingModal').classList.add('hidden')" class="text-xl font-bold">←</button>
+        <h3 id="subSettingTitle" class="font-bold text-base">Details</h3>
+      </header>
+      <div id="subSettingBody" class="p-4 flex-1 overflow-y-auto space-y-3 text-sm"></div>
+    </div>
+
+    <!-- ACTIVITY TAB -->
     <section id="activityTab" class="hidden flex-1 pb-16">
       <header class="sticky top-0 bg-white px-4 py-3 border-b border-slate-100 flex items-center gap-3">
         <button onclick="switchTab('homeTab')" class="text-lg font-bold">←</button>
         <span class="font-bold text-base">Notifications</span>
       </header>
-      <div id="activityList" class="p-4 space-y-3 text-xs text-slate-600">
+      <div class="p-4 space-y-3 text-xs text-slate-600">
         <p>Welcome to ZestUp! Like, follow, and post to see updates here.</p>
       </div>
     </section>
 
-    <!-- BOTTOM NAVIGATION BAR (Exact 5 Instagram Icons) -->
-    <nav class="w-full max-w-md fixed bottom-0 z-50 bg-white border-t border-slate-200 px-6 py-2.5 flex items-center justify-between">
-      <!-- Home -->
+    <!-- BOTTOM NAVIGATION BAR -->
+    <nav class="w-full max-w-md fixed bottom-0 z-40 bg-white border-t border-slate-200 px-6 py-2.5 flex items-center justify-between">
       <button onclick="switchTab('homeTab')" class="nav-icon text-slate-900" data-tab="homeTab">
         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.1L1 12h3v9h7v-6h2v6h7v-9h3L12 2.1z"/></svg>
       </button>
-      <!-- Reels -->
       <button onclick="switchTab('reelsTab')" class="nav-icon text-slate-400" data-tab="reelsTab">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor"/></svg>
       </button>
-      <!-- Messages -->
       <button onclick="switchTab('chatTab')" class="nav-icon text-slate-400 relative" data-tab="chatTab">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
         <span class="w-2 h-2 bg-rose-500 rounded-full absolute -top-0.5 -right-0.5"></span>
       </button>
-      <!-- Search -->
       <button onclick="switchTab('searchTab')" class="nav-icon text-slate-400" data-tab="searchTab">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
       </button>
-      <!-- Profile Avatar -->
       <button onclick="switchTab('profileTab')" class="nav-icon" data-tab="profileTab">
         <img id="navAvatarImg" src="" class="w-6 h-6 rounded-full object-cover border border-slate-400" />
       </button>
     </nav>
   </div>
 
-  <!-- CREATE POST / STORY MODAL -->
+  <!-- CREATE MODAL -->
   <div id="createModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center">
     <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -268,12 +411,24 @@
     </div>
   </div>
 
+  <!-- FOUNDER ADMIN MODAL -->
+  <div id="adminModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-2xl p-5 max-h-[80vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="font-bold text-sm">🛡️ Manage Blue Verified Ticks</h3>
+        <button onclick="document.getElementById('adminModal').classList.add('hidden')" class="text-slate-400 font-bold">✕</button>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-2 mb-3">Tap "Give Blue Tick" to verify any user. Everyone on ZestUp will see their badge.</p>
+      <div id="adminUsersList" class="flex-1 overflow-y-auto space-y-2.5"></div>
+    </div>
+  </div>
+
   <!-- STORY VIEWER MODAL -->
   <div id="storyViewer" class="hidden fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 text-white">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
         <img id="storyUserImg" class="w-8 h-8 rounded-full object-cover" />
-        <span id="storyUserName" class="text-xs font-bold">User</span>
+        <span id="storyUserName" class="text-xs font-bold flex items-center gap-1">User</span>
       </div>
       <button onclick="document.getElementById('storyViewer').classList.add('hidden')" class="text-xl font-bold">✕</button>
     </div>
@@ -296,6 +451,9 @@
       measurementId: "G-BXLVG4MSCN"
     };
 
+    const FOUNDER_EMAIL = "akhtarhossain718@gmail.com";
+    const BLUE_TICK_SVG = `<svg class="inline-block w-3.5 h-3.5 text-[#0095F6] shrink-0" viewBox="0 0 40 40" fill="currentColor"><path d="M19.998 3.094 14.638 0l-2.972 5.15H5.432v6.354L0 14.64 3.094 20 0 25.359l5.432 3.137v5.905h5.975L14.638 40l5.36-3.094L25.358 40l3.232-5.6h6.162v-6.01L40 25.359 36.905 20 40 14.641l-5.248-3.03v-6.46h-6.419L25.358 0l-5.36 3.094Zm7.415 11.225 2.254 2.287-11.43 11.5-6.835-6.93 2.244-2.258 4.587 4.581 9.18-9.18Z"/></svg>`;
+
     const CLOUDINARY_CLOUD_NAME = "nnahwcuk";
     const CLOUDINARY_UPLOAD_PRESET = "zestup_upload";
 
@@ -306,12 +464,24 @@
     let isSignUp = false;
     let currentUser = null;
     let userProfileData = {};
+    let usersMap = {};
     let allPosts = [];
     let allStories = [];
     let createMode = 'post';
     let selectedFile = null;
+    let searchFilter = 'all';
 
     const defaultAvatar = (name) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'U')}&background=0ea5e9&color=fff&bold=true`;
+
+    function isUserVerified(uid) {
+      const u = usersMap[uid];
+      if (!u) return false;
+      return u.email === FOUNDER_EMAIL || u.isFounder === true || u.verified === true;
+    }
+
+    function getBadgeHTML(uid) {
+      return isUserVerified(uid) ? BLUE_TICK_SVG : '';
+    }
 
     window.switchTab = (tabId) => {
       ['homeTab', 'reelsTab', 'chatTab', 'searchTab', 'profileTab', 'activityTab'].forEach(id => {
@@ -322,6 +492,78 @@
         btn.classList.toggle('text-slate-900', active);
         btn.classList.toggle('text-slate-400', !active);
       });
+      if (tabId === 'searchTab') renderSearchAndExplore();
+    };
+
+    // Settings Controls
+    window.openSettings = () => document.getElementById('settingsPage').classList.remove('hidden');
+    window.closeSettings = () => document.getElementById('settingsPage').classList.add('hidden');
+
+    document.getElementById('settingsSearchInput').oninput = (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      document.querySelectorAll('.settings-item').forEach(item => {
+        item.classList.toggle('hidden', q && !item.textContent.toLowerCase().includes(q));
+      });
+    };
+
+    window.toggleSettingPref = async (key) => {
+      const currentVal = userProfileData[key] !== undefined ? userProfileData[key] : (key === 'isPrivate' ? false : true);
+      await updateDoc(doc(db, "users", currentUser.uid), { [key]: !currentVal });
+    };
+
+    window.openSubSetting = (type) => {
+      const modal = document.getElementById('subSettingModal');
+      const title = document.getElementById('subSettingTitle');
+      const body = document.getElementById('subSettingBody');
+      modal.classList.remove('hidden');
+
+      if (type === 'saved') {
+        title.textContent = "Saved Posts";
+        const savedIds = userProfileData.savedPosts || [];
+        const savedPosts = allPosts.filter(p => savedIds.includes(p.id));
+        body.innerHTML = savedPosts.length
+          ? `<div class="grid grid-cols-3 gap-1">${savedPosts.map(p => p.mediaUrl ? `<img src="${p.mediaUrl}" class="aspect-square object-cover rounded" />` : `<div class="aspect-square bg-slate-100 p-2 text-xs flex items-center justify-center text-center">${p.text}</div>`).join('')}</div>`
+          : `<p class="text-slate-400 text-center py-12">No saved posts yet. Tap the bookmark icon on any post to save it here.</p>`;
+      } else if (type === 'dashboard') {
+        title.textContent = "Professional dashboard";
+        const myPosts = allPosts.filter(p => p.authorId === currentUser.uid);
+        const totalLikes = myPosts.reduce((s, p) => s + (p.likes?.length || 0), 0);
+        const totalComments = myPosts.reduce((s, p) => s + (p.comments?.length || 0), 0);
+        body.innerHTML = `
+          <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
+            <p class="font-bold text-base">Account Insights (Last 30 Days)</p>
+            <div class="grid grid-cols-3 gap-2 text-center">
+              <div class="bg-white p-3 rounded-xl border border-slate-100"><p class="font-bold text-lg text-sky-500">${myPosts.length}</p><p class="text-[11px] text-slate-500">Posts</p></div>
+              <div class="bg-white p-3 rounded-xl border border-slate-100"><p class="font-bold text-lg text-rose-500">${totalLikes}</p><p class="text-[11px] text-slate-500">Likes</p></div>
+              <div class="bg-white p-3 rounded-xl border border-slate-100"><p class="font-bold text-lg text-emerald-500">${totalComments}</p><p class="text-[11px] text-slate-500">Comments</p></div>
+            </div>
+          </div>`;
+      } else if (type === 'profilestatus') {
+        title.textContent = "Profile status";
+        const verified = isUserVerified(currentUser.uid);
+        body.innerHTML = `
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
+            <p class="font-bold flex items-center gap-1.5">${userProfileData.name || 'User'} ${verified ? BLUE_TICK_SVG : ''}</p>
+            <p class="text-xs text-emerald-600 font-semibold">✔ Your account is in good standing and meets all ZestUp community guidelines.</p>
+            <p class="text-xs text-slate-500">Verification status: <strong>${verified ? 'Verified Creator ✔' : 'Standard Account'}</strong></p>
+          </div>`;
+      } else if (type === 'about') {
+        title.textContent = "About ZestUp";
+        body.innerHTML = `
+          <div class="p-4 rounded-2xl bg-slate-50 space-y-2 text-xs text-slate-600">
+            <p class="font-bold text-base text-slate-900">ZestUp v5.0</p>
+            <p>Created & Founded by <strong>Akhtar Hossain</strong>.</p>
+            <p>Share photos, reels, stories, and connect with your community in real time.</p>
+          </div>`;
+      } else if (type === 'activity') {
+        title.textContent = "Your activity";
+        const likedPosts = allPosts.filter(p => (p.likes || []).includes(currentUser.uid));
+        body.innerHTML = `<p class="text-xs text-slate-500 mb-2">Posts you liked (${likedPosts.length})</p>` +
+          (likedPosts.length ? likedPosts.map(p => `<div class="p-3 bg-slate-50 rounded-xl text-xs">❤️ Liked <strong>${p.authorName}</strong>'s post: "${p.text || 'Media post'}"</div>`).join('') : `<p class="text-xs text-slate-400">No recent activity.</p>`);
+      } else {
+        title.textContent = "Settings Info";
+        body.innerHTML = `<p class="text-xs text-slate-500 py-8 text-center">All preferences are synced automatically to your ZestUp account.</p>`;
+      }
     };
 
     window.openCreateModal = (mode = 'post') => {
@@ -336,7 +578,7 @@
       document.getElementById('previewContainer').classList.add('hidden');
     };
 
-    // Auth Logic
+    // Auth
     document.getElementById('toggleAuthBtn').onclick = () => {
       isSignUp = !isSignUp;
       document.getElementById('authSubtitle').textContent = isSignUp ? "Sign up to see photos and videos from your friends." : "Sign in to see photos and videos from your friends.";
@@ -347,7 +589,7 @@
     };
 
     document.getElementById('authSubmitBtn').onclick = async () => {
-      const email = document.getElementById('emailInput').value.trim();
+      const email = document.getElementById('emailInput').value.trim().toLowerCase();
       const password = document.getElementById('passwordInput').value.trim();
       const name = document.getElementById('userNameInput').value.trim();
       const errEl = document.getElementById('authError');
@@ -357,14 +599,15 @@
         if (isSignUp) {
           const cred = await createUserWithEmailAndPassword(auth, email, password);
           const displayName = name || email.split('@')[0];
+          const isFounder = (email === FOUNDER_EMAIL);
           await updateProfile(cred.user, { displayName });
           await setDoc(doc(db, "users", cred.user.uid), {
-            name: displayName,
+            uid: cred.user.uid, email, name: displayName,
             username: email.split('@')[0].toLowerCase(),
             bio: "Digital Creator on ZestUp ✨",
             avatar: defaultAvatar(displayName),
-            followers: [],
-            following: []
+            verified: isFounder, isFounder,
+            followers: [], following: [], savedPosts: []
           });
         } else {
           await signInWithEmailAndPassword(auth, email, password);
@@ -375,48 +618,147 @@
       }
     };
 
-    document.getElementById('logoutBtn').onclick = () => signOut(auth);
+    document.getElementById('logoutBtn').onclick = () => {
+      closeSettings();
+      signOut(auth);
+    };
 
     onAuthStateChanged(auth, async (user) => {
       currentUser = user;
       document.getElementById('authSection').classList.toggle('hidden', !!user);
       document.getElementById('appShell').classList.toggle('hidden', !user);
       if (user) {
+        const email = (user.email || "").toLowerCase();
+        const isFounder = (email === FOUNDER_EMAIL);
         const userRef = doc(db, "users", user.uid);
         const snap = await getDoc(userRef);
+
         if (!snap.exists()) {
-          const displayName = user.displayName || user.email.split('@')[0];
+          const displayName = user.displayName || email.split('@')[0];
           await setDoc(userRef, {
-            name: displayName,
-            username: user.email.split('@')[0].toLowerCase(),
+            uid: user.uid, email, name: displayName,
+            username: email.split('@')[0].toLowerCase(),
             bio: "Digital Creator on ZestUp ✨",
             avatar: defaultAvatar(displayName),
-            followers: [],
-            following: []
+            verified: isFounder, isFounder,
+            followers: [], following: [], savedPosts: []
           });
+        } else if (isFounder && !snap.data().isFounder) {
+          await updateDoc(userRef, { verified: true, isFounder: true, email });
         }
-        onSnapshot(userRef, (docSnap) => {
-          userProfileData = docSnap.data() || {};
-          updateProfileUI();
-        });
+
+        if (isFounder) document.getElementById('adminPanelBtn').classList.remove('hidden');
         initRealtimeListeners();
       }
     });
 
+    function initRealtimeListeners() {
+      onSnapshot(collection(db, "users"), (snap) => {
+        usersMap = {};
+        snap.forEach(d => usersMap[d.id] = { uid: d.id, ...d.data() });
+        userProfileData = usersMap[currentUser.uid] || {};
+        updateProfileUI();
+        renderFeed();
+        renderStories();
+        renderSearchAndExplore();
+        renderAdminUsersList();
+      });
+
+      onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "desc")), (snap) => {
+        allPosts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderFeed();
+        renderReels();
+        renderSearchAndExplore();
+        renderProfileGrid();
+        updateDashboardStats();
+      });
+
+      onSnapshot(query(collection(db, "stories"), orderBy("createdAt", "desc")), (snap) => {
+        allStories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderStories();
+      });
+
+      onSnapshot(query(collection(db, "messages"), orderBy("createdAt", "asc")), (snap) => {
+        const box = document.getElementById('chatMessages');
+        box.innerHTML = "";
+        snap.forEach(d => {
+          const m = d.data();
+          const isMe = m.senderId === currentUser.uid;
+          const badge = getBadgeHTML(m.senderId);
+          box.innerHTML += `
+            <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+              <span class="text-[10px] text-slate-500 mb-0.5 px-1 flex items-center gap-1">${m.senderName} ${badge}</span>
+              <div class="px-3.5 py-2 rounded-2xl text-xs max-w-[75%] ${isMe ? 'bg-sky-500 text-white' : 'bg-white border border-slate-200 text-slate-800'}">${m.text}</div>
+            </div>`;
+        });
+        box.scrollTop = box.scrollHeight;
+      });
+    }
+
+    function updateDashboardStats() {
+      const myPosts = allPosts.filter(p => p.authorId === currentUser.uid);
+      const totalEngagements = myPosts.reduce((s, p) => s + (p.likes?.length || 0) + (p.comments?.length || 0), 0);
+      document.getElementById('dashboardSummaryText').textContent = `↗ ${totalEngagements} engagements in the last 30 days.`;
+    }
+
     function updateProfileUI() {
       const name = userProfileData.name || currentUser.displayName || "User";
       const avatar = userProfileData.avatar || defaultAvatar(name);
+      const badge = getBadgeHTML(currentUser.uid);
+
       document.getElementById('profUsernameTop').textContent = userProfileData.username || name.toLowerCase().replace(/\s+/g, '_');
-      document.getElementById('profFullName').innerHTML = `${name} <span class="text-sky-500 text-xs">✔</span>`;
+      document.getElementById('profTopBadge').innerHTML = badge;
+      document.getElementById('profFullName').innerHTML = `${name} ${badge}`;
       document.getElementById('profBio').textContent = userProfileData.bio || "Digital Creator on ZestUp ✨";
       document.getElementById('profAvatarImg').src = avatar;
       document.getElementById('navAvatarImg').src = avatar;
       document.getElementById('statFollowers').textContent = (userProfileData.followers || []).length;
       document.getElementById('statFollowing').textContent = (userProfileData.following || []).length;
-      document.getElementById('chatHeaderUser').textContent = userProfileData.username || name;
+      document.getElementById('chatHeaderUser').innerHTML = `${userProfileData.username || name} ${badge}`;
+
+      // Sync Settings Badges
+      document.getElementById('savedCountBadge').textContent = `${(userProfileData.savedPosts || []).length} ›`;
+      document.getElementById('pref_isPrivate').textContent = userProfileData.isPrivate ? 'Private ›' : 'Public ›';
+      document.getElementById('pref_allowComments').textContent = userProfileData.allowComments === false ? 'Off ›' : 'Everyone ›';
+      document.getElementById('pref_allowSharing').textContent = userProfileData.allowSharing === false ? 'Off ›' : 'On ›';
+      document.getElementById('pref_notificationsEnabled').textContent = userProfileData.notificationsEnabled === false ? 'Off ›' : 'On ›';
+      document.getElementById('pref_highQualityMedia').textContent = userProfileData.highQualityMedia === false ? 'Data Saver ›' : 'HD ›';
     }
 
-    // Edit Profile
+    window.openAdminModal = () => {
+      renderAdminUsersList();
+      document.getElementById('adminModal').classList.remove('hidden');
+    };
+
+    function renderAdminUsersList() {
+      const list = document.getElementById('adminUsersList');
+      if (!list) return;
+      list.innerHTML = Object.values(usersMap).map(u => {
+        const isFounder = u.email === FOUNDER_EMAIL || u.isFounder;
+        const verified = isUserVerified(u.uid);
+        return `
+          <div class="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-100">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <img src="${u.avatar || defaultAvatar(u.name)}" class="w-9 h-9 rounded-full object-cover shrink-0" />
+              <div class="truncate">
+                <p class="text-xs font-bold flex items-center gap-1 truncate">${u.name || u.username} ${verified ? BLUE_TICK_SVG : ''}</p>
+                <p class="text-[10px] text-slate-400 truncate">@${u.username || ''}</p>
+              </div>
+            </div>
+            ${isFounder
+              ? `<span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-sky-100 text-sky-700 shrink-0">Founder</span>`
+              : `<button data-uid="${u.uid}" data-verified="${verified}" class="toggle-verify-btn text-[11px] font-bold px-3 py-1.5 rounded-lg shrink-0 ${verified ? 'bg-rose-100 text-rose-600' : 'bg-sky-500 text-white'}">${verified ? 'Remove' : 'Give Blue Tick'}</button>`
+            }
+          </div>`;
+      }).join('');
+
+      list.querySelectorAll('.toggle-verify-btn').forEach(btn => {
+        btn.onclick = async () => {
+          await updateDoc(doc(db, "users", btn.dataset.uid), { verified: btn.dataset.verified !== 'true' });
+        };
+      });
+    }
+
     window.openEditProfile = () => {
       document.getElementById('editNameInput').value = userProfileData.name || "";
       document.getElementById('editBioInput').value = userProfileData.bio || "";
@@ -454,7 +796,6 @@
       return data.secure_url || "";
     }
 
-    // Media Preview
     document.getElementById('mediaInput').onchange = (e) => {
       selectedFile = e.target.files[0];
       if (selectedFile) {
@@ -467,7 +808,6 @@
       document.getElementById('previewContainer').classList.add('hidden');
     };
 
-    // Publish Post or Story
     document.getElementById('publishBtn').onclick = async () => {
       const text = document.getElementById('postText').value.trim();
       if (!text && !selectedFile) return;
@@ -510,39 +850,6 @@
       }
     };
 
-    function initRealtimeListeners() {
-      // Posts
-      onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "desc")), (snap) => {
-        allPosts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderFeed();
-        renderReels();
-        renderExplore();
-        renderProfileGrid();
-      });
-
-      // Stories
-      onSnapshot(query(collection(db, "stories"), orderBy("createdAt", "desc")), (snap) => {
-        allStories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderStories();
-      });
-
-      // Global Direct Chat
-      onSnapshot(query(collection(db, "messages"), orderBy("createdAt", "asc")), (snap) => {
-        const box = document.getElementById('chatMessages');
-        box.innerHTML = "";
-        snap.forEach(d => {
-          const m = d.data();
-          const isMe = m.senderId === currentUser.uid;
-          box.innerHTML += `
-            <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
-              <span class="text-[10px] text-slate-400 mb-0.5 px-1">${m.senderName}</span>
-              <div class="px-3.5 py-2 rounded-2xl text-xs max-w-[75%] ${isMe ? 'bg-sky-500 text-white' : 'bg-white border border-slate-200 text-slate-800'}">${m.text}</div>
-            </div>`;
-        });
-        box.scrollTop = box.scrollHeight;
-      });
-    }
-
     document.getElementById('sendChatBtn').onclick = async () => {
       const input = document.getElementById('chatInput');
       const text = input.value.trim();
@@ -568,16 +875,21 @@
         </div>`;
 
       allStories.forEach(s => {
+        const u = usersMap[s.authorId] || {};
+        const name = u.username || s.authorName;
+        const avatar = u.avatar || s.authorAvatar || defaultAvatar(name);
+        const badge = getBadgeHTML(s.authorId);
+
         const el = document.createElement('div');
         el.className = "flex flex-col items-center gap-1 shrink-0 cursor-pointer";
         el.innerHTML = `
           <div class="story-ring rounded-full">
-            <img src="${s.authorAvatar || defaultAvatar(s.authorName)}" class="w-15 h-15 w-[60px] h-[60px] rounded-full object-cover border-2 border-white" />
+            <img src="${avatar}" class="w-[60px] h-[60px] rounded-full object-cover border-2 border-white" />
           </div>
-          <span class="text-[11px] text-slate-800 max-w-[66px] truncate">${s.authorName}</span>`;
+          <span class="text-[11px] text-slate-800 max-w-[70px] truncate flex items-center gap-0.5">${name} ${badge}</span>`;
         el.onclick = () => {
-          document.getElementById('storyUserImg').src = s.authorAvatar || defaultAvatar(s.authorName);
-          document.getElementById('storyUserName').textContent = s.authorName;
+          document.getElementById('storyUserImg').src = avatar;
+          document.getElementById('storyUserName').innerHTML = `${name} ${badge}`;
           document.getElementById('storyFullImg').src = s.mediaUrl;
           document.getElementById('storyCaption').textContent = s.caption || "";
           document.getElementById('storyViewer').classList.remove('hidden');
@@ -595,7 +907,12 @@
       }
 
       allPosts.forEach(post => {
+        const u = usersMap[post.authorId] || {};
+        const authorName = u.username || post.authorName;
+        const authorAvatar = u.avatar || post.authorAvatar || defaultAvatar(authorName);
+        const badge = getBadgeHTML(post.authorId);
         const isLiked = post.likes?.includes(currentUser.uid);
+        const isSaved = (userProfileData.savedPosts || []).includes(post.id);
         const isFollowing = (userProfileData.following || []).includes(post.authorId);
         const isMine = post.authorId === currentUser.uid;
 
@@ -605,15 +922,15 @@
           <div class="flex items-center justify-between px-3 py-2.5">
             <div class="flex items-center gap-2.5">
               <div class="story-ring rounded-full p-[1.5px]">
-                <img src="${post.authorAvatar || defaultAvatar(post.authorName)}" class="w-8 h-8 rounded-full object-cover border border-white" />
+                <img src="${authorAvatar}" class="w-8 h-8 rounded-full object-cover border border-white" />
               </div>
               <div>
-                <p class="text-xs font-bold leading-tight">${post.authorName}</p>
+                <p class="text-xs font-bold leading-tight flex items-center gap-1">${authorName} ${badge}</p>
                 <p class="text-[10px] text-slate-400">Suggested for you</p>
               </div>
             </div>
             <div class="flex items-center gap-2">
-              ${!isMine ? `<button data-uid="${post.authorId}" class="follow-btn text-xs font-semibold px-3 py-1 rounded-lg ${isFollowing ? 'bg-slate-100 text-slate-700' : 'bg-slate-100 text-sky-600'}">${isFollowing ? 'Following' : 'Follow'}</button>` : ''}
+              ${!isMine ? `<button data-uid="${post.authorId}" class="follow-btn text-xs font-semibold px-3 py-1 rounded-lg ${isFollowing ? 'bg-slate-100 text-slate-700' : 'bg-sky-500 text-white'}">${isFollowing ? 'Following' : 'Follow'}</button>` : ''}
               ${isMine ? `<button data-id="${post.id}" class="del-btn text-xs text-rose-500 px-1">•••</button>` : ''}
             </div>
           </div>
@@ -623,15 +940,21 @@
             : `<img src="${post.mediaUrl}" class="w-full max-h-[480px] object-cover bg-slate-100" />`) : ''}
 
           <div class="px-3 pt-2.5 space-y-1.5">
-            <div class="flex items-center gap-4">
-              <button data-id="${post.id}" data-liked="${isLiked}" class="like-btn text-xl">${isLiked ? '❤️' : '🤍'}</button>
-              <span class="text-lg">💬</span>
-              <span class="text-lg">✈️</span>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <button data-id="${post.id}" data-liked="${isLiked}" class="like-btn text-xl">${isLiked ? '❤️' : '🤍'}</button>
+                <span class="text-lg">💬</span>
+                <span class="text-lg">✈️</span>
+              </div>
+              <button data-id="${post.id}" data-saved="${isSaved}" class="save-btn text-lg" title="Save">${isSaved ? '🔖' : '📑'}</button>
             </div>
             <p class="text-xs font-bold">${(post.likes || []).length} likes</p>
-            ${post.text ? `<p class="text-xs"><span class="font-bold mr-1">${post.authorName}</span>${post.text}</p>` : ''}
+            ${post.text ? `<p class="text-xs"><span class="font-bold mr-1 inline-flex items-center gap-0.5">${authorName} ${badge}</span>${post.text}</p>` : ''}
             <div class="space-y-1 pt-1">
-              ${(post.comments || []).map(c => `<p class="text-xs text-slate-700"><span class="font-bold">${c.user}</span> ${c.text}</p>`).join('')}
+              ${(post.comments || []).map(c => {
+                const cBadge = c.uid ? getBadgeHTML(c.uid) : '';
+                return `<p class="text-xs text-slate-700"><span class="font-bold inline-flex items-center gap-0.5">${c.user} ${cBadge}</span> ${c.text}</p>`;
+              }).join('')}
               <div class="flex items-center gap-2 pt-1">
                 <input type="text" placeholder="Add a comment..." class="comment-input flex-1 text-xs py-1 focus:outline-none" />
                 <button data-id="${post.id}" class="comment-btn text-xs font-bold text-sky-500">Post</button>
@@ -641,12 +964,20 @@
         feed.appendChild(card);
       });
 
-      // Attach Events
       feed.querySelectorAll('.like-btn').forEach(btn => {
         btn.onclick = async () => {
           const liked = btn.dataset.liked === 'true';
           await updateDoc(doc(db, "posts", btn.dataset.id), {
             likes: liked ? arrayRemove(currentUser.uid) : arrayUnion(currentUser.uid)
+          });
+        };
+      });
+
+      feed.querySelectorAll('.save-btn').forEach(btn => {
+        btn.onclick = async () => {
+          const saved = btn.dataset.saved === 'true';
+          await updateDoc(doc(db, "users", currentUser.uid), {
+            savedPosts: saved ? arrayRemove(btn.dataset.id) : arrayUnion(btn.dataset.id)
           });
         };
       });
@@ -669,7 +1000,11 @@
           const input = btn.previousElementSibling;
           if (!input.value.trim()) return;
           await updateDoc(doc(db, "posts", btn.dataset.id), {
-            comments: arrayUnion({ user: userProfileData.username || userProfileData.name, text: input.value.trim() })
+            comments: arrayUnion({
+              uid: currentUser.uid,
+              user: userProfileData.username || userProfileData.name,
+              text: input.value.trim()
+            })
           });
           input.value = "";
         };
@@ -686,25 +1021,91 @@
       const container = document.getElementById('reelsContainer');
       const videos = allPosts.filter(p => p.mediaType === 'video' && p.mediaUrl);
       if (!videos.length) return;
-      container.innerHTML = videos.map(v => `
-        <div class="relative rounded-2xl overflow-hidden bg-slate-900">
-          <video src="${v.mediaUrl}" controls loop playsinline class="w-full h-[72vh] object-cover"></video>
-          <div class="p-3 bg-gradient-to-t from-black/90 to-transparent absolute bottom-0 inset-x-0">
-            <p class="text-xs font-bold">@${v.authorName}</p>
-            <p class="text-xs text-slate-200 mt-0.5">${v.text || ''}</p>
-          </div>
-        </div>`).join('');
+      container.innerHTML = videos.map(v => {
+        const u = usersMap[v.authorId] || {};
+        const badge = getBadgeHTML(v.authorId);
+        return `
+          <div class="relative rounded-2xl overflow-hidden bg-slate-900">
+            <video src="${v.mediaUrl}" controls loop playsinline class="w-full h-[72vh] object-cover"></video>
+            <div class="p-3 bg-gradient-to-t from-black/90 to-transparent absolute bottom-0 inset-x-0">
+              <p class="text-xs font-bold flex items-center gap-1">@${u.username || v.authorName} ${badge}</p>
+              <p class="text-xs text-slate-200 mt-0.5">${v.text || ''}</p>
+            </div>
+          </div>`;
+      }).join('');
     }
 
-    function renderExplore(term = "") {
+    window.setSearchFilter = (type) => {
+      searchFilter = type;
+      document.getElementById('filterAllBtn').className = type === 'all' ? 'px-3 py-1 rounded-lg bg-slate-900 text-white' : 'px-3 py-1 rounded-lg bg-slate-100 text-slate-700';
+      document.getElementById('filterAccountsBtn').className = type === 'accounts' ? 'px-3 py-1 rounded-lg bg-slate-900 text-white' : 'px-3 py-1 rounded-lg bg-slate-100 text-slate-700';
+      renderSearchAndExplore();
+    };
+
+    function renderSearchAndExplore() {
+      const term = (document.getElementById('searchInput')?.value || "").toLowerCase().trim();
+      const accountsBox = document.getElementById('searchAccountsBox');
       const grid = document.getElementById('exploreGrid');
-      const filtered = allPosts.filter(p => p.mediaUrl && (!term || (p.text || "").toLowerCase().includes(term) || (p.authorName || "").toLowerCase().includes(term)));
-      grid.innerHTML = filtered.map(p => p.mediaType === 'video'
-        ? `<video src="${p.mediaUrl}" class="aspect-square w-full object-cover bg-black"></video>`
-        : `<img src="${p.mediaUrl}" class="aspect-square w-full object-cover bg-slate-100" />`).join('');
+
+      const matchedUsers = Object.values(usersMap)
+        .filter(u => !term || (u.name || "").toLowerCase().includes(term) || (u.username || "").toLowerCase().includes(term))
+        .sort((a, b) => {
+          const aFounder = (a.email === FOUNDER_EMAIL || a.isFounder) ? 100 : 0;
+          const bFounder = (b.email === FOUNDER_EMAIL || b.isFounder) ? 100 : 0;
+          if (aFounder !== bFounder) return bFounder - aFounder;
+          const aVer = isUserVerified(a.uid) ? 50 : 0;
+          const bVer = isUserVerified(b.uid) ? 50 : 0;
+          if (aVer !== bVer) return bVer - aVer;
+          return (b.followers?.length || 0) - (a.followers?.length || 0);
+        });
+
+      if (term || searchFilter === 'accounts') {
+        accountsBox.innerHTML = matchedUsers.map(u => {
+          const badge = getBadgeHTML(u.uid);
+          const isMe = u.uid === currentUser.uid;
+          const isFollowing = (userProfileData.following || []).includes(u.uid);
+          return `
+            <div class="flex items-center justify-between px-4 py-3 bg-white">
+              <div class="flex items-center gap-3">
+                <div class="story-ring rounded-full p-[1.5px]">
+                  <img src="${u.avatar || defaultAvatar(u.name)}" class="w-11 h-11 rounded-full object-cover border border-white" />
+                </div>
+                <div>
+                  <p class="text-xs font-bold flex items-center gap-1">${u.username || u.name} ${badge}</p>
+                  <p class="text-[11px] text-slate-500">${u.name || ''} • ${(u.followers || []).length} followers</p>
+                </div>
+              </div>
+              ${!isMe ? `<button data-uid="${u.uid}" class="search-follow-btn text-xs font-semibold px-4 py-1.5 rounded-lg ${isFollowing ? 'bg-slate-100 text-slate-800' : 'bg-sky-500 text-white'}">${isFollowing ? 'Following' : 'Follow'}</button>` : ''}
+            </div>`;
+        }).join('');
+
+        accountsBox.querySelectorAll('.search-follow-btn').forEach(btn => {
+          btn.onclick = async () => {
+            const targetId = btn.dataset.uid;
+            const following = (userProfileData.following || []).includes(targetId);
+            await updateDoc(doc(db, "users", currentUser.uid), {
+              following: following ? arrayRemove(targetId) : arrayUnion(targetId)
+            });
+            await updateDoc(doc(db, "users", targetId), {
+              followers: following ? arrayRemove(currentUser.uid) : arrayUnion(currentUser.uid)
+            });
+          };
+        });
+      } else {
+        accountsBox.innerHTML = "";
+      }
+
+      if (searchFilter === 'accounts') {
+        grid.innerHTML = "";
+      } else {
+        const filteredPosts = allPosts.filter(p => p.mediaUrl && (!term || (p.text || "").toLowerCase().includes(term) || (p.authorName || "").toLowerCase().includes(term)));
+        grid.innerHTML = filteredPosts.map(p => p.mediaType === 'video'
+          ? `<video src="${p.mediaUrl}" class="aspect-square w-full object-cover bg-black"></video>`
+          : `<img src="${p.mediaUrl}" class="aspect-square w-full object-cover bg-slate-100" />`).join('');
+      }
     }
 
-    document.getElementById('searchInput').oninput = (e) => renderExplore(e.target.value.toLowerCase().trim());
+    document.getElementById('searchInput').oninput = () => renderSearchAndExplore();
 
     function renderProfileGrid() {
       const myPosts = allPosts.filter(p => p.authorId === currentUser.uid);
