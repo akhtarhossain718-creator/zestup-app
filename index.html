@@ -17,14 +17,21 @@
     .ring-none { background: #e2e8f0; padding: 1.5px; border-radius: 9999px; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .filter-none { filter: none; }
+    .filter-vivid { filter: saturate(1.5) contrast(1.1); }
+    .filter-warm { filter: sepia(0.35) saturate(1.3); }
+    .filter-cool { filter: hue-rotate(15deg) saturate(1.15) brightness(1.05); }
+    .filter-vintage { filter: sepia(0.6) contrast(0.95) brightness(0.95); }
+    .filter-bw { filter: grayscale(1) contrast(1.2); }
+    .filter-glow { filter: brightness(1.12) contrast(1.08) drop-shadow(0 0 8px rgba(236,72,153,0.4)); }
   </style>
 </head>
 <body class="min-h-screen flex flex-col items-center bg-slate-50 text-slate-900">
 
-  <!-- AUTH SCREEN (Hidden on load to prevent login flash) -->
-  <main id="authSection" class="hidden w-full max-w-md px-5 py-10 flex-1 flex flex-col justify-center bg-white min-h-screen">
-    <div class="border border-slate-200/80 rounded-3xl p-7 shadow-sm bg-white">
-      <div class="flex flex-col items-center mb-5">
+  <!-- 1. AUTH SCREEN (Separate Sign Up & Log In with Mobile/Gmail + OTP + Password) -->
+  <main id="authSection" class="hidden w-full max-w-md px-5 py-8 flex-1 flex flex-col justify-center bg-white min-h-screen">
+    <div class="border border-slate-200/80 rounded-3xl p-6 shadow-sm bg-white">
+      <div class="flex flex-col items-center mb-4">
         <svg class="w-16 h-16 mb-2 shadow-md rounded-full" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="zLogoGrad" x1="0" y1="120" x2="120" y2="0" gradientUnits="userSpaceOnUse">
@@ -39,39 +46,64 @@
           <path d="M46 46H74L46 74H74" stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <h1 class="text-3xl font-extrabold tracking-tight zest-text-gradient">ZestUp</h1>
-        <p class="text-xs text-slate-500 mt-1 text-center">Share moments, reels & connect via OTP</p>
+        <p class="text-xs text-slate-500 mt-1 text-center">Create account or log in securely</p>
       </div>
 
-      <div class="grid grid-cols-2 bg-slate-100 p-1 rounded-xl mb-4 text-xs font-bold">
-        <button id="tabGmailAuth" onclick="setAuthMethod('gmail')" class="py-2 rounded-lg bg-white text-indigo-600 shadow-sm">Gmail + OTP</button>
-        <button id="tabPhoneAuth" onclick="setAuthMethod('phone')" class="py-2 rounded-lg text-slate-500">Mobile + OTP</button>
+      <!-- Mode Switch: Log In vs Sign Up -->
+      <div class="grid grid-cols-2 bg-slate-100 p-1 rounded-xl mb-3 text-xs font-extrabold">
+        <button id="modeLoginBtn" onclick="setAuthMode('login')" class="py-2 rounded-lg bg-white text-indigo-600 shadow-sm">Log In</button>
+        <button id="modeSignupBtn" onclick="setAuthMode('signup')" class="py-2 rounded-lg text-slate-500">Sign Up (New)</button>
       </div>
 
-      <div class="space-y-3">
-        <input id="authFullName" type="text" placeholder="Full Name (for new account)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
+      <!-- Channel Switch: Mobile vs Gmail -->
+      <div class="flex items-center justify-center gap-4 mb-3 text-xs font-bold border-b border-slate-100 pb-2">
+        <button id="channelPhoneBtn" onclick="setAuthChannel('phone')" class="text-indigo-600 border-b-2 border-indigo-600 pb-1">📱 Mobile Number</button>
+        <button id="channelGmailBtn" onclick="setAuthChannel('gmail')" class="text-slate-400 pb-1">✉️ Gmail</button>
+      </div>
 
-        <div id="gmailInputBox" class="space-y-2.5">
+      <div class="space-y-2.5">
+        <!-- Sign Up Full Name -->
+        <input id="authFullName" type="text" placeholder="Full Name" class="hidden w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
+
+        <!-- Mobile Input -->
+        <div id="phoneInputBox" class="flex gap-2">
+          <span class="px-3 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-sm font-semibold text-slate-700">+91</span>
+          <input id="phoneInput" type="tel" maxlength="10" placeholder="10-digit Mobile Number" class="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
+        </div>
+
+        <!-- Gmail Input -->
+        <div id="gmailInputBox" class="hidden">
           <input id="emailInput" type="email" placeholder="Enter your Gmail (e.g. name@gmail.com)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
-          <input id="passwordInput" type="password" placeholder="Password (min 6 chars)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
         </div>
 
-        <div id="phoneInputBox" class="hidden space-y-2.5">
-          <div class="flex gap-2">
-            <span class="px-3 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-sm font-semibold text-slate-700">+91</span>
-            <input id="phoneInput" type="tel" maxlength="10" placeholder="10-digit Mobile Number" class="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
+        <!-- Login Sub-method Toggle (Password vs OTP) -->
+        <div id="loginMethodRow" class="flex items-center justify-between text-[11px] px-1">
+          <span class="text-slate-500">Login via:</span>
+          <div class="flex gap-3 font-bold">
+            <button id="loginViaPassBtn" onclick="setLoginSubType('password')" class="text-indigo-600 underline">Password</button>
+            <button id="loginViaOtpBtn" onclick="setLoginSubType('otp')" class="text-slate-400">OTP</button>
           </div>
-          <div id="recaptcha-container"></div>
         </div>
 
+        <!-- Password Field (Used for Login-Password OR SignUp Create New Password) -->
+        <div id="passwordFieldBox">
+          <input id="passwordInput" type="password" placeholder="Enter Password" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
+        </div>
+
+        <!-- OTP Field -->
         <div id="otpBox" class="hidden space-y-2 pt-1">
-          <p id="otpHintText" class="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg">Enter the 6-digit OTP sent to you</p>
+          <p id="otpHintText" class="text-[11px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-2 rounded-xl text-center"></p>
           <input id="otpCodeInput" type="text" maxlength="6" placeholder="Enter 6-digit OTP" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-indigo-300 text-center tracking-[0.4em] font-bold text-base focus:outline-none" />
         </div>
 
-        <p id="authError" class="text-xs text-rose-500 hidden"></p>
+        <p id="authError" class="text-xs text-rose-500 font-medium hidden"></p>
 
-        <button id="sendOtpBtn" class="w-full py-2.5 rounded-xl zest-gradient font-bold text-white text-sm shadow-sm">Send OTP</button>
-        <button id="verifyOtpBtn" class="hidden w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-bold text-white text-sm shadow-sm">Verify OTP & Continue</button>
+        <button id="primaryAuthBtn" class="w-full py-2.5 rounded-xl zest-gradient font-bold text-white text-sm shadow-sm">Log In</button>
+        <button id="verifyOtpAuthBtn" class="hidden w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-bold text-white text-sm shadow-sm">Verify OTP & Continue</button>
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-slate-100 flex justify-center">
+        <button onclick="openHelpAiModal()" class="text-xs font-bold text-indigo-600 flex items-center gap-1">🤖 Need help? Ask ZestUp Help AI</button>
       </div>
     </div>
   </main>
@@ -93,7 +125,7 @@
         </div>
         <button onclick="switchTab('activityTab')" class="relative p-1.5 rounded-xl hover:bg-slate-100">
           <svg class="w-6 h-6 text-slate-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-          <span class="w-2 h-2 bg-pink-500 rounded-full absolute top-1.5 right-1.5"></span>
+          <span id="notifDot" class="w-2 h-2 bg-pink-500 rounded-full absolute top-1.5 right-1.5"></span>
         </button>
       </header>
 
@@ -116,7 +148,7 @@
       </div>
     </section>
 
-    <!-- 3. MESSAGES / DM INBOX TAB -->
+    <!-- 3. MESSAGES / DM INBOX TAB (Only Active Conversations + Search) -->
     <section id="chatTab" class="hidden flex-1 flex flex-col pb-16 min-h-screen bg-white">
       <header class="sticky top-0 z-40 bg-white px-4 py-3 flex items-center justify-between border-b border-slate-100">
         <button onclick="switchTab('profileTab')" class="p-1 text-slate-800">
@@ -134,20 +166,22 @@
 
       <div class="px-4 pt-3 pb-2">
         <div class="relative">
-          <input id="dmSearchInput" type="text" placeholder="Search messages or people..." class="w-full bg-slate-100 text-xs pl-9 pr-4 py-2.5 rounded-2xl focus:outline-none" />
+          <input id="dmSearchInput" type="text" placeholder="Search people to message..." class="w-full bg-slate-100 text-xs pl-9 pr-4 py-2.5 rounded-2xl focus:outline-none" />
           <span class="absolute left-3.5 top-2.5 text-slate-400 text-xs">🔍</span>
         </div>
       </div>
 
+      <!-- Notes Row (Only people you follow or chatted with) -->
       <div id="dmNotesRow" class="flex items-center gap-4 px-4 py-2.5 overflow-x-auto no-scrollbar"></div>
 
+      <!-- Filter Pills -->
       <div class="flex items-center gap-2 px-4 py-2 overflow-x-auto no-scrollbar border-b border-slate-100">
         <button onclick="setDmFilter('Primary')" class="dm-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shrink-0" data-filter="Primary">Primary</button>
-        <button onclick="setDmFilter('General')" class="dm-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 shrink-0" data-filter="General">General</button>
         <button onclick="setDmFilter('Followers')" class="dm-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 shrink-0" data-filter="Followers">Followers</button>
         <button onclick="setDmFilter('Verified')" class="dm-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 shrink-0" data-filter="Verified">Verified profiles</button>
       </div>
 
+      <!-- Conversation List (Only users who sent/received messages, unless searching) -->
       <div id="dmThreadsList" class="flex-1 divide-y divide-slate-50"></div>
     </section>
 
@@ -156,10 +190,13 @@
       <header class="sticky top-0 bg-white px-4 py-3 border-b border-slate-100 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <button onclick="closePrivateChat()" class="text-xl font-bold">←</button>
-          <img id="chatTargetAvatar" class="w-9 h-9 rounded-full object-cover" />
+          <div class="relative">
+            <img id="chatTargetAvatar" class="w-9 h-9 rounded-full object-cover" />
+            <span id="chatTargetOnlineDot" class="hidden w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full absolute bottom-0 right-0"></span>
+          </div>
           <div>
             <p id="chatTargetName" class="text-xs font-bold flex items-center gap-1">User</p>
-            <p class="text-[10px] text-emerald-500 font-semibold">● Active on ZestUp</p>
+            <p id="chatTargetStatusText" class="text-[10px] text-slate-500 font-semibold">Active now</p>
           </div>
         </div>
         <button id="viewChatUserProfileBtn" class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg">Profile</button>
@@ -214,11 +251,11 @@
               <p id="statPosts" class="font-bold text-base">0</p>
               <p class="text-xs text-slate-500">posts</p>
             </div>
-            <div>
+            <div onclick="openFollowListModal(currentUser.uid, 'followers')" class="cursor-pointer hover:opacity-75">
               <p id="statFollowers" class="font-bold text-base">0</p>
               <p class="text-xs text-slate-500">followers</p>
             </div>
-            <div>
+            <div onclick="openFollowListModal(currentUser.uid, 'following')" class="cursor-pointer hover:opacity-75">
               <p id="statFollowing" class="font-bold text-base">0</p>
               <p class="text-xs text-slate-500">following</p>
             </div>
@@ -230,18 +267,23 @@
           <p id="profBio" class="text-xs text-slate-700 whitespace-pre-line">Creator on ZestUp ✨</p>
         </div>
 
-        <div onclick="openSubSetting('dashboard')" class="mt-3 bg-slate-100 rounded-2xl px-3.5 py-2.5 cursor-pointer">
-          <p class="text-xs font-bold text-slate-900">Creator dashboard</p>
-          <p id="dashboardSummaryText" class="text-[11px] text-slate-500">↗ 0 engagements in the last 30 days.</p>
+        <!-- Creator Dashboard Card (Shows Engagements + Earnings) -->
+        <div onclick="openSubSetting('dashboard')" class="mt-3 bg-slate-100 rounded-2xl px-3.5 py-2.5 cursor-pointer flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold text-slate-900">Creator dashboard</p>
+            <p id="dashboardSummaryText" class="text-[11px] text-slate-500">↗ 0 engagements • Balance: ₹0</p>
+          </div>
+          <span class="text-slate-400 text-sm">›</span>
         </div>
 
         <div class="grid grid-cols-2 gap-2 mt-3">
           <button onclick="openEditBioModal()" class="py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Edit Bio & Profile</button>
-          <button onclick="shareProfileUrl(currentUser.uid)" class="py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Share profile</button>
+          <button onclick="openShareProfileSheet(currentUser.uid)" class="py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Share profile</button>
         </div>
 
-        <button id="adminPanelBtn" onclick="openAdminModal()" class="hidden w-full mt-2.5 py-2 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold text-xs flex items-center justify-center gap-1.5">
-          <span>🛡️ Founder Admin: Manage Blue Ticks</span>
+        <!-- FOUNDER ADMIN BUTTON -->
+        <button id="adminPanelBtn" onclick="openAdminModal()" class="hidden w-full mt-2.5 py-2.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold text-xs flex items-center justify-center gap-1.5">
+          <span>🛡️ Founder Admin: Users, Strikes, Earnings & Help</span>
         </button>
 
         <div class="flex items-center gap-4 mt-4 overflow-x-auto no-scrollbar">
@@ -269,20 +311,26 @@
       <header class="sticky top-0 z-20 bg-white px-4 py-3 flex items-center justify-between border-b border-slate-100">
         <div class="flex items-center gap-3">
           <button onclick="closeOtherProfile()" class="text-xl font-bold">←</button>
-          <span id="otherProfHeaderUser" class="font-bold text-base flex items-center gap-1">username</span>
+          <div>
+            <span id="otherProfHeaderUser" class="font-bold text-base flex items-center gap-1">username</span>
+            <p id="otherProfActiveStatus" class="text-[10px] text-slate-500 font-medium"></p>
+          </div>
         </div>
         <button onclick="openOtherUserMenu()" class="p-1.5 text-xl font-bold leading-none">⋮</button>
       </header>
 
       <div class="px-4 pt-4 pb-3">
         <div class="flex items-center justify-between">
-          <div id="otherProfRing" class="ring-none cursor-pointer">
-            <img id="otherProfAvatar" class="w-20 h-20 rounded-full object-cover border-2 border-white bg-slate-200" />
+          <div class="relative">
+            <div id="otherProfRing" class="ring-none cursor-pointer">
+              <img id="otherProfAvatar" class="w-20 h-20 rounded-full object-cover border-2 border-white bg-slate-200" />
+            </div>
+            <span id="otherProfOnlineDot" class="hidden w-4 h-4 bg-emerald-500 border-2 border-white rounded-full absolute bottom-1 right-1"></span>
           </div>
           <div class="flex-1 flex justify-around text-center ml-4">
             <div><p id="otherStatPosts" class="font-bold text-base">0</p><p class="text-xs text-slate-500">posts</p></div>
-            <div><p id="otherStatFollowers" class="font-bold text-base">0</p><p class="text-xs text-slate-500">followers</p></div>
-            <div><p id="otherStatFollowing" class="font-bold text-base">0</p><p class="text-xs text-slate-500">following</p></div>
+            <div onclick="openFollowListModal(viewingUserId, 'followers')" class="cursor-pointer hover:opacity-75"><p id="otherStatFollowers" class="font-bold text-base">0</p><p class="text-xs text-slate-500">followers</p></div>
+            <div onclick="openFollowListModal(viewingUserId, 'following')" class="cursor-pointer hover:opacity-75"><p id="otherStatFollowing" class="font-bold text-base">0</p><p class="text-xs text-slate-500">following</p></div>
           </div>
         </div>
 
@@ -294,7 +342,7 @@
         <div class="flex items-center gap-2 mt-4">
           <button id="otherFollowBtn" class="flex-1 py-2 rounded-xl font-bold text-xs transition">Follow</button>
           <button id="otherMessageBtn" class="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-xs text-slate-900">Message</button>
-          <button onclick="shareProfileUrl(viewingUserId)" class="px-3 py-2 rounded-xl bg-slate-100 text-xs font-bold">👤+</button>
+          <button onclick="openShareProfileSheet(viewingUserId)" class="px-3 py-2 rounded-xl bg-slate-100 text-xs font-bold">Share</button>
         </div>
       </div>
 
@@ -306,41 +354,159 @@
       <div class="bg-white w-full max-w-md rounded-t-3xl p-5 space-y-3.5 text-sm font-medium">
         <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto mb-2"></div>
         <button id="sheetBlockBtn" onclick="toggleBlockViewingUser()" class="w-full text-left py-1.5 text-rose-600 font-bold">Block</button>
-        <button onclick="alert('Report submitted to ZestUp Safety Team.'); document.getElementById('otherUserSheet').classList.add('hidden');" class="w-full text-left py-1.5 text-rose-600">Report</button>
-        <button onclick="showAboutAccount()" class="w-full text-left py-1.5 text-slate-800">About this account</button>
+        <button onclick="openReportUserModal(viewingUserId); document.getElementById('otherUserSheet').classList.add('hidden');" class="w-full text-left py-1.5 text-rose-600">Report</button>
+        <button onclick="openAboutAccountModal(viewingUserId)" class="w-full text-left py-1.5 text-slate-800 font-semibold">About this account</button>
         <button id="sheetHideStoryBtn" onclick="toggleHideStoryViewingUser()" class="w-full text-left py-1.5 text-slate-800">Hide your story</button>
-        <button onclick="shareProfileUrl(viewingUserId); document.getElementById('otherUserSheet').classList.add('hidden');" class="w-full text-left py-1.5 text-slate-800">Copy profile URL</button>
-        <button onclick="shareProfileUrl(viewingUserId); document.getElementById('otherUserSheet').classList.add('hidden');" class="w-full text-left py-1.5 text-slate-800">Share this profile</button>
+        <button onclick="copyProfileLink(viewingUserId); document.getElementById('otherUserSheet').classList.add('hidden');" class="w-full text-left py-1.5 text-slate-800">Copy profile URL</button>
+        <button onclick="document.getElementById('otherUserSheet').classList.add('hidden'); openShareProfileSheet(viewingUserId);" class="w-full text-left py-1.5 text-slate-800">Share this profile</button>
         <button onclick="showUserQrCode()" class="w-full text-left py-1.5 text-slate-800">QR code</button>
       </div>
     </div>
 
-    <!-- 7. CREATE SCREEN -->
+    <!-- CUSTOM "ABOUT THIS ACCOUNT" MODAL (Privacy Protected - Specific to Viewed User) -->
+    <div id="aboutAccountModal" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col">
+      <header class="sticky top-0 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
+        <button onclick="document.getElementById('aboutAccountModal').classList.add('hidden')" class="text-xl font-bold">←</button>
+        <h3 class="font-bold text-base">About this account</h3>
+      </header>
+      <div id="aboutAccountBody" class="p-6 flex-1 overflow-y-auto space-y-5"></div>
+    </div>
+
+    <!-- FOLLOWERS / FOLLOWING INTERACTIVE MODAL -->
+    <div id="followListModal" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col">
+      <header class="sticky top-0 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
+        <button onclick="document.getElementById('followListModal').classList.add('hidden')" class="text-xl font-bold">←</button>
+        <h3 id="followListHeaderTitle" class="font-bold text-base">Connections</h3>
+      </header>
+      <div class="grid grid-cols-2 border-b border-slate-100 text-xs font-bold">
+        <button id="tabListFollowers" onclick="switchFollowListTab('followers')" class="py-3 border-b-2 border-indigo-600 text-indigo-600">Followers</button>
+        <button id="tabListFollowing" onclick="switchFollowListTab('following')" class="py-3 text-slate-400">Following</button>
+      </div>
+      <div id="followListContainer" class="flex-1 overflow-y-auto divide-y divide-slate-100"></div>
+    </div>
+
+    <!-- SHARE PROFILE BOTTOM SHEET (WhatsApp, WhatsApp Status, SMS, Copy) -->
+    <div id="shareProfileSheet" class="hidden fixed inset-0 z-50 bg-black/50 flex items-end justify-center" onclick="if(event.target===this)this.classList.add('hidden')">
+      <div class="bg-white w-full max-w-md rounded-t-3xl p-5 space-y-4">
+        <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto"></div>
+        <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100">
+          <img id="shareSheetAvatar" class="w-12 h-12 rounded-full object-cover" />
+          <div>
+            <p id="shareSheetName" class="text-sm font-bold flex items-center gap-1">Name</p>
+            <p id="shareSheetUrlText" class="text-[11px] text-slate-400 truncate max-w-[230px]"></p>
+          </div>
+        </div>
+        <p class="text-xs font-bold text-slate-500">Share profile via</p>
+        <div class="grid grid-cols-4 gap-3 text-center text-[11px] font-semibold">
+          <button id="shareWhatsAppBtn" class="flex flex-col items-center gap-1.5">
+            <span class="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-xl shadow-xs">💬</span>
+            <span>WhatsApp</span>
+          </button>
+          <button id="shareWaStatusBtn" class="flex flex-col items-center gap-1.5">
+            <span class="w-12 h-12 rounded-2xl bg-teal-600 text-white flex items-center justify-center text-xl shadow-xs">⭕</span>
+            <span>WA Status</span>
+          </button>
+          <button id="shareSmsBtn" class="flex flex-col items-center gap-1.5">
+            <span class="w-12 h-12 rounded-2xl bg-sky-500 text-white flex items-center justify-center text-xl shadow-xs">✉️</span>
+            <span>SMS</span>
+          </button>
+          <button id="shareCopyBtn" class="flex flex-col items-center gap-1.5">
+            <span class="w-12 h-12 rounded-2xl bg-slate-800 text-white flex items-center justify-center text-xl shadow-xs">🔗</span>
+            <span>Copy Link</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. CREATE & VIDEO/REELS EDITING STUDIO SCREEN -->
     <section id="createScreen" class="hidden fixed inset-0 z-50 bg-zinc-950 text-white max-w-md mx-auto flex flex-col justify-between">
-      <header class="px-4 py-3.5 flex items-center justify-between border-b border-zinc-800">
+      <header class="px-4 py-3 flex items-center justify-between border-b border-zinc-800">
         <button onclick="closeCreateScreen()" class="text-xl font-bold text-zinc-300">✕</button>
         <h3 id="createHeaderTitle" class="font-bold text-sm">New post</h3>
-        <button id="publishContentBtn" class="text-sm font-bold text-indigo-400">Next ›</button>
+        <button id="publishContentBtn" class="text-sm font-bold text-indigo-400">Share ›</button>
       </header>
 
-      <div class="flex-1 overflow-y-auto p-4 flex flex-col justify-center">
-        <div id="mediaUploadArea" class="space-y-4">
+      <div class="flex-1 overflow-y-auto p-3.5 space-y-3">
+        <div id="mediaUploadArea" class="space-y-3">
+          <!-- Preview Stage with Live Overlay (Filter, Text, Sticker, Location, Audio Badge) -->
           <div id="createPreviewBox" class="hidden relative rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800">
-            <img id="createImgPreview" class="hidden w-full max-h-72 object-contain mx-auto" />
-            <video id="createVidPreview" controls class="hidden w-full max-h-72 mx-auto"></video>
+            <img id="createImgPreview" class="hidden w-full max-h-64 object-contain mx-auto filter-none" />
+            <video id="createVidPreview" controls playsinline class="hidden w-full max-h-64 mx-auto filter-none"></video>
+            
+            <!-- Live Overlay Badges -->
+            <div id="overlayLocationTag" class="hidden absolute top-2.5 left-2.5 bg-black/65 backdrop-blur px-2.5 py-1 rounded-full text-[11px] font-bold text-white">📍 Location</div>
+            <div id="overlayAudioTag" class="hidden absolute bottom-2.5 left-2.5 bg-black/65 backdrop-blur px-2.5 py-1 rounded-full text-[11px] font-bold text-pink-300">🎵 Audio</div>
+            <div id="overlayStickerTag" class="hidden absolute top-1/3 right-4 text-4xl drop-shadow"></div>
+            <div id="overlayTextTag" class="hidden absolute bottom-10 inset-x-4 text-center font-extrabold text-base text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]"></div>
+
             <button onclick="clearCreateMedia()" class="absolute top-2 right-2 bg-black/70 text-white text-xs px-2.5 py-1 rounded-full">✕</button>
           </div>
 
-          <label class="flex flex-col items-center justify-center h-44 rounded-2xl border-2 border-dashed border-zinc-700 bg-zinc-900/60 cursor-pointer hover:border-indigo-500 transition">
-            <span class="text-3xl mb-1">📷</span>
-            <span class="text-xs font-bold text-zinc-200">Select Photo or Video from Gallery</span>
-            <span class="text-[11px] text-zinc-500 mt-0.5">Supports HD Images & Reels Videos</span>
+          <!-- Upload Picker -->
+          <label id="filePickerLabel" class="flex flex-col items-center justify-center h-36 rounded-2xl border-2 border-dashed border-zinc-700 bg-zinc-900/60 cursor-pointer hover:border-indigo-500 transition">
+            <span class="text-3xl mb-1">🎬</span>
+            <span class="text-xs font-bold text-zinc-200">Select Video, Reel or Photo</span>
+            <span class="text-[11px] text-zinc-500 mt-0.5">Edit with Filters, Effects, Audio, Stickers & Location</span>
             <input id="createFileInput" type="file" accept="image/*,video/*" class="hidden" />
           </label>
 
-          <textarea id="createCaptionInput" rows="3" placeholder="Write a caption for ZestUp..." class="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-3.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500"></textarea>
+          <!-- CREATIVE STUDIO TOOLBAR (Filters, Effect, Audio, Sticker, Text, Live Location, Speed/Mute) -->
+          <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-3 space-y-2.5">
+            <p class="text-[11px] font-bold text-zinc-400">Creative Studio Tools</p>
+            <div class="grid grid-cols-3 gap-1.5 text-[11px] font-bold">
+              <button onclick="toggleEditorPanel('panelFilters')" class="py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700">✨ Filter/Effect</button>
+              <button onclick="toggleEditorPanel('panelAudio')" class="py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700">🎵 Audio</button>
+              <button onclick="toggleEditorPanel('panelStickers')" class="py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700">😍 Sticker</button>
+              <button onclick="addOverlayText()" class="py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700">🔤 Text</button>
+              <button onclick="detectLiveLocation()" class="py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700">📍 Live Location</button>
+              <button onclick="toggleEditorPanel('panelEdit')" class="py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700">✂️ Speed/Mute</button>
+            </div>
+
+            <!-- Sub-panel: Filters & Effects -->
+            <div id="panelFilters" class="hidden flex gap-2 overflow-x-auto no-scrollbar pt-1">
+              <button onclick="applyMediaFilter('filter-none', 'Normal')" class="px-3 py-1.5 rounded-lg bg-zinc-800 text-xs shrink-0">Normal</button>
+              <button onclick="applyMediaFilter('filter-vivid', 'Vivid')" class="px-3 py-1.5 rounded-lg bg-zinc-800 text-xs shrink-0">Vivid</button>
+              <button onclick="applyMediaFilter('filter-warm', 'Warm Sunset')" class="px-3 py-1.5 rounded-lg bg-zinc-800 text-xs shrink-0">Warm</button>
+              <button onclick="applyMediaFilter('filter-cool', 'Cool Breeze')" class="px-3 py-1.5 rounded-lg bg-zinc-800 text-xs shrink-0">Cool</button>
+              <button onclick="applyMediaFilter('filter-vintage', 'Vintage')" class="px-3 py-1.5 rounded-lg bg-zinc-800 text-xs shrink-0">Vintage</button>
+              <button onclick="applyMediaFilter('filter-bw', 'B&W Noir')" class="px-3 py-1.5 rounded-lg bg-zinc-800 text-xs shrink-0">B&W</button>
+              <button onclick="applyMediaFilter('filter-glow', 'Neon Glow')" class="px-3 py-1.5 rounded-lg bg-zinc-800 text-xs shrink-0">Glow</button>
+            </div>
+
+            <!-- Sub-panel: Audio -->
+            <div id="panelAudio" class="hidden space-y-1.5 pt-1">
+              <div class="flex gap-1.5 overflow-x-auto no-scrollbar">
+                <button onclick="selectAudioTrack('Trending Lo-Fi Beats 🎧')" class="px-2.5 py-1.5 rounded-lg bg-zinc-800 text-[11px] shrink-0">🎧 Lo-Fi Beats</button>
+                <button onclick="selectAudioTrack('ZestUp Viral Pop 🔥')" class="px-2.5 py-1.5 rounded-lg bg-zinc-800 text-[11px] shrink-0">🔥 Viral Pop</button>
+                <button onclick="selectAudioTrack('Romantic Acoustic 🎸')" class="px-2.5 py-1.5 rounded-lg bg-zinc-800 text-[11px] shrink-0">🎸 Acoustic</button>
+                <button onclick="selectAudioTrack('Cinematic Epic 🎬')" class="px-2.5 py-1.5 rounded-lg bg-zinc-800 text-[11px] shrink-0">🎬 Cinematic</button>
+              </div>
+            </div>
+
+            <!-- Sub-panel: Stickers -->
+            <div id="panelStickers" class="hidden flex gap-2 overflow-x-auto no-scrollbar pt-1 text-xl">
+              <button onclick="applySticker('🔥')" class="p-1.5 bg-zinc-800 rounded-lg">🔥</button>
+              <button onclick="applySticker('❤️')" class="p-1.5 bg-zinc-800 rounded-lg">❤️</button>
+              <button onclick="applySticker('✨')" class="p-1.5 bg-zinc-800 rounded-lg">✨</button>
+              <button onclick="applySticker('😎')" class="p-1.5 bg-zinc-800 rounded-lg">😎</button>
+              <button onclick="applySticker('🎉')" class="p-1.5 bg-zinc-800 rounded-lg">🎉</button>
+              <button onclick="applySticker('👑')" class="p-1.5 bg-zinc-800 rounded-lg">👑</button>
+              <button onclick="applySticker('')" class="px-2 py-1 bg-rose-900/60 text-xs rounded-lg">Clear</button>
+            </div>
+
+            <!-- Sub-panel: Video Speed / Mute Edit -->
+            <div id="panelEdit" class="hidden flex items-center gap-2 pt-1 text-xs">
+              <button onclick="setVideoSpeed(0.5)" class="px-2.5 py-1 bg-zinc-800 rounded-lg">0.5x Slow</button>
+              <button onclick="setVideoSpeed(1)" class="px-2.5 py-1 bg-zinc-800 rounded-lg">1x Normal</button>
+              <button onclick="setVideoSpeed(1.5)" class="px-2.5 py-1 bg-zinc-800 rounded-lg">1.5x Fast</button>
+              <button onclick="toggleVideoMute()" id="muteVidBtn" class="px-2.5 py-1 bg-zinc-800 rounded-lg">🔊 Sound On</button>
+            </div>
+          </div>
+
+          <textarea id="createCaptionInput" rows="2" placeholder="Write a caption for ZestUp..." class="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500"></textarea>
         </div>
 
+        <!-- LIVE STREAM CAMERA -->
         <div id="liveStreamArea" class="hidden flex-col items-center justify-center space-y-4 text-center">
           <div class="relative w-full h-80 bg-zinc-900 rounded-3xl overflow-hidden border border-zinc-800 flex items-center justify-center">
             <video id="liveCameraVideo" autoplay muted playsinline class="w-full h-full object-cover"></video>
@@ -351,7 +517,7 @@
         </div>
       </div>
 
-      <div class="p-4 flex justify-center">
+      <div class="p-3 flex justify-center">
         <div class="bg-zinc-900/95 border border-zinc-800 rounded-full px-3 py-2 flex items-center gap-4 text-xs font-extrabold tracking-wider">
           <button onclick="setCreateType('POST')" class="create-tab-btn text-white" data-type="POST">POST</button>
           <button onclick="setCreateType('STORY')" class="create-tab-btn text-zinc-500" data-type="STORY">STORY</button>
@@ -361,26 +527,22 @@
       </div>
     </section>
 
-    <!-- 8. SETTINGS AND ACTIVITY -->
+    <!-- 8. SETTINGS AND ACTIVITY (Includes Help & ZestUp Help AI) -->
     <section id="settingsPage" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col overflow-y-auto">
       <header class="sticky top-0 z-20 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
         <button onclick="closeSettings()" class="text-xl font-bold leading-none">←</button>
         <h2 class="font-bold text-base">Settings and activity</h2>
       </header>
 
-      <div class="p-3 border-b border-slate-100">
-        <input id="settingsSearchInput" type="text" placeholder="Search settings..." class="w-full bg-slate-100 text-sm px-4 py-2 rounded-xl focus:outline-none" />
-      </div>
-
       <div class="divide-y divide-slate-100 pb-10">
         <div class="p-4 space-y-3">
           <p class="text-xs font-semibold text-slate-500">Your account</p>
-          <div onclick="closeSettings(); openAccountsCenter();" class="settings-item flex items-center justify-between py-1 cursor-pointer">
+          <div onclick="closeSettings(); openAccountsCenter();" class="flex items-center justify-between py-1 cursor-pointer">
             <div class="flex items-center gap-3">
               <span class="text-lg">👤</span>
               <div>
                 <p class="text-sm font-bold">Accounts Center</p>
-                <p class="text-[11px] text-slate-400">Name, Username, Profile picture</p>
+                <p class="text-[11px] text-slate-400">Name, Username, Linked Mobile & Gmail, DOB</p>
               </div>
             </div>
             <span class="text-slate-400">›</span>
@@ -389,65 +551,102 @@
 
         <div class="p-4 space-y-3.5">
           <p class="text-xs font-semibold text-slate-500">How you use ZestUp</p>
-          <div onclick="openSubSetting('saved')" class="settings-item flex items-center justify-between cursor-pointer">
+          <div onclick="openSubSetting('saved')" class="flex items-center justify-between cursor-pointer">
             <div class="flex items-center gap-3"><span class="text-lg">🔖</span><span class="text-sm">Saved</span></div>
             <span class="text-slate-400 text-xs" id="savedCountBadge">0 ›</span>
           </div>
-          <div onclick="openSubSetting('activity')" class="settings-item flex items-center justify-between cursor-pointer">
-            <div class="flex items-center gap-3"><span class="text-lg">📈</span><span class="text-sm">Your activity</span></div>
-            <span class="text-slate-400">›</span>
-          </div>
-          <div onclick="openSubSetting('dashboard')" class="settings-item flex items-center justify-between cursor-pointer">
-            <div class="flex items-center gap-3"><span class="text-lg">📊</span><span class="text-sm">Creator dashboard</span></div>
+          <div onclick="openSubSetting('dashboard')" class="flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3"><span class="text-lg">💰</span><span class="text-sm">Creator dashboard & Earnings</span></div>
             <span class="text-slate-400">›</span>
           </div>
         </div>
 
         <div class="p-4 space-y-3.5">
-          <p class="text-xs font-semibold text-slate-500">Privacy & Safety</p>
-          <div onclick="toggleSettingPref('isPrivate')" class="settings-item flex items-center justify-between cursor-pointer">
+          <p class="text-xs font-semibold text-slate-500">Privacy, Safety & Help</p>
+          <div onclick="toggleSettingPref('isPrivate')" class="flex items-center justify-between cursor-pointer">
             <div class="flex items-center gap-3"><span class="text-lg">🔒</span><span class="text-sm">Profile privacy</span></div>
             <span id="pref_isPrivate" class="text-xs font-semibold text-indigo-600">Public ›</span>
           </div>
-          <div onclick="openSubSetting('blocked')" class="settings-item flex items-center justify-between cursor-pointer">
+          <div onclick="openSubSetting('blocked')" class="flex items-center justify-between cursor-pointer">
             <div class="flex items-center gap-3"><span class="text-lg">🚫</span><span class="text-sm">Blocked accounts</span></div>
             <span id="blockedCountBadge" class="text-xs text-slate-400">0 ›</span>
           </div>
-          <div onclick="openSubSetting('profilestatus')" class="settings-item flex items-center justify-between cursor-pointer">
-            <div class="flex items-center gap-3"><span class="text-lg">🛡️</span><span class="text-sm">Profile status</span></div>
+          <div onclick="openSubSetting('profilestatus')" class="flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-3"><span class="text-lg">🛡️</span><span class="text-sm">Profile status & Strikes</span></div>
             <span class="text-slate-400">›</span>
+          </div>
+          <!-- HELP & ZESTUP HELP AI -->
+          <div onclick="closeSettings(); openHelpAiModal();" class="flex items-center justify-between cursor-pointer bg-indigo-50/70 p-2.5 rounded-xl">
+            <div class="flex items-center gap-3">
+              <span class="text-lg">🤖</span>
+              <div>
+                <p class="text-sm font-bold text-indigo-700">Help (ZestUp Help AI)</p>
+                <p class="text-[11px] text-indigo-500">Instant AI solutions & ZestUp Team support</p>
+              </div>
+            </div>
+            <span class="text-indigo-500 font-bold">›</span>
           </div>
         </div>
 
         <div class="p-4 space-y-3">
           <p class="text-xs font-semibold text-slate-500">Login</p>
-          <button id="logoutBtn" class="settings-item w-full text-left text-sm font-bold text-rose-500 py-1">Log out</button>
+          <button id="logoutBtn" class="w-full text-left text-sm font-bold text-rose-500 py-1">Log out</button>
         </div>
       </div>
     </section>
 
-    <!-- ACCOUNTS CENTER MODAL -->
-    <section id="accountsCenterPage" class="hidden fixed inset-0 z-50 bg-slate-50 max-w-md mx-auto flex flex-col">
-      <header class="bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
+    <!-- ACCOUNTS CENTER MODAL (Shows Linked Mobile Number, Linked Gmail & Date of Birth) -->
+    <section id="accountsCenterPage" class="hidden fixed inset-0 z-50 bg-slate-50 max-w-md mx-auto flex flex-col overflow-y-auto">
+      <header class="sticky top-0 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
         <button onclick="document.getElementById('accountsCenterPage').classList.add('hidden')" class="text-xl font-bold">←</button>
         <h3 class="font-bold text-base">Accounts Center</h3>
       </header>
-      <div class="p-6 flex flex-col items-center">
-        <img id="acAvatarImg" class="w-20 h-20 rounded-full object-cover border-2 border-white shadow-sm mb-3" />
+      <div class="p-5 flex flex-col items-center">
+        <img id="acAvatarImg" class="w-20 h-20 rounded-full object-cover border-2 border-white shadow-sm mb-2" />
         <p id="acFullName" class="font-bold text-base text-slate-900">Name</p>
-        <p id="acSubText" class="text-xs text-slate-500 mb-6">username • ZestUp</p>
+        <p id="acSubText" class="text-xs text-slate-500 mb-5">username • ZestUp</p>
 
-        <div class="w-full bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden shadow-xs">
-          <button onclick="editSingleField('name')" class="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium hover:bg-slate-50">
-            <span>Name</span><span class="text-slate-400">›</span>
-          </button>
-          <button onclick="editSingleField('username')" class="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium hover:bg-slate-50">
-            <span>Username</span><span class="text-slate-400">›</span>
-          </button>
-          <label class="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium hover:bg-slate-50 cursor-pointer">
-            <span>Profile picture</span><span class="text-slate-400">›</span>
-            <input id="acPhotoUploadInput" type="file" accept="image/*" class="hidden" />
-          </label>
+        <div class="w-full space-y-4">
+          <div class="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden shadow-xs">
+            <button onclick="editSingleField('name')" class="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium hover:bg-slate-50">
+              <span>Name</span><span class="text-slate-400">›</span>
+            </button>
+            <button onclick="editSingleField('username')" class="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium hover:bg-slate-50">
+              <span>Username</span><span class="text-slate-400">›</span>
+            </button>
+            <label class="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium hover:bg-slate-50 cursor-pointer">
+              <span>Profile picture</span><span class="text-slate-400">›</span>
+              <input id="acPhotoUploadInput" type="file" accept="image/*" class="hidden" />
+            </label>
+          </div>
+
+          <!-- Contact & Recovery Info (Private to Account Owner) -->
+          <div>
+            <p class="text-xs font-bold text-slate-500 mb-1.5 px-1">Account Recovery & Personal Info (Private)</p>
+            <div class="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden shadow-xs text-sm">
+              <div onclick="linkOrEditContact('phone')" class="px-4 py-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50">
+                <div>
+                  <p class="font-semibold text-slate-800">Mobile Number</p>
+                  <p id="acLinkedPhoneText" class="text-xs text-emerald-600 font-medium mt-0.5">Not linked</p>
+                </div>
+                <span id="acPhoneActionBadge" class="text-xs font-bold text-indigo-600">Link ›</span>
+              </div>
+              <div onclick="linkOrEditContact('email')" class="px-4 py-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50">
+                <div>
+                  <p class="font-semibold text-slate-800">Gmail Address</p>
+                  <p id="acLinkedEmailText" class="text-xs text-emerald-600 font-medium mt-0.5">Not linked</p>
+                </div>
+                <span id="acEmailActionBadge" class="text-xs font-bold text-indigo-600">Link ›</span>
+              </div>
+              <div onclick="editDateOfBirth()" class="px-4 py-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50">
+                <div>
+                  <p class="font-semibold text-slate-800">Date of Birth</p>
+                  <p id="acDobText" class="text-xs text-slate-500 mt-0.5">Not set</p>
+                </div>
+                <span class="text-xs font-bold text-indigo-600">Edit ›</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -470,7 +669,7 @@
       </div>
     </div>
 
-    <!-- SUB-SETTING DETAIL MODAL -->
+    <!-- SUB-SETTING DETAIL MODAL (Saved, Creator Dashboard & Earnings, Blocked, Profile Status) -->
     <div id="subSettingModal" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col">
       <header class="sticky top-0 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
         <button onclick="document.getElementById('subSettingModal').classList.add('hidden')" class="text-xl font-bold">←</button>
@@ -479,15 +678,13 @@
       <div id="subSettingBody" class="p-4 flex-1 overflow-y-auto space-y-3 text-sm"></div>
     </div>
 
-    <!-- ACTIVITY TAB -->
+    <!-- ACTIVITY / NOTIFICATIONS TAB (Includes New User Alerts for Owner + Warnings/Earnings) -->
     <section id="activityTab" class="hidden flex-1 pb-16">
       <header class="sticky top-0 bg-white px-4 py-3 border-b border-slate-100 flex items-center gap-3">
         <button onclick="switchTab('homeTab')" class="text-lg font-bold">←</button>
-        <span class="font-bold text-base">Notifications</span>
+        <span class="font-bold text-base">Notifications & Activity</span>
       </header>
-      <div id="notificationsList" class="p-4 space-y-3 text-xs text-slate-600">
-        <p>Welcome to ZestUp! Follow creators, like posts, and send messages.</p>
-      </div>
+      <div id="notificationsList" class="p-4 space-y-2.5 text-xs text-slate-700"></div>
     </section>
 
     <!-- BOTTOM NAVIGATION BAR -->
@@ -511,14 +708,47 @@
     </nav>
   </div>
 
-  <!-- FOUNDER ADMIN MODAL -->
-  <div id="adminModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-sm rounded-3xl p-5 max-h-[80vh] flex flex-col">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-        <h3 class="font-bold text-sm">🛡️ Manage Blue Verified Ticks</h3>
-        <button onclick="document.getElementById('adminModal').classList.add('hidden')" class="text-slate-400 font-bold">✕</button>
+  <!-- FOUNDER ADMIN SUPER-PANEL MODAL (All Users, NEW Badges, Blue Tick, Copyright Strike, Report/Ban, Earnings, Help Tickets) -->
+  <div id="adminModal" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col">
+    <header class="sticky top-0 bg-white px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button onclick="document.getElementById('adminModal').classList.add('hidden')" class="text-xl font-bold">←</button>
+        <div>
+          <h3 class="font-bold text-sm">🛡️ Founder Admin Control</h3>
+          <p id="adminTotalUsersCount" class="text-[11px] text-indigo-600 font-semibold">Total Registered Users: 0</p>
+        </div>
       </div>
-      <div id="adminUsersList" class="flex-1 overflow-y-auto space-y-2.5 mt-3"></div>
+    </header>
+    <div class="grid grid-cols-2 border-b border-slate-100 text-xs font-bold">
+      <button id="adminTabUsersBtn" onclick="switchAdminTab('users')" class="py-2.5 border-b-2 border-indigo-600 text-indigo-600">All Users & Actions</button>
+      <button id="adminTabTicketsBtn" onclick="switchAdminTab('tickets')" class="py-2.5 text-slate-400">Help & Reports</button>
+    </div>
+    <div id="adminUsersList" class="flex-1 overflow-y-auto p-3 space-y-2.5"></div>
+    <div id="adminTicketsList" class="hidden flex-1 overflow-y-auto p-3 space-y-2.5"></div>
+  </div>
+
+  <!-- ZESTUP HELP AI MODAL -->
+  <div id="helpAiModal" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col">
+    <header class="sticky top-0 bg-white px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <button onclick="document.getElementById('helpAiModal').classList.add('hidden')" class="text-xl font-bold">←</button>
+        <div class="w-8 h-8 rounded-full zest-gradient text-white flex items-center justify-center font-bold text-xs">AI</div>
+        <div>
+          <h3 class="font-bold text-sm">ZestUp Help AI</h3>
+          <p class="text-[10px] text-emerald-600 font-semibold">● Instant AI Support & ZestUp Team</p>
+        </div>
+      </div>
+      <button onclick="escalateToHumanTeam()" class="text-[11px] font-bold bg-indigo-50 text-indigo-700 px-2.5 py-1.5 rounded-lg">Message Team</button>
+    </header>
+    <div id="helpAiChatBox" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50 text-xs">
+      <div class="bg-white border border-slate-200 p-3 rounded-2xl max-w-[85%] space-y-1.5">
+        <p class="font-bold text-indigo-600">ZestUp Help AI 🤖</p>
+        <p>Hello! I am <b>ZestUp Help AI</b>. Ask me anything about Account Recovery, Blue Tick, Copyright Strikes, Creator Earnings, or Video Uploads—or tap <b>Message Team</b> above to contact the ZestUp Owner directly!</p>
+      </div>
+    </div>
+    <div class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
+      <input id="helpAiInput" type="text" placeholder="Describe your problem to ZestUp Help AI..." class="flex-1 bg-slate-100 text-xs px-4 py-2.5 rounded-full focus:outline-none" />
+      <button onclick="sendHelpAiMessage()" class="px-4 py-2 rounded-full zest-gradient text-white font-bold text-xs">Ask AI</button>
     </div>
   </div>
 
@@ -537,7 +767,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, RecaptchaVerifier, signInWithPhoneNumber, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getFirestore, collection, addDoc, setDoc, getDoc, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, arrayUnion, arrayRemove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     if ('serviceWorker' in navigator) {
@@ -564,9 +794,10 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let authMethod = 'gmail';
-    let generatedEmailOtp = null;
-    let phoneConfirmationResult = null;
+    let authMode = 'login';      // 'login' | 'signup'
+    let authChannel = 'phone';   // 'phone' | 'gmail'
+    let loginSubType = 'password'; // 'password' | 'otp'
+    let generatedOtp = null;
 
     let currentUser = null;
     let userProfileData = {};
@@ -574,13 +805,23 @@
     let allPosts = [];
     let allStories = [];
     let allMessages = [];
+    let allSupportTickets = [];
     let viewingUserId = null;
     let activeChatPartnerId = null;
+    let followModalTargetUid = null;
+    let followModalTab = 'followers';
     let dmFilter = 'Primary';
     let searchFilter = 'all';
     let createType = 'POST';
     let createFile = null;
     let liveStreamObj = null;
+
+    // Creative Editor States
+    let selectedFilterClass = 'filter-none';
+    let selectedAudioName = '';
+    let selectedSticker = '';
+    let selectedOverlayText = '';
+    let selectedLocation = '';
 
     const defaultAvatar = (name) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Z')}&background=4F46E5&color=fff&bold=true`;
 
@@ -616,83 +857,165 @@
       return { text: 'Follow', cls: 'zest-gradient text-white' };
     }
 
-    window.setAuthMethod = (method) => {
-      authMethod = method;
-      document.getElementById('tabGmailAuth').className = method === 'gmail' ? 'py-2 rounded-lg bg-white text-indigo-600 shadow-sm' : 'py-2 rounded-lg text-slate-500';
-      document.getElementById('tabPhoneAuth').className = method === 'phone' ? 'py-2 rounded-lg bg-white text-indigo-600 shadow-sm' : 'py-2 rounded-lg text-slate-500';
-      document.getElementById('gmailInputBox').classList.toggle('hidden', method !== 'gmail');
-      document.getElementById('phoneInputBox').classList.toggle('hidden', method !== 'phone');
+    // --- 6. REAL-TIME PRESENCE & LAST SEEN FORMATTER (Minutes, Hours, Days) ---
+    function getPresenceInfo(u) {
+      if (!u) return { isOnline: false, text: 'Offline' };
+      const now = Date.now();
+      const last = u.lastActive || 0;
+      const diffMs = now - last;
+      if (u.isOnline && diffMs < 90000) {
+        return { isOnline: true, text: 'Active now' };
+      }
+      if (!last) return { isOnline: false, text: 'Active recently' };
+      const mins = Math.max(1, Math.floor(diffMs / 60000));
+      if (mins < 60) return { isOnline: false, text: `Active ${mins}m ago` };
+      const hours = Math.floor(mins / 60);
+      if (hours < 24) return { isOnline: false, text: `Active ${hours}h ago` };
+      const days = Math.floor(hours / 24);
+      return { isOnline: false, text: `Active ${days}d ago` };
+    }
+
+    function updateMyPresence(online) {
+      if (!currentUser) return;
+      updateDoc(doc(db, "users", currentUser.uid), {
+        isOnline: online,
+        lastActive: Date.now()
+      }).catch(() => {});
+    }
+
+    setInterval(() => { if (currentUser && !document.hidden) updateMyPresence(true); }, 30000);
+    document.addEventListener('visibilitychange', () => {
+      if (currentUser) updateMyPresence(!document.hidden);
+    });
+    window.addEventListener('beforeunload', () => { if (currentUser) updateMyPresence(false); });
+
+    // --- 1. AUTHENTICATION LOGIC (Sign Up: Mobile+OTP+Create Password | Log In: Mobile+Password OR Mobile+OTP) ---
+    window.setAuthMode = (mode) => {
+      authMode = mode;
+      document.getElementById('modeLoginBtn').className = mode === 'login' ? 'py-2 rounded-lg bg-white text-indigo-600 shadow-sm' : 'py-2 rounded-lg text-slate-500';
+      document.getElementById('modeSignupBtn').className = mode === 'signup' ? 'py-2 rounded-lg bg-white text-indigo-600 shadow-sm' : 'py-2 rounded-lg text-slate-500';
+      document.getElementById('authFullName').classList.toggle('hidden', mode !== 'signup');
+      document.getElementById('loginMethodRow').classList.toggle('hidden', mode === 'signup');
+      document.getElementById('passwordInput').placeholder = mode === 'signup' ? 'Create a New Password (min 6 chars)' : 'Enter Password';
+      document.getElementById('primaryAuthBtn').textContent = mode === 'signup' ? 'Send OTP to Sign Up' : (loginSubType === 'otp' ? 'Send Login OTP' : 'Log In');
+      document.getElementById('passwordFieldBox').classList.toggle('hidden', mode === 'login' && loginSubType === 'otp');
       document.getElementById('otpBox').classList.add('hidden');
-      document.getElementById('sendOtpBtn').classList.remove('hidden');
-      document.getElementById('verifyOtpBtn').classList.add('hidden');
+      document.getElementById('primaryAuthBtn').classList.remove('hidden');
+      document.getElementById('verifyOtpAuthBtn').classList.add('hidden');
     };
 
-    document.getElementById('sendOtpBtn').onclick = async () => {
+    window.setAuthChannel = (ch) => {
+      authChannel = ch;
+      document.getElementById('channelPhoneBtn').className = ch === 'phone' ? 'text-indigo-600 border-b-2 border-indigo-600 pb-1' : 'text-slate-400 pb-1';
+      document.getElementById('channelGmailBtn').className = ch === 'gmail' ? 'text-indigo-600 border-b-2 border-indigo-600 pb-1' : 'text-slate-400 pb-1';
+      document.getElementById('phoneInputBox').classList.toggle('hidden', ch !== 'phone');
+      document.getElementById('gmailInputBox').classList.toggle('hidden', ch !== 'gmail');
+    };
+
+    window.setLoginSubType = (sub) => {
+      loginSubType = sub;
+      document.getElementById('loginViaPassBtn').className = sub === 'password' ? 'text-indigo-600 underline' : 'text-slate-400';
+      document.getElementById('loginViaOtpBtn').className = sub === 'otp' ? 'text-indigo-600 underline' : 'text-slate-400';
+      document.getElementById('passwordFieldBox').classList.toggle('hidden', sub === 'otp');
+      document.getElementById('primaryAuthBtn').textContent = sub === 'otp' ? 'Send Login OTP' : 'Log In';
+    };
+
+    function getAuthIdentifierEmail() {
+      if (authChannel === 'gmail') {
+        return document.getElementById('emailInput').value.trim().toLowerCase();
+      } else {
+        const phone = document.getElementById('phoneInput').value.trim();
+        return phone ? `${phone}@zestup.phone` : '';
+      }
+    }
+
+    document.getElementById('primaryAuthBtn').onclick = async () => {
       const errEl = document.getElementById('authError');
       errEl.classList.add('hidden');
 
-      if (authMethod === 'gmail') {
-        const email = document.getElementById('emailInput').value.trim().toLowerCase();
-        const pass = document.getElementById('passwordInput').value.trim();
-        if (!email || pass.length < 6) {
-          errEl.textContent = "Enter valid Gmail and password (min 6 characters).";
+      const phone = document.getElementById('phoneInput').value.trim();
+      const email = document.getElementById('emailInput').value.trim().toLowerCase();
+      const pass = document.getElementById('passwordInput').value.trim();
+      const fullName = document.getElementById('authFullName').value.trim();
+
+      if (authChannel === 'phone' && phone.length !== 10) {
+        errEl.textContent = "Please enter a valid 10-digit Mobile Number.";
+        errEl.classList.remove('hidden');
+        return;
+      }
+      if (authChannel === 'gmail' && !email.includes('@')) {
+        errEl.textContent = "Please enter a valid Gmail address.";
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      if (authMode === 'signup') {
+        if (!fullName) {
+          errEl.textContent = "Please enter your Full Name.";
           errEl.classList.remove('hidden');
           return;
         }
-        generatedEmailOtp = Math.floor(100000 + Math.random() * 900000).toString();
-        document.getElementById('otpHintText').textContent = `Your ZestUp Verification OTP is: ${generatedEmailOtp}`;
+        if (pass.length < 6) {
+          errEl.textContent = "Create a New Password with at least 6 characters.";
+          errEl.classList.remove('hidden');
+          return;
+        }
+        generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+        document.getElementById('otpHintText').textContent = `ZestUp Verification OTP: ${generatedOtp}`;
         document.getElementById('otpBox').classList.remove('hidden');
-        document.getElementById('sendOtpBtn').classList.add('hidden');
-        document.getElementById('verifyOtpBtn').classList.remove('hidden');
+        document.getElementById('primaryAuthBtn').classList.add('hidden');
+        document.getElementById('verifyOtpAuthBtn').classList.remove('hidden');
       } else {
-        const phone = document.getElementById('phoneInput').value.trim();
-        if (phone.length !== 10) {
-          errEl.textContent = "Enter a valid 10-digit mobile number.";
-          errEl.classList.remove('hidden');
-          return;
-        }
-        try {
-          if (!window.recaptchaVerifier) {
-            window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
-          }
-          phoneConfirmationResult = await signInWithPhoneNumber(auth, '+91' + phone, window.recaptchaVerifier);
-          document.getElementById('otpHintText').textContent = `SMS OTP sent to +91 ${phone}`;
+        // Log In Mode
+        if (loginSubType === 'otp') {
+          generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+          document.getElementById('otpHintText').textContent = `Your ZestUp Login OTP: ${generatedOtp}`;
           document.getElementById('otpBox').classList.remove('hidden');
-          document.getElementById('sendOtpBtn').classList.add('hidden');
-          document.getElementById('verifyOtpBtn').classList.remove('hidden');
-        } catch (e) {
-          errEl.textContent = e.message;
-          errEl.classList.remove('hidden');
+          document.getElementById('primaryAuthBtn').classList.add('hidden');
+          document.getElementById('verifyOtpAuthBtn').classList.remove('hidden');
+        } else {
+          if (pass.length < 6) {
+            errEl.textContent = "Enter your 6+ character password.";
+            errEl.classList.remove('hidden');
+            return;
+          }
+          try {
+            await signInWithEmailAndPassword(auth, getAuthIdentifierEmail(), pass);
+          } catch (e) {
+            errEl.textContent = "Invalid credentials. If you are new, switch to 'Sign Up (New)' above.";
+            errEl.classList.remove('hidden');
+          }
         }
       }
     };
 
-    document.getElementById('verifyOtpBtn').onclick = async () => {
+    document.getElementById('verifyOtpAuthBtn').onclick = async () => {
       const code = document.getElementById('otpCodeInput').value.trim();
-      const nameInput = document.getElementById('authFullName').value.trim();
       const errEl = document.getElementById('authError');
       errEl.classList.add('hidden');
 
+      if (code !== generatedOtp) {
+        errEl.textContent = "Incorrect 6-digit OTP! Please check the OTP shown above.";
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      const idEmail = getAuthIdentifierEmail();
+      const pass = document.getElementById('passwordInput').value.trim() || `zest_${document.getElementById('phoneInput').value.trim()}`;
+      const fullName = document.getElementById('authFullName').value.trim();
+
       try {
-        if (authMethod === 'gmail') {
-          if (code !== generatedEmailOtp) {
-            errEl.textContent = "Invalid OTP! Please check and enter the 6-digit OTP.";
-            errEl.classList.remove('hidden');
-            return;
-          }
-          const email = document.getElementById('emailInput').value.trim().toLowerCase();
-          const pass = document.getElementById('passwordInput').value.trim();
-          try {
-            await signInWithEmailAndPassword(auth, email, pass);
-          } catch (loginErr) {
-            const cred = await createUserWithEmailAndPassword(auth, email, pass);
-            const displayName = nameInput || email.split('@')[0];
-            await updateProfile(cred.user, { displayName });
-            await sendEmailVerification(cred.user).catch(() => {});
-          }
+        if (authMode === 'signup') {
+          const cred = await createUserWithEmailAndPassword(auth, idEmail, pass);
+          await updateProfile(cred.user, { displayName: fullName });
         } else {
-          const cred = await phoneConfirmationResult.confirm(code);
-          if (nameInput) await updateProfile(cred.user, { displayName: nameInput });
+          // Login via OTP: try signing in with stored OTP pass or prompt password if needed
+          try {
+            await signInWithEmailAndPassword(auth, idEmail, pass);
+          } catch (e) {
+            errEl.textContent = "Account found with custom password. Please log in with your Password or reset via Help.";
+            errEl.classList.remove('hidden');
+          }
         }
       } catch (e) {
         errEl.textContent = e.message;
@@ -701,6 +1024,7 @@
     };
 
     document.getElementById('logoutBtn').onclick = () => {
+      updateMyPresence(false);
       closeSettings();
       signOut(auth);
     };
@@ -710,26 +1034,51 @@
       document.getElementById('authSection').classList.toggle('hidden', !!user);
       document.getElementById('appShell').classList.toggle('hidden', !user);
       if (user) {
-        const email = (user.email || "").toLowerCase();
-        const isFounder = (email === FOUNDER_EMAIL);
+        const rawEmail = (user.email || "").toLowerCase();
+        const isPhoneAccount = rawEmail.endsWith("@zestup.phone");
+        const linkedPhone = isPhoneAccount ? "+91 " + rawEmail.split("@")[0] : (document.getElementById('phoneInput').value.trim() ? "+91 " + document.getElementById('phoneInput').value.trim() : "");
+        const linkedEmail = isPhoneAccount ? "" : rawEmail;
+        const isFounder = (linkedEmail === FOUNDER_EMAIL);
+
         const userRef = doc(db, "users", user.uid);
         const snap = await getDoc(userRef);
 
         if (!snap.exists()) {
-          const fallbackName = document.getElementById('authFullName').value.trim() || user.displayName || (email ? email.split('@')[0] : 'zest_user');
-          const uname = (email ? email.split('@')[0] : 'user_' + user.uid.slice(0, 5)).toLowerCase();
+          const fallbackName = document.getElementById('authFullName').value.trim() || user.displayName || (linkedEmail ? linkedEmail.split('@')[0] : 'zest_creator');
+          const baseUname = (linkedEmail ? linkedEmail.split('@')[0] : 'user_' + rawEmail.split('@')[0].slice(-5)).toLowerCase().replace(/[^a-z0-9_]/g, '');
           await setDoc(userRef, {
-            uid: user.uid, email, phone: user.phoneNumber || "",
-            name: fallbackName, username: uname,
+            uid: user.uid,
+            email: linkedEmail,
+            phone: linkedPhone,
+            dob: "",
+            name: fallbackName,
+            username: baseUname,
             bio: "Creator on ZestUp ✨",
             avatar: defaultAvatar(fallbackName),
-            verified: isFounder, isFounder,
-            followers: [], following: [], savedPosts: [], blockedUsers: [], hiddenStoryFrom: [],
+            verified: isFounder,
+            isFounder,
+            isNewAccount: true,
+            isSuspended: false,
+            copyrightStrikes: 0,
+            earnings: 0,
+            monetized: isFounder,
+            warnings: [],
+            followers: [],
+            following: [],
+            savedPosts: [],
+            blockedUsers: [],
+            hiddenStoryFrom: [],
             note: "Sharing vibes ✨",
-            joinedAt: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+            isOnline: true,
+            lastActive: Date.now(),
+            joinedAt: new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })
           });
-        } else if (isFounder && !snap.data().isFounder) {
-          await updateDoc(userRef, { verified: true, isFounder: true, email });
+        } else {
+          await updateDoc(userRef, {
+            isOnline: true,
+            lastActive: Date.now(),
+            ...(isFounder ? { verified: true, isFounder: true } : {})
+          });
         }
 
         if (isFounder) document.getElementById('adminPanelBtn').classList.remove('hidden');
@@ -742,7 +1091,15 @@
         usersMap = {};
         snap.forEach(d => usersMap[d.id] = { uid: d.id, ...d.data() });
         userProfileData = usersMap[currentUser.uid] || {};
+
+        if (userProfileData.isSuspended && !isOwner(currentUser.uid)) {
+          alert("Your ZestUp account has been suspended for violating community guidelines.");
+          signOut(auth);
+          return;
+        }
+
         updateOwnProfileUI();
+        renderNotifications();
         renderFeed();
         renderStories();
         renderSearchAndExplore();
@@ -769,6 +1126,11 @@
         allMessages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         renderDmInbox();
         if (activeChatPartnerId) renderPrivateChatMessages();
+      });
+
+      onSnapshot(query(collection(db, "supportTickets"), orderBy("createdAt", "desc")), (snap) => {
+        allSupportTickets = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderAdminTicketsList();
       });
 
       onSnapshot(collection(db, "liveStreams"), (snap) => {
@@ -823,21 +1185,87 @@
       const myPosts = allPosts.filter(p => p.authorId === currentUser.uid);
       document.getElementById('statPosts').textContent = myPosts.length;
       const totalEng = myPosts.reduce((s, p) => s + (p.likes?.length || 0) + (p.comments?.length || 0), 0);
-      document.getElementById('dashboardSummaryText').textContent = `↗ ${totalEng} engagements in the last 30 days.`;
+      const earnings = userProfileData.earnings || 0;
+      document.getElementById('dashboardSummaryText').textContent = `↗ ${totalEng} engagements • Earnings: ₹${earnings}`;
 
       document.getElementById('profileGrid').innerHTML = myPosts.map(p => p.mediaUrl
         ? (p.mediaType === 'video'
-          ? `<video src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover bg-black"></video>`
-          : `<img src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover bg-slate-100" />`)
+          ? `<video src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover bg-black ${p.filterClass || ''}"></video>`
+          : `<img src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover bg-slate-100 ${p.filterClass || ''}" />`)
         : `<div class="aspect-[3/4] bg-slate-100 p-2 flex items-center justify-center text-center text-[11px] font-medium">${p.text}</div>`
       ).join('');
     }
 
+    // --- 2. ACCOUNTS CENTER (Linked Mobile, Linked Gmail, Date of Birth) ---
     window.openAccountsCenter = () => {
       document.getElementById('acAvatarImg').src = userProfileData.avatar || defaultAvatar(userProfileData.name);
       document.getElementById('acFullName').textContent = userProfileData.name || "User";
       document.getElementById('acSubText').textContent = `${userProfileData.username || 'user'} • ZestUp`;
+
+      const phoneEl = document.getElementById('acLinkedPhoneText');
+      const phoneBadge = document.getElementById('acPhoneActionBadge');
+      if (userProfileData.phone) {
+        phoneEl.textContent = `✔ Linked: ${userProfileData.phone}`;
+        phoneEl.className = "text-xs text-emerald-600 font-bold mt-0.5";
+        phoneBadge.textContent = "Change ›";
+      } else {
+        phoneEl.textContent = "⚠️ Not linked — Link now to protect your ID";
+        phoneEl.className = "text-xs text-rose-500 font-semibold mt-0.5";
+        phoneBadge.textContent = "Add ›";
+      }
+
+      const emailEl = document.getElementById('acLinkedEmailText');
+      const emailBadge = document.getElementById('acEmailActionBadge');
+      if (userProfileData.email) {
+        emailEl.textContent = `✔ Linked: ${userProfileData.email}`;
+        emailEl.className = "text-xs text-emerald-600 font-bold mt-0.5";
+        emailBadge.textContent = "Change ›";
+      } else {
+        emailEl.textContent = "⚠️ Not linked — Link Gmail for recovery";
+        emailEl.className = "text-xs text-rose-500 font-semibold mt-0.5";
+        emailBadge.textContent = "Add ›";
+      }
+
+      document.getElementById('acDobText').textContent = userProfileData.dob || "Not set — Tap to add your birth date";
       document.getElementById('accountsCenterPage').classList.remove('hidden');
+    };
+
+    window.linkOrEditContact = async (type) => {
+      if (type === 'phone') {
+        const num = prompt("Enter 10-digit Mobile Number to link with your ZestUp ID:", (userProfileData.phone || "").replace("+91 ", ""));
+        if (num && num.trim().length === 10) {
+          const otp = Math.floor(100000 + Math.random() * 900000).toString();
+          const entered = prompt(`Verification OTP is ${otp}. Enter OTP to confirm linking:`);
+          if (entered === otp) {
+            await updateDoc(doc(db, "users", currentUser.uid), { phone: "+91 " + num.trim() });
+            openAccountsCenter();
+            alert("Mobile Number linked successfully!");
+          } else {
+            alert("Invalid OTP.");
+          }
+        }
+      } else {
+        const mail = prompt("Enter Gmail Address to link with your ZestUp ID:", userProfileData.email || "");
+        if (mail && mail.includes("@")) {
+          const otp = Math.floor(100000 + Math.random() * 900000).toString();
+          const entered = prompt(`Verification OTP is ${otp}. Enter OTP to confirm linking Gmail:`);
+          if (entered === otp) {
+            await updateDoc(doc(db, "users", currentUser.uid), { email: mail.trim().toLowerCase() });
+            openAccountsCenter();
+            alert("Gmail linked successfully!");
+          } else {
+            alert("Invalid OTP.");
+          }
+        }
+      }
+    };
+
+    window.editDateOfBirth = async () => {
+      const dob = prompt("Enter your Date of Birth (e.g. 15 August 2002):", userProfileData.dob || "");
+      if (dob && dob.trim()) {
+        await updateDoc(doc(db, "users", currentUser.uid), { dob: dob.trim() });
+        openAccountsCenter();
+      }
     };
 
     window.editSingleField = async (field) => {
@@ -877,6 +1305,87 @@
       document.getElementById('editBioModal').classList.add('hidden');
     };
 
+    // --- 3. INTERACTIVE FOLLOWERS & FOLLOWING LIST MODAL ---
+    window.openFollowListModal = (uid, initialTab) => {
+      if (!uid) return;
+      followModalTargetUid = uid;
+      followModalTab = initialTab;
+      const targetUser = usersMap[uid] || {};
+      document.getElementById('followListHeaderTitle').textContent = targetUser.username || targetUser.name || "Connections";
+      switchFollowListTab(initialTab);
+      document.getElementById('followListModal').classList.remove('hidden');
+    };
+
+    window.switchFollowListTab = (tab) => {
+      followModalTab = tab;
+      document.getElementById('tabListFollowers').className = tab === 'followers' ? 'py-3 border-b-2 border-indigo-600 text-indigo-600' : 'py-3 text-slate-400';
+      document.getElementById('tabListFollowing').className = tab === 'following' ? 'py-3 border-b-2 border-indigo-600 text-indigo-600' : 'py-3 text-slate-400';
+
+      const targetUser = usersMap[followModalTargetUid] || {};
+      const idList = tab === 'followers' ? (targetUser.followers || []) : (targetUser.following || []);
+      const container = document.getElementById('followListContainer');
+
+      if (!idList.length) {
+        container.innerHTML = `<p class="text-center text-xs text-slate-400 py-14">No ${tab} yet.</p>`;
+        return;
+      }
+
+      container.innerHTML = idList.map(id => {
+        const u = usersMap[id];
+        if (!u) return '';
+        const isMe = id === currentUser.uid;
+        const fState = getFollowButtonState(id);
+        return `
+          <div class="flex items-center justify-between px-4 py-3">
+            <div onclick="document.getElementById('followListModal').classList.add('hidden'); openOtherProfile('${id}')" class="flex items-center gap-3 cursor-pointer">
+              <img src="${u.avatar || defaultAvatar(u.name)}" class="w-11 h-11 rounded-full object-cover" />
+              <div>
+                <p class="text-xs font-bold flex items-center gap-1">${u.username || u.name} ${getBadgeHTML(id)}</p>
+                <p class="text-[11px] text-slate-500">${u.name || ''}</p>
+              </div>
+            </div>
+            ${!isMe ? `<button onclick="toggleFollowUser('${id}'); setTimeout(()=>switchFollowListTab('${tab}'), 300)" class="text-xs font-bold px-3.5 py-1.5 rounded-xl ${fState.cls}">${fState.text}</button>` : ''}
+          </div>`;
+      }).join('');
+    };
+
+    // --- 4. SHARE PROFILE SHEET (WhatsApp, WhatsApp Status, SMS, Copy Link) ---
+    window.openShareProfileSheet = (uid) => {
+      const targetUid = uid || currentUser.uid;
+      const u = usersMap[targetUid] || {};
+      const profileUrl = `${window.location.origin}${window.location.pathname}?user=${targetUid}`;
+      const shareText = `Check out ${u.name || u.username}'s profile on ZestUp! ✨ ${profileUrl}`;
+
+      document.getElementById('shareSheetAvatar').src = u.avatar || defaultAvatar(u.name);
+      document.getElementById('shareSheetName').innerHTML = `${u.name || u.username} ${getBadgeHTML(targetUid)}`;
+      document.getElementById('shareSheetUrlText').textContent = profileUrl;
+
+      document.getElementById('shareWhatsAppBtn').onclick = () => {
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
+      };
+      document.getElementById('shareWaStatusBtn').onclick = () => {
+        navigator.clipboard?.writeText(shareText);
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
+      };
+      document.getElementById('shareSmsBtn').onclick = () => {
+        window.location.href = `sms:?body=${encodeURIComponent(shareText)}`;
+      };
+      document.getElementById('shareCopyBtn').onclick = () => {
+        navigator.clipboard?.writeText(profileUrl);
+        alert("Profile link copied!");
+        document.getElementById('shareProfileSheet').classList.add('hidden');
+      };
+
+      document.getElementById('shareProfileSheet').classList.remove('hidden');
+    };
+
+    window.copyProfileLink = (uid) => {
+      const url = `${window.location.origin}${window.location.pathname}?user=${uid}`;
+      navigator.clipboard?.writeText(url);
+      alert("Profile URL copied!");
+    };
+
+    // --- OTHER USER PROFILE & 7. CUSTOM "ABOUT THIS ACCOUNT" (Privacy Protected) ---
     window.openOtherProfile = (uid) => {
       if (!uid || uid === currentUser.uid) {
         switchTab('profileTab');
@@ -886,8 +1395,13 @@
       const u = usersMap[uid] || {};
       const badge = getBadgeHTML(uid);
       const userPosts = allPosts.filter(p => p.authorId === uid);
+      const presence = getPresenceInfo(u);
 
       document.getElementById('otherProfHeaderUser').innerHTML = `${u.username || u.name || 'User'} ${badge}`;
+      document.getElementById('otherProfActiveStatus').textContent = presence.text;
+      document.getElementById('otherProfActiveStatus').className = presence.isOnline ? "text-[10px] text-emerald-600 font-bold" : "text-[10px] text-slate-500 font-medium";
+      document.getElementById('otherProfOnlineDot').classList.toggle('hidden', !presence.isOnline);
+
       document.getElementById('otherProfAvatar').src = u.avatar || defaultAvatar(u.name);
       document.getElementById('otherProfRing').className = getProfileRingClass(uid);
       document.getElementById('otherProfName').innerHTML = `${u.name || 'User'} ${badge}`;
@@ -908,7 +1422,7 @@
       };
 
       document.getElementById('otherProfileGrid').innerHTML = userPosts.map(p => p.mediaUrl
-        ? (p.mediaType === 'video' ? `<video src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover bg-black"></video>` : `<img src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover" />`)
+        ? (p.mediaType === 'video' ? `<video src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover bg-black ${p.filterClass || ''}"></video>` : `<img src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover ${p.filterClass || ''}" />`)
         : `<div class="aspect-[3/4] bg-slate-100 p-2 text-[11px] flex items-center justify-center text-center">${p.text}</div>`
       ).join('');
 
@@ -928,6 +1442,47 @@
       document.getElementById('otherUserSheet').classList.remove('hidden');
     };
 
+    // Custom "About this account" UI — strictly for the currently viewed account, hiding all private contact info
+    window.openAboutAccountModal = (targetUid) => {
+      document.getElementById('otherUserSheet').classList.add('hidden');
+      const u = usersMap[targetUid];
+      if (!u) return;
+      const badge = getBadgeHTML(targetUid);
+      document.getElementById('aboutAccountBody').innerHTML = `
+        <div class="flex flex-col items-center text-center pb-4 border-b border-slate-100">
+          <img src="${u.avatar || defaultAvatar(u.name)}" class="w-20 h-20 rounded-full object-cover mb-2.5 border border-slate-200" />
+          <h4 class="font-bold text-base flex items-center gap-1">${u.name || 'User'} ${badge}</h4>
+          <p class="text-xs text-slate-500">@${u.username || 'user'}</p>
+        </div>
+        <div class="space-y-4 text-sm">
+          <div class="flex items-center gap-3.5">
+            <span class="text-xl">📅</span>
+            <div>
+              <p class="font-bold text-slate-900">Date joined</p>
+              <p class="text-xs text-slate-500">${u.joinedAt || 'November 2026'}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3.5">
+            <span class="text-xl">🎂</span>
+            <div>
+              <p class="font-bold text-slate-900">Date of Birth</p>
+              <p class="text-xs text-slate-500">${u.dob || 'Not shared publicly'}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3.5">
+            <span class="text-xl">🛡️</span>
+            <div>
+              <p class="font-bold text-slate-900">Account verification</p>
+              <p class="text-xs text-slate-500">${isUserVerified(targetUid) ? 'Verified ZestUp Account ✔' : 'Standard Member'}</p>
+            </div>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-2xl text-[11px] text-slate-500">
+            🔒 Personal contact details (Mobile Number & Gmail) are strictly protected by ZestUp Privacy and are never visible to other users.
+          </div>
+        </div>`;
+      document.getElementById('aboutAccountModal').classList.remove('hidden');
+    };
+
     window.toggleBlockViewingUser = async () => {
       const isBlocked = (userProfileData.blockedUsers || []).includes(viewingUserId);
       await updateDoc(doc(db, "users", currentUser.uid), {
@@ -943,28 +1498,33 @@
         hiddenStoryFrom: isHidden ? arrayRemove(viewingUserId) : arrayUnion(viewingUserId)
       });
       document.getElementById('otherUserSheet').classList.add('hidden');
-      alert(isHidden ? "Story unhidden for this user." : "Your story is now hidden from this user.");
-    };
-
-    window.showAboutAccount = () => {
-      const u = usersMap[viewingUserId] || {};
-      document.getElementById('otherUserSheet').classList.add('hidden');
-      alert(`About @${u.username || u.name}\nJoined ZestUp: ${u.joinedAt || '2026'}\nStatus: ${isUserVerified(viewingUserId) ? 'Verified Account ✔' : 'Member'}`);
+      alert(isHidden ? "Story unhidden." : "Your story is now hidden from this user.");
     };
 
     window.showUserQrCode = () => {
       const u = usersMap[viewingUserId] || {};
       document.getElementById('otherUserSheet').classList.add('hidden');
-      alert(`ZestUp Profile QR Code for @${u.username || u.name}\nLink: ${window.location.origin}${window.location.pathname}?user=${viewingUserId}`);
+      openShareProfileSheet(viewingUserId);
     };
 
-    window.shareProfileUrl = (uid) => {
-      const url = `${window.location.origin}${window.location.pathname}?user=${uid}`;
-      navigator.clipboard?.writeText(url);
-      alert("Profile link copied: " + url);
+    window.openReportUserModal = async (targetUid) => {
+      const target = usersMap[targetUid] || {};
+      const reason = prompt(`Why are you reporting @${target.username || target.name}? (e.g., Spam, Bad behavior, Copyright)`);
+      if (reason && reason.trim()) {
+        await addDoc(collection(db, "supportTickets"), {
+          type: "USER_REPORT",
+          fromUid: currentUser.uid,
+          fromName: userProfileData.username || userProfileData.name,
+          targetUid,
+          targetName: target.username || target.name,
+          message: reason.trim(),
+          createdAt: serverTimestamp()
+        });
+        alert("Report sent to ZestUp Safety Team & Owner.");
+      }
     };
 
-    async function toggleFollowUser(targetUid) {
+    window.toggleFollowUser = async (targetUid) => {
       const isFollowing = (userProfileData.following || []).includes(targetUid);
       await updateDoc(doc(db, "users", currentUser.uid), {
         following: isFollowing ? arrayRemove(targetUid) : arrayUnion(targetUid)
@@ -972,8 +1532,9 @@
       await updateDoc(doc(db, "users", targetUid), {
         followers: isFollowing ? arrayRemove(currentUser.uid) : arrayUnion(currentUser.uid)
       });
-    }
+    };
 
+    // --- 8. CREATIVE VIDEO & REELS STUDIO (Filter, Effect, Audio, Sticker, Text, Live Location, Speed/Mute) ---
     window.openCreateScreen = (type = 'POST') => {
       setCreateType(type);
       document.getElementById('createScreen').classList.remove('hidden');
@@ -983,6 +1544,91 @@
       document.getElementById('createScreen').classList.add('hidden');
       clearCreateMedia();
       stopLiveCamera();
+    };
+
+    window.toggleEditorPanel = (panelId) => {
+      ['panelFilters', 'panelAudio', 'panelStickers', 'panelEdit'].forEach(id => {
+        const el = document.getElementById(id);
+        if (id === panelId) el.classList.toggle('hidden');
+        else el.classList.add('hidden');
+      });
+    };
+
+    window.applyMediaFilter = (cls, label) => {
+      selectedFilterClass = cls;
+      document.getElementById('createImgPreview').className = `w-full max-h-64 object-contain mx-auto ${cls} ${document.getElementById('createImgPreview').classList.contains('hidden') ? 'hidden' : ''}`;
+      document.getElementById('createVidPreview').className = `w-full max-h-64 mx-auto ${cls} ${document.getElementById('createVidPreview').classList.contains('hidden') ? 'hidden' : ''}`;
+    };
+
+    window.selectAudioTrack = (trackName) => {
+      selectedAudioName = trackName;
+      const badge = document.getElementById('overlayAudioTag');
+      badge.textContent = `🎵 ${trackName}`;
+      badge.classList.remove('hidden');
+      document.getElementById('createPreviewBox').classList.remove('hidden');
+    };
+
+    window.applySticker = (emoji) => {
+      selectedSticker = emoji;
+      const tag = document.getElementById('overlayStickerTag');
+      tag.textContent = emoji;
+      tag.classList.toggle('hidden', !emoji);
+      if (emoji) document.getElementById('createPreviewBox').classList.remove('hidden');
+    };
+
+    window.addOverlayText = () => {
+      const txt = prompt("Enter text to overlay on your video/photo:", selectedOverlayText);
+      if (txt !== null) {
+        selectedOverlayText = txt.trim();
+        const tag = document.getElementById('overlayTextTag');
+        tag.textContent = selectedOverlayText;
+        tag.classList.toggle('hidden', !selectedOverlayText);
+        if (selectedOverlayText) document.getElementById('createPreviewBox').classList.remove('hidden');
+      }
+    };
+
+    window.detectLiveLocation = () => {
+      const tag = document.getElementById('overlayLocationTag');
+      tag.textContent = "📍 Detecting live location...";
+      tag.classList.remove('hidden');
+      document.getElementById('createPreviewBox').classList.remove('hidden');
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (pos) => {
+            try {
+              const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
+              const data = await res.json();
+              const city = data.address?.city || data.address?.town || data.address?.state || "Live Location";
+              selectedLocation = city;
+              tag.textContent = `📍 ${city}`;
+            } catch {
+              selectedLocation = "Live Location";
+              tag.textContent = "📍 Live Location";
+            }
+          },
+          () => {
+            const manual = prompt("Enter your Location:", "India");
+            selectedLocation = manual || "";
+            tag.textContent = selectedLocation ? `📍 ${selectedLocation}` : "";
+            tag.classList.toggle('hidden', !selectedLocation);
+          }
+        );
+      }
+    };
+
+    window.setVideoSpeed = (rate) => {
+      const vid = document.getElementById('createVidPreview');
+      if (vid) vid.playbackRate = rate;
+    };
+
+    window.toggleVideoMute = () => {
+      const vid = document.getElementById('createVidPreview');
+      const btn = document.getElementById('muteVidBtn');
+      if (vid) {
+        vid.muted = !vid.muted;
+        btn.textContent = vid.muted ? "🔇 Muted" : "🔊 Sound On";
+      }
     };
 
     window.setCreateType = async (type) => {
@@ -1059,7 +1705,16 @@
 
     window.clearCreateMedia = () => {
       createFile = null;
+      selectedFilterClass = 'filter-none';
+      selectedAudioName = '';
+      selectedSticker = '';
+      selectedOverlayText = '';
+      selectedLocation = '';
       document.getElementById('createPreviewBox').classList.add('hidden');
+      document.getElementById('overlayLocationTag').classList.add('hidden');
+      document.getElementById('overlayAudioTag').classList.add('hidden');
+      document.getElementById('overlayStickerTag').classList.add('hidden');
+      document.getElementById('overlayTextTag').classList.add('hidden');
       document.getElementById('createCaptionInput').value = '';
     };
 
@@ -1091,6 +1746,9 @@
         if (createType === 'STORY' && mediaUrl) {
           await addDoc(collection(db, "stories"), {
             mediaUrl, caption,
+            filterClass: selectedFilterClass,
+            audioName: selectedAudioName,
+            location: selectedLocation,
             authorId: currentUser.uid,
             authorName: userProfileData.username || userProfileData.name,
             authorAvatar: userProfileData.avatar || defaultAvatar(userProfileData.name),
@@ -1100,6 +1758,11 @@
           await addDoc(collection(db, "posts"), {
             text: caption, mediaUrl, mediaType,
             isReel: createType === 'REEL',
+            filterClass: selectedFilterClass,
+            audioName: selectedAudioName,
+            sticker: selectedSticker,
+            overlayText: selectedOverlayText,
+            location: selectedLocation,
             authorId: currentUser.uid,
             authorName: userProfileData.username || userProfileData.name,
             authorAvatar: userProfileData.avatar || defaultAvatar(userProfileData.name),
@@ -1111,11 +1774,12 @@
       } catch (e) {
         alert("Upload failed: " + e.message);
       } finally {
-        btn.textContent = "Next ›";
+        btn.textContent = "Share ›";
         btn.disabled = false;
       }
     };
 
+    // --- STORIES & FEED RENDERING ---
     function renderStories() {
       const row = document.getElementById('storiesRow');
       const myAvatar = userProfileData.avatar || defaultAvatar(userProfileData.name);
@@ -1148,7 +1812,8 @@
           document.getElementById('storyUserImg').src = avatar;
           document.getElementById('storyUserName').innerHTML = `${name} ${badge}`;
           document.getElementById('storyFullImg').src = s.mediaUrl;
-          document.getElementById('storyCaption').textContent = s.caption || "";
+          document.getElementById('storyFullImg').className = `max-h-[75vh] w-full object-contain rounded-xl my-auto ${s.filterClass || ''}`;
+          document.getElementById('storyCaption').textContent = [s.location ? `📍 ${s.location}` : '', s.caption || ''].filter(Boolean).join(' • ');
           document.getElementById('storyViewer').classList.remove('hidden');
         };
         row.appendChild(el);
@@ -1185,7 +1850,7 @@
               </div>
               <div>
                 <p class="text-xs font-bold leading-tight flex items-center gap-1">${authorName} ${badge}</p>
-                <p class="text-[10px] text-slate-400">Trending on ZestUp</p>
+                <p class="text-[10px] text-slate-400">${post.location ? `📍 ${post.location}` : (post.audioName ? `🎵 ${post.audioName}` : 'Trending on ZestUp')}</p>
               </div>
             </div>
             <div class="flex items-center gap-2">
@@ -1194,9 +1859,15 @@
             </div>
           </div>
 
-          ${post.mediaUrl ? (post.mediaType === 'video'
-            ? `<video src="${post.mediaUrl}" controls playsinline class="w-full max-h-[480px] bg-black object-cover"></video>`
-            : `<img src="${post.mediaUrl}" class="w-full max-h-[480px] object-cover bg-slate-100" />`) : ''}
+          ${post.mediaUrl ? `
+            <div class="relative overflow-hidden">
+              ${post.mediaType === 'video'
+                ? `<video src="${post.mediaUrl}" controls playsinline class="w-full max-h-[480px] bg-black object-cover ${post.filterClass || ''}"></video>`
+                : `<img src="${post.mediaUrl}" class="w-full max-h-[480px] object-cover bg-slate-100 ${post.filterClass || ''}" />`}
+              ${post.sticker ? `<span class="absolute top-4 right-4 text-4xl drop-shadow">${post.sticker}</span>` : ''}
+              ${post.overlayText ? `<div class="absolute bottom-10 inset-x-4 text-center font-extrabold text-base text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">${post.overlayText}</div>` : ''}
+              ${post.audioName ? `<div class="absolute bottom-2.5 left-2.5 bg-black/60 text-white text-[10px] px-2.5 py-1 rounded-full">🎵 ${post.audioName}</div>` : ''}
+            </div>` : ''}
 
           <div class="px-3 pt-2.5 space-y-1.5">
             <div class="flex items-center justify-between">
@@ -1276,7 +1947,7 @@
 
       feed.querySelectorAll('.post-dots-btn').forEach(btn => {
         btn.onclick = async () => {
-          if (btn.dataset.mine === 'true') {
+          if (btn.dataset.mine === 'true' || isOwner(currentUser.uid)) {
             if (confirm("Delete this post?")) await deleteDoc(doc(db, "posts", btn.dataset.id));
           } else {
             navigator.clipboard?.writeText(window.location.href);
@@ -1286,6 +1957,7 @@
       });
     }
 
+    // --- 5. DM INBOX (ONLY PEOPLE YOU MESSAGED OR WHO MESSAGED YOU) & 6. REAL-TIME ACTIVE / LAST SEEN ---
     window.setDmFilter = (filterName) => {
       dmFilter = filterName;
       document.querySelectorAll('.dm-filter-btn').forEach(btn => {
@@ -1301,8 +1973,18 @@
       const notesRow = document.getElementById('dmNotesRow');
       const threadsList = document.getElementById('dmThreadsList');
       const searchQ = (document.getElementById('dmSearchInput')?.value || "").toLowerCase().trim();
-      const otherUsers = Object.values(usersMap).filter(u => u.uid !== currentUser.uid && !(userProfileData.blockedUsers || []).includes(u.uid));
 
+      // Find unique partner UIDs who actually have messages with currentUser
+      const chattedPartnerIds = new Set();
+      allMessages.forEach(m => {
+        if (m.senderId === currentUser.uid) chattedPartnerIds.add(m.receiverId);
+        if (m.receiverId === currentUser.uid) chattedPartnerIds.add(m.senderId);
+      });
+
+      const allOtherUsers = Object.values(usersMap).filter(u => u.uid !== currentUser.uid && !(userProfileData.blockedUsers || []).includes(u.uid));
+
+      // Notes row shows own note + people you follow or have chatted with
+      const noteUsers = allOtherUsers.filter(u => chattedPartnerIds.has(u.uid) || (userProfileData.following || []).includes(u.uid));
       notesRow.innerHTML = `
         <div onclick="updateMyNote()" class="flex flex-col items-center shrink-0 cursor-pointer">
           <div class="relative">
@@ -1311,24 +1993,37 @@
           </div>
           <span class="text-[11px] text-slate-500 mt-1">Your note</span>
         </div>` +
-        otherUsers.map(u => `
-          <div onclick="openPrivateChat('${u.uid}')" class="flex flex-col items-center shrink-0 cursor-pointer">
-            <div class="relative mt-4">
-              <img src="${u.avatar || defaultAvatar(u.name)}" class="w-14 h-14 rounded-full object-cover border border-slate-200" />
-              <span class="w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full absolute bottom-0 right-0"></span>
-            </div>
-            <span class="text-[11px] text-slate-800 max-w-[68px] truncate mt-1">${u.username || u.name}</span>
-          </div>`).join('');
+        noteUsers.map(u => {
+          const presence = getPresenceInfo(u);
+          return `
+            <div onclick="openPrivateChat('${u.uid}')" class="flex flex-col items-center shrink-0 cursor-pointer">
+              <div class="relative mt-4">
+                <img src="${u.avatar || defaultAvatar(u.name)}" class="w-14 h-14 rounded-full object-cover border border-slate-200" />
+                ${presence.isOnline ? `<span class="w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full absolute bottom-0 right-0"></span>` : ''}
+              </div>
+              <span class="text-[11px] text-slate-800 max-w-[68px] truncate mt-1">${u.username || u.name}</span>
+            </div>`;
+        }).join('');
 
-      let filteredUsers = otherUsers.filter(u => !searchQ || (u.name || "").toLowerCase().includes(searchQ) || (u.username || "").toLowerCase().includes(searchQ));
+      // If searching, allow finding any user to start a new chat; otherwise ONLY show users with existing messages
+      let listPool = searchQ
+        ? allOtherUsers.filter(u => (u.name || "").toLowerCase().includes(searchQ) || (u.username || "").toLowerCase().includes(searchQ))
+        : allOtherUsers.filter(u => chattedPartnerIds.has(u.uid));
+
       if (dmFilter === 'Followers') {
-        filteredUsers = filteredUsers.filter(u => (userProfileData.followers || []).includes(u.uid));
+        listPool = listPool.filter(u => (userProfileData.followers || []).includes(u.uid));
       } else if (dmFilter === 'Verified') {
-        filteredUsers = filteredUsers.filter(u => isUserVerified(u.uid));
+        listPool = listPool.filter(u => isUserVerified(u.uid));
       }
 
-      threadsList.innerHTML = filteredUsers.map(u => {
+      if (!listPool.length) {
+        threadsList.innerHTML = `<p class="text-center text-xs text-slate-400 py-14 px-6">No messages yet. Search a user above or tap Message on any profile to start chatting!</p>`;
+        return;
+      }
+
+      threadsList.innerHTML = listPool.map(u => {
         const badge = getBadgeHTML(u.uid);
+        const presence = getPresenceInfo(u);
         const convo = allMessages.filter(m =>
           (m.senderId === currentUser.uid && m.receiverId === u.uid) ||
           (m.senderId === u.uid && m.receiverId === currentUser.uid)
@@ -1339,11 +2034,13 @@
             <div class="flex items-center gap-3 min-w-0">
               <div class="relative shrink-0">
                 <img src="${u.avatar || defaultAvatar(u.name)}" class="w-12 h-12 rounded-full object-cover" />
-                <span class="w-3 h-3 bg-emerald-500 border-2 border-white rounded-full absolute bottom-0 right-0"></span>
+                ${presence.isOnline ? `<span class="w-3 h-3 bg-emerald-500 border-2 border-white rounded-full absolute bottom-0 right-0"></span>` : ''}
               </div>
               <div class="min-w-0">
                 <p class="text-xs font-bold flex items-center gap-1 truncate">${u.username || u.name} ${badge}</p>
-                <p class="text-[11px] text-slate-500 truncate">${lastMsg ? lastMsg.text : 'Active now • Tap to chat'}</p>
+                <p class="text-[11px] ${presence.isOnline ? 'text-emerald-600 font-semibold' : 'text-slate-500'} truncate">
+                  ${lastMsg ? lastMsg.text : presence.text} • <span class="text-slate-400 font-normal">${presence.text}</span>
+                </p>
               </div>
             </div>
             <span class="text-slate-400 text-lg">📷</span>
@@ -1361,8 +2058,12 @@
     window.openPrivateChat = (targetUid) => {
       activeChatPartnerId = targetUid;
       const u = usersMap[targetUid] || {};
+      const presence = getPresenceInfo(u);
       document.getElementById('chatTargetAvatar').src = u.avatar || defaultAvatar(u.name);
       document.getElementById('chatTargetName').innerHTML = `${u.username || u.name} ${getBadgeHTML(targetUid)}`;
+      document.getElementById('chatTargetOnlineDot').classList.toggle('hidden', !presence.isOnline);
+      document.getElementById('chatTargetStatusText').textContent = presence.isOnline ? `● ${presence.text}` : presence.text;
+      document.getElementById('chatTargetStatusText').className = presence.isOnline ? "text-[10px] text-emerald-500 font-bold" : "text-[10px] text-slate-400 font-semibold";
       document.getElementById('viewChatUserProfileBtn').onclick = () => {
         closePrivateChat();
         openOtherProfile(targetUid);
@@ -1405,16 +2106,20 @@
       });
     };
 
+    // --- REELS & EXPLORE ---
     function renderReels() {
       const container = document.getElementById('reelsContainer');
       const videos = allPosts.filter(p => p.mediaType === 'video' && p.mediaUrl);
       if (!videos.length) return;
       container.innerHTML = videos.map(v => `
         <div class="relative rounded-2xl overflow-hidden bg-zinc-900">
-          <video src="${v.mediaUrl}" controls loop playsinline class="w-full h-[72vh] object-cover"></video>
+          <video src="${v.mediaUrl}" controls loop playsinline class="w-full h-[72vh] object-cover ${v.filterClass || ''}"></video>
+          ${v.sticker ? `<span class="absolute top-5 right-5 text-4xl">${v.sticker}</span>` : ''}
+          ${v.overlayText ? `<div class="absolute top-1/3 inset-x-4 text-center font-extrabold text-lg text-white drop-shadow">${v.overlayText}</div>` : ''}
           <div onclick="openOtherProfile('${v.authorId}')" class="p-3 bg-gradient-to-t from-black/90 to-transparent absolute bottom-0 inset-x-0 cursor-pointer">
             <p class="text-xs font-bold flex items-center gap-1">@${v.authorName} ${getBadgeHTML(v.authorId)}</p>
             <p class="text-xs text-zinc-200 mt-0.5">${v.text || ''}</p>
+            ${v.audioName ? `<p class="text-[10px] text-pink-300 mt-0.5">🎵 ${v.audioName}</p>` : ''}
           </div>
         </div>`).join('');
     }
@@ -1470,13 +2175,14 @@
       } else {
         const filteredPosts = allPosts.filter(p => p.mediaUrl && (!term || (p.text || "").toLowerCase().includes(term)));
         grid.innerHTML = filteredPosts.map(p => p.mediaType === 'video'
-          ? `<video src="${p.mediaUrl}" class="aspect-square w-full object-cover bg-black"></video>`
-          : `<img src="${p.mediaUrl}" class="aspect-square w-full object-cover bg-slate-100" />`).join('');
+          ? `<video src="${p.mediaUrl}" class="aspect-square w-full object-cover bg-black ${p.filterClass || ''}"></video>`
+          : `<img src="${p.mediaUrl}" class="aspect-square w-full object-cover bg-slate-100 ${p.filterClass || ''}" />`).join('');
       }
     }
 
     document.getElementById('searchInput').oninput = () => renderSearchAndExplore();
 
+    // --- SETTINGS, CREATOR EARNINGS DASHBOARD & PROFILE STATUS ---
     window.openSettings = () => document.getElementById('settingsPage').classList.remove('hidden');
     window.closeSettings = () => document.getElementById('settingsPage').classList.add('hidden');
 
@@ -1502,39 +2208,250 @@
         body.innerHTML = blocked.length
           ? blocked.map(u => `<div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl"><span class="font-bold text-xs">${u.username || u.name}</span><button onclick="updateDoc(doc(db,'users',currentUser.uid),{blockedUsers:arrayRemove('${u.uid}')})" class="text-xs text-indigo-600 font-bold">Unblock</button></div>`).join('')
           : `<p class="text-slate-400 text-center py-12">No blocked accounts.</p>`;
+      } else if (type === 'dashboard') {
+        title.textContent = "Creator Dashboard & Earnings";
+        const myPosts = allPosts.filter(p => p.authorId === currentUser.uid);
+        const totalLikes = myPosts.reduce((s, p) => s + (p.likes?.length || 0), 0);
+        const totalComments = myPosts.reduce((s, p) => s + (p.comments?.length || 0), 0);
+        body.innerHTML = `
+          <div class="p-4 rounded-2xl zest-gradient text-white space-y-1">
+            <p class="text-xs opacity-90">Total Creator Earnings</p>
+            <p class="text-3xl font-extrabold">₹${userProfileData.earnings || 0}</p>
+            <p class="text-[11px] opacity-85">Monetization Status: ${userProfileData.monetized ? 'Active ✔' : 'Standard Creator'}</p>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
+              <p class="text-xs text-slate-500">Total Likes</p>
+              <p class="text-xl font-extrabold text-slate-900 mt-1">${totalLikes}</p>
+            </div>
+            <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
+              <p class="text-xs text-slate-500">Total Comments</p>
+              <p class="text-xl font-extrabold text-slate-900 mt-1">${totalComments}</p>
+            </div>
+          </div>`;
       } else {
-        title.textContent = "Account Details";
-        body.innerHTML = `<div class="p-4 bg-slate-50 rounded-2xl text-xs space-y-2"><p class="font-bold">${userProfileData.name}</p><p>Status: ${isUserVerified(currentUser.uid) ? 'Verified Creator ✔' : 'Active Member'}</p></div>`;
+        title.textContent = "Profile Status & Strikes";
+        const strikes = userProfileData.copyrightStrikes || 0;
+        const warnings = userProfileData.warnings || [];
+        body.innerHTML = `
+          <div class="p-4 bg-slate-50 rounded-2xl space-y-2">
+            <p class="font-bold text-sm">Account Standing: ${strikes === 0 ? '✅ Good Standing' : `⚠️ ${strikes} Copyright Strike(s)`}</p>
+            <p class="text-xs text-slate-600">Copyright Strikes: <b>${strikes} / 3</b></p>
+            ${warnings.length ? `<div class="pt-2 space-y-1"><p class="text-xs font-bold text-rose-600">Warnings from ZestUp Team:</p>${warnings.map(w => `<p class="text-xs bg-rose-50 text-rose-700 p-2 rounded-lg">• ${w}</p>`).join('')}</div>` : '<p class="text-xs text-emerald-600">No active warnings on your account.</p>'}
+          </div>`;
       }
     };
 
+    // --- 9 & 10. FOUNDER ADMIN PANEL (All Users, NEW Badge, Blue Tick, Copyright Strike, Warning/Ban, Earnings) ---
+    function renderNotifications() {
+      const box = document.getElementById('notificationsList');
+      if (!box) return;
+      let html = `<div class="p-3 bg-indigo-50/70 rounded-xl text-indigo-800 font-medium">👋 Welcome to ZestUp, <b>${userProfileData.name || 'Creator'}</b>!</div>`;
+
+      (userProfileData.warnings || []).forEach(w => {
+        html += `<div class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700">⚠️ <b>ZestUp Safety Notice:</b> ${w}</div>`;
+      });
+
+      if ((userProfileData.earnings || 0) > 0) {
+        html += `<div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800">💰 <b>Creator Reward:</b> Your ZestUp Earnings balance is <b>₹${userProfileData.earnings}</b>!</div>`;
+      }
+
+      if (isOwner(currentUser.uid)) {
+        const allUsers = Object.values(usersMap).filter(u => u.uid !== currentUser.uid);
+        allUsers.forEach(u => {
+          html += `
+            <div onclick="openOtherProfile('${u.uid}')" class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between cursor-pointer">
+              <div>
+                <p class="font-bold text-slate-900">🆕 ${u.name || u.username} (@${u.username}) joined ZestUp</p>
+                <p class="text-[11px] text-slate-500">Joined: ${u.joinedAt || 'Recently'}</p>
+              </div>
+              <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">USER</span>
+            </div>`;
+        });
+      }
+      box.innerHTML = html;
+    }
+
     window.openAdminModal = () => {
       renderAdminUsersList();
+      renderAdminTicketsList();
       document.getElementById('adminModal').classList.remove('hidden');
+    };
+
+    window.switchAdminTab = (tab) => {
+      document.getElementById('adminTabUsersBtn').className = tab === 'users' ? 'py-2.5 border-b-2 border-indigo-600 text-indigo-600' : 'py-2.5 text-slate-400';
+      document.getElementById('adminTabTicketsBtn').className = tab === 'tickets' ? 'py-2.5 border-b-2 border-indigo-600 text-indigo-600' : 'py-2.5 text-slate-400';
+      document.getElementById('adminUsersList').classList.toggle('hidden', tab !== 'users');
+      document.getElementById('adminTicketsList').classList.toggle('hidden', tab !== 'tickets');
     };
 
     function renderAdminUsersList() {
       const list = document.getElementById('adminUsersList');
+      const countEl = document.getElementById('adminTotalUsersCount');
       if (!list) return;
-      list.innerHTML = Object.values(usersMap).map(u => {
+      const usersArr = Object.values(usersMap);
+      if (countEl) countEl.textContent = `Total Registered Users: ${usersArr.length}`;
+
+      list.innerHTML = usersArr.map(u => {
         const owner = isOwner(u.uid);
         const verified = isUserVerified(u.uid);
         return `
-          <div class="flex items-center justify-between p-2 rounded-xl bg-slate-50">
-            <div class="flex items-center gap-2 min-w-0">
-              <img src="${u.avatar || defaultAvatar(u.name)}" class="w-8 h-8 rounded-full object-cover" />
-              <span class="text-xs font-bold truncate">${u.username || u.name} ${verified ? BLUE_TICK_SVG : ''}</span>
+          <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div onclick="document.getElementById('adminModal').classList.add('hidden'); openOtherProfile('${u.uid}')" class="flex items-center gap-2.5 min-w-0 cursor-pointer">
+                <img src="${u.avatar || defaultAvatar(u.name)}" class="w-10 h-10 rounded-full object-cover" />
+                <div class="min-w-0">
+                  <p class="text-xs font-bold truncate flex items-center gap-1">
+                    ${u.name || u.username} ${verified ? BLUE_TICK_SVG : ''}
+                    ${!owner ? `<span class="text-[9px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-extrabold">ID</span>` : ''}
+                  </p>
+                  <p class="text-[10px] text-slate-500">@${u.username} • Joined ${u.joinedAt || '2026'}</p>
+                  <p class="text-[10px] text-indigo-600 font-semibold">Earnings: ₹${u.earnings || 0} • Strikes: ${u.copyrightStrikes || 0}</p>
+                </div>
+              </div>
+              ${owner ? `<span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-zinc-900 text-white">Owner</span>` : ''}
             </div>
-            ${owner
-              ? `<span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-zinc-900 text-white">Owner</span>`
-              : `<button onclick="toggleVerifyUser('${u.uid}', ${verified})" class="text-[11px] font-bold px-3 py-1 rounded-lg ${verified ? 'bg-rose-100 text-rose-600' : 'bg-indigo-600 text-white'}">${verified ? 'Remove' : 'Give Blue Tick'}</button>`
-            }
+
+            ${!owner ? `
+              <div class="grid grid-cols-2 gap-1.5 text-[11px] font-bold pt-1">
+                <button onclick="toggleVerifyUser('${u.uid}', ${verified})" class="py-1.5 rounded-lg ${verified ? 'bg-slate-200 text-slate-800' : 'bg-sky-600 text-white'}">
+                  ${verified ? 'Remove Blue Tick' : '✔ Give Blue Tick'}
+                </button>
+                <button onclick="giveCreatorEarning('${u.uid}')" class="py-1.5 rounded-lg bg-emerald-600 text-white">
+                  💰 Give Earning (₹)
+                </button>
+                <button onclick="issueCopyrightStrike('${u.uid}')" class="py-1.5 rounded-lg bg-amber-500 text-white">
+                  ©️ Copyright Strike
+                </button>
+                <button onclick="warnOrSuspendUser('${u.uid}', ${!!u.isSuspended})" class="py-1.5 rounded-lg bg-rose-600 text-white">
+                  ${u.isSuspended ? 'Unban Account' : '⚠️ Report / Ban'}
+                </button>
+              </div>` : ''}
           </div>`;
       }).join('');
     }
 
+    function renderAdminTicketsList() {
+      const box = document.getElementById('adminTicketsList');
+      if (!box) return;
+      box.innerHTML = allSupportTickets.length ? allSupportTickets.map(t => `
+        <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+          <div class="flex justify-between text-[10px] font-bold">
+            <span class="text-indigo-600">${t.type === 'USER_REPORT' ? '🚨 User Report' : '🆘 Help Request'}</span>
+            <span class="text-slate-400">From: @${t.fromName}</span>
+          </div>
+          ${t.targetName ? `<p class="text-xs font-bold text-rose-600">Reported User: @${t.targetName}</p>` : ''}
+          <p class="text-xs text-slate-800">${t.message}</p>
+        </div>`).join('') : `<p class="text-center text-xs text-slate-400 py-12">No reports or support messages yet.</p>`;
+    }
+
     window.toggleVerifyUser = async (uid, current) => {
       await updateDoc(doc(db, "users", uid), { verified: !current });
+    };
+
+    window.giveCreatorEarning = async (uid) => {
+      const u = usersMap[uid] || {};
+      const amountStr = prompt(`Enter Earning amount (in ₹) to add to @${u.username}'s Creator Balance:`, "500");
+      const amt = parseFloat(amountStr);
+      if (!isNaN(amt) && amt > 0) {
+        await updateDoc(doc(db, "users", uid), {
+          earnings: (u.earnings || 0) + amt,
+          monetized: true
+        });
+        alert(`₹${amt} added to @${u.username}'s Creator Earnings!`);
+      }
+    };
+
+    window.issueCopyrightStrike = async (uid) => {
+      const u = usersMap[uid] || {};
+      const reason = prompt(`Enter Copyright Strike reason for @${u.username}:`, "Unauthorized copyrighted video/audio used.");
+      if (reason && reason.trim()) {
+        const newStrikes = (u.copyrightStrikes || 0) + 1;
+        await updateDoc(doc(db, "users", uid), {
+          copyrightStrikes: newStrikes,
+          warnings: arrayUnion(`Copyright Strike #${newStrikes}: ${reason.trim()}`)
+        });
+        alert(`Copyright Strike issued to @${u.username}. Total strikes: ${newStrikes}`);
+      }
+    };
+
+    window.warnOrSuspendUser = async (uid, isCurrentlySuspended) => {
+      const u = usersMap[uid] || {};
+      if (isCurrentlySuspended) {
+        await updateDoc(doc(db, "users", uid), { isSuspended: false });
+        alert(`@${u.username}'s account has been unbanned.`);
+        return;
+      }
+      const action = prompt(`Type 'WARN' to send a warning or 'BAN' to suspend @${u.username}:`, "WARN");
+      if (action?.toUpperCase() === 'BAN') {
+        await updateDoc(doc(db, "users", uid), {
+          isSuspended: true,
+          warnings: arrayUnion("Account suspended by ZestUp Owner for policy violation.")
+        });
+        alert(`@${u.username} has been suspended.`);
+      } else if (action?.toUpperCase() === 'WARN') {
+        const msg = prompt("Enter warning message:");
+        if (msg) {
+          await updateDoc(doc(db, "users", uid), { warnings: arrayUnion(msg.trim()) });
+          alert("Warning sent to user.");
+        }
+      }
+    };
+
+    // --- 11. ZESTUP HELP AI ASSISTANT ---
+    window.openHelpAiModal = () => {
+      document.getElementById('helpAiModal').classList.remove('hidden');
+    };
+
+    window.sendHelpAiMessage = () => {
+      const input = document.getElementById('helpAiInput');
+      const q = input.value.trim();
+      if (!q) return;
+      input.value = "";
+      const box = document.getElementById('helpAiChatBox');
+
+      box.innerHTML += `
+        <div class="flex justify-end">
+          <div class="px-3.5 py-2 rounded-2xl zest-gradient text-white max-w-[80%]">${q}</div>
+        </div>`;
+
+      const lower = q.toLowerCase();
+      let reply = "I understand your concern! You can check your account settings or tap <b>Message Team</b> at the top right so our ZestUp Owner & Support Team can directly review your account.";
+
+      if (lower.includes("password") || lower.includes("login") || lower.includes("recover") || lower.includes("id") || lower.includes("otp")) {
+        reply = "🔑 <b>Account Login & Recovery Solution:</b> Go to <b>Profile → Menu (☰) → Accounts Center</b> and make sure both your <b>Mobile Number</b> and <b>Gmail</b> are linked. You can log in anytime using either Mobile + Password or Mobile + OTP!";
+      } else if (lower.includes("blue") || lower.includes("tick") || lower.includes("verify")) {
+        reply = "☑️ <b>Blue Verified Tick Solution:</b> Post original videos/reels regularly and keep a complete profile bio & picture. The ZestUp Founder reviews active creators and grants the Blue Tick directly!";
+      } else if (lower.includes("earn") || lower.includes("money") || lower.includes("monetiz")) {
+        reply = "💰 <b>Creator Earnings Solution:</b> Upload original Reels and Posts to grow your engagement. Once approved by the ZestUp Team, your earnings appear inside <b>Profile → Creator Dashboard & Earnings</b>.";
+      } else if (lower.includes("copyright") || lower.includes("strike") || lower.includes("report") || lower.includes("ban")) {
+        reply = "🛡️ <b>Copyright & Safety Solution:</b> Always upload original content or use ZestUp Studio audio. You can check any active strikes in <b>Settings → Profile status & Strikes</b>.";
+      } else if (lower.includes("video") || lower.includes("reel") || lower.includes("upload") || lower.includes("filter")) {
+        reply = "🎬 <b>Video & Reels Studio Solution:</b> Tap the <b>+</b> button, select <b>REEL</b> or <b>POST</b>, pick your video, and use the <b>Creative Studio Tools</b> (Filter/Effect, Audio, Sticker, Text, Live Location, Speed/Mute) before sharing!";
+      }
+
+      setTimeout(() => {
+        box.innerHTML += `
+          <div class="bg-white border border-slate-200 p-3 rounded-2xl max-w-[85%] space-y-1">
+            <p class="font-bold text-indigo-600">ZestUp Help AI 🤖</p>
+            <p>${reply}</p>
+          </div>`;
+        box.scrollTop = box.scrollHeight;
+      }, 350);
+    };
+
+    window.escalateToHumanTeam = async () => {
+      const msg = prompt("Describe your issue to send directly to the ZestUp Owner & Support Team:");
+      if (msg && msg.trim()) {
+        await addDoc(collection(db, "supportTickets"), {
+          type: "HELP_REQUEST",
+          fromUid: currentUser ? currentUser.uid : "guest",
+          fromName: userProfileData.username || userProfileData.name || "Guest User",
+          message: msg.trim(),
+          createdAt: serverTimestamp()
+        });
+        alert("Your message has been sent to the ZestUp Team & Owner!");
+      }
     };
   </script>
 </body>
