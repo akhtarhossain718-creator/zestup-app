@@ -1,0 +1,17 @@
+{
+  "name": "ZestUp",
+  "short_name": "ZestUp",
+  "start_url": "/zestup-app/",
+  "scope": "/zestup-app/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4F46E5",
+  "icons": [
+    {
+      "src": "https://ui-avatars.com/api/?name=Z&background=4F46E5&color=fff&size=512&bold=true",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
