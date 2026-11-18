@@ -28,7 +28,10 @@
 </head>
 <body class="min-h-screen flex flex-col items-center bg-slate-50 text-slate-900">
 
-  <!-- 1. AUTH SCREEN (Separate Sign Up & Log In with Mobile/Gmail + OTP + Password) -->
+  <!-- Hidden reCAPTCHA container required for real SIM SMS OTP -->
+  <div id="recaptcha-container"></div>
+
+  <!-- 1. AUTH SCREEN (Real SIM SMS OTP + Password Login & Sign Up) -->
   <main id="authSection" class="hidden w-full max-w-md px-5 py-8 flex-1 flex flex-col justify-center bg-white min-h-screen">
     <div class="border border-slate-200/80 rounded-3xl p-6 shadow-sm bg-white">
       <div class="flex flex-col items-center mb-4">
@@ -57,7 +60,7 @@
 
       <!-- Channel Switch: Mobile vs Gmail -->
       <div class="flex items-center justify-center gap-4 mb-3 text-xs font-bold border-b border-slate-100 pb-2">
-        <button id="channelPhoneBtn" onclick="setAuthChannel('phone')" class="text-indigo-600 border-b-2 border-indigo-600 pb-1">📱 Mobile Number</button>
+        <button id="channelPhoneBtn" onclick="setAuthChannel('phone')" class="text-indigo-600 border-b-2 border-indigo-600 pb-1">📱 Mobile (SIM SMS)</button>
         <button id="channelGmailBtn" onclick="setAuthChannel('gmail')" class="text-slate-400 pb-1">✉️ Gmail</button>
       </div>
 
@@ -76,30 +79,30 @@
           <input id="emailInput" type="email" placeholder="Enter your Gmail (e.g. name@gmail.com)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
         </div>
 
-        <!-- Login Sub-method Toggle (Password vs OTP) -->
+        <!-- Login Sub-method Toggle (SIM SMS OTP vs Password) -->
         <div id="loginMethodRow" class="flex items-center justify-between text-[11px] px-1">
           <span class="text-slate-500">Login via:</span>
           <div class="flex gap-3 font-bold">
-            <button id="loginViaPassBtn" onclick="setLoginSubType('password')" class="text-indigo-600 underline">Password</button>
-            <button id="loginViaOtpBtn" onclick="setLoginSubType('otp')" class="text-slate-400">OTP</button>
+            <button id="loginViaOtpBtn" onclick="setLoginSubType('otp')" class="text-indigo-600 underline">SIM SMS OTP</button>
+            <button id="loginViaPassBtn" onclick="setLoginSubType('password')" class="text-slate-400">Password</button>
           </div>
         </div>
 
-        <!-- Password Field (Used for Login-Password OR SignUp Create New Password) -->
-        <div id="passwordFieldBox">
+        <!-- Password Field -->
+        <div id="passwordFieldBox" class="hidden">
           <input id="passwordInput" type="password" placeholder="Enter Password" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
         </div>
 
-        <!-- OTP Field -->
+        <!-- Real SIM SMS OTP Entry Field -->
         <div id="otpBox" class="hidden space-y-2 pt-1">
-          <p id="otpHintText" class="text-[11px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-2 rounded-xl text-center"></p>
-          <input id="otpCodeInput" type="text" maxlength="6" placeholder="Enter 6-digit OTP" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-indigo-300 text-center tracking-[0.4em] font-bold text-base focus:outline-none" />
+          <p id="otpHintText" class="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl text-center">📩 SMS OTP sent to your mobile SIM!</p>
+          <input id="otpCodeInput" type="tel" maxlength="6" placeholder="Enter 6-digit SMS OTP" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-indigo-300 text-center tracking-[0.4em] font-bold text-base focus:outline-none" />
         </div>
 
         <p id="authError" class="text-xs text-rose-500 font-medium hidden"></p>
 
-        <button id="primaryAuthBtn" class="w-full py-2.5 rounded-xl zest-gradient font-bold text-white text-sm shadow-sm">Log In</button>
-        <button id="verifyOtpAuthBtn" class="hidden w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-bold text-white text-sm shadow-sm">Verify OTP & Continue</button>
+        <button id="primaryAuthBtn" class="w-full py-2.5 rounded-xl zest-gradient font-bold text-white text-sm shadow-sm">Send SMS OTP</button>
+        <button id="verifyOtpAuthBtn" class="hidden w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-bold text-white text-sm shadow-sm">Verify SIM OTP & Continue</button>
       </div>
 
       <div class="mt-4 pt-3 border-t border-slate-100 flex justify-center">
@@ -148,7 +151,7 @@
       </div>
     </section>
 
-    <!-- 3. MESSAGES / DM INBOX TAB (Only Active Conversations + Search) -->
+    <!-- 3. MESSAGES / DM INBOX TAB -->
     <section id="chatTab" class="hidden flex-1 flex flex-col pb-16 min-h-screen bg-white">
       <header class="sticky top-0 z-40 bg-white px-4 py-3 flex items-center justify-between border-b border-slate-100">
         <button onclick="switchTab('profileTab')" class="p-1 text-slate-800">
@@ -171,17 +174,14 @@
         </div>
       </div>
 
-      <!-- Notes Row (Only people you follow or chatted with) -->
       <div id="dmNotesRow" class="flex items-center gap-4 px-4 py-2.5 overflow-x-auto no-scrollbar"></div>
 
-      <!-- Filter Pills -->
       <div class="flex items-center gap-2 px-4 py-2 overflow-x-auto no-scrollbar border-b border-slate-100">
         <button onclick="setDmFilter('Primary')" class="dm-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shrink-0" data-filter="Primary">Primary</button>
         <button onclick="setDmFilter('Followers')" class="dm-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 shrink-0" data-filter="Followers">Followers</button>
         <button onclick="setDmFilter('Verified')" class="dm-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 shrink-0" data-filter="Verified">Verified profiles</button>
       </div>
 
-      <!-- Conversation List (Only users who sent/received messages, unless searching) -->
       <div id="dmThreadsList" class="flex-1 divide-y divide-slate-50"></div>
     </section>
 
@@ -267,7 +267,6 @@
           <p id="profBio" class="text-xs text-slate-700 whitespace-pre-line">Creator on ZestUp ✨</p>
         </div>
 
-        <!-- Creator Dashboard Card (Shows Engagements + Earnings) -->
         <div onclick="openSubSetting('dashboard')" class="mt-3 bg-slate-100 rounded-2xl px-3.5 py-2.5 cursor-pointer flex items-center justify-between">
           <div>
             <p class="text-xs font-bold text-slate-900">Creator dashboard</p>
@@ -281,7 +280,6 @@
           <button onclick="openShareProfileSheet(currentUser.uid)" class="py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Share profile</button>
         </div>
 
-        <!-- FOUNDER ADMIN BUTTON -->
         <button id="adminPanelBtn" onclick="openAdminModal()" class="hidden w-full mt-2.5 py-2.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold text-xs flex items-center justify-center gap-1.5">
           <span>🛡️ Founder Admin: Users, Strikes, Earnings & Help</span>
         </button>
@@ -363,7 +361,7 @@
       </div>
     </div>
 
-    <!-- CUSTOM "ABOUT THIS ACCOUNT" MODAL (Privacy Protected - Specific to Viewed User) -->
+    <!-- CUSTOM "ABOUT THIS ACCOUNT" MODAL -->
     <div id="aboutAccountModal" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col">
       <header class="sticky top-0 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
         <button onclick="document.getElementById('aboutAccountModal').classList.add('hidden')" class="text-xl font-bold">←</button>
@@ -385,7 +383,7 @@
       <div id="followListContainer" class="flex-1 overflow-y-auto divide-y divide-slate-100"></div>
     </div>
 
-    <!-- SHARE PROFILE BOTTOM SHEET (WhatsApp, WhatsApp Status, SMS, Copy) -->
+    <!-- SHARE PROFILE BOTTOM SHEET -->
     <div id="shareProfileSheet" class="hidden fixed inset-0 z-50 bg-black/50 flex items-end justify-center" onclick="if(event.target===this)this.classList.add('hidden')">
       <div class="bg-white w-full max-w-md rounded-t-3xl p-5 space-y-4">
         <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto"></div>
@@ -428,12 +426,10 @@
 
       <div class="flex-1 overflow-y-auto p-3.5 space-y-3">
         <div id="mediaUploadArea" class="space-y-3">
-          <!-- Preview Stage with Live Overlay (Filter, Text, Sticker, Location, Audio Badge) -->
           <div id="createPreviewBox" class="hidden relative rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800">
             <img id="createImgPreview" class="hidden w-full max-h-64 object-contain mx-auto filter-none" />
             <video id="createVidPreview" controls playsinline class="hidden w-full max-h-64 mx-auto filter-none"></video>
             
-            <!-- Live Overlay Badges -->
             <div id="overlayLocationTag" class="hidden absolute top-2.5 left-2.5 bg-black/65 backdrop-blur px-2.5 py-1 rounded-full text-[11px] font-bold text-white">📍 Location</div>
             <div id="overlayAudioTag" class="hidden absolute bottom-2.5 left-2.5 bg-black/65 backdrop-blur px-2.5 py-1 rounded-full text-[11px] font-bold text-pink-300">🎵 Audio</div>
             <div id="overlayStickerTag" class="hidden absolute top-1/3 right-4 text-4xl drop-shadow"></div>
@@ -442,7 +438,6 @@
             <button onclick="clearCreateMedia()" class="absolute top-2 right-2 bg-black/70 text-white text-xs px-2.5 py-1 rounded-full">✕</button>
           </div>
 
-          <!-- Upload Picker -->
           <label id="filePickerLabel" class="flex flex-col items-center justify-center h-36 rounded-2xl border-2 border-dashed border-zinc-700 bg-zinc-900/60 cursor-pointer hover:border-indigo-500 transition">
             <span class="text-3xl mb-1">🎬</span>
             <span class="text-xs font-bold text-zinc-200">Select Video, Reel or Photo</span>
@@ -450,7 +445,6 @@
             <input id="createFileInput" type="file" accept="image/*,video/*" class="hidden" />
           </label>
 
-          <!-- CREATIVE STUDIO TOOLBAR (Filters, Effect, Audio, Sticker, Text, Live Location, Speed/Mute) -->
           <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-3 space-y-2.5">
             <p class="text-[11px] font-bold text-zinc-400">Creative Studio Tools</p>
             <div class="grid grid-cols-3 gap-1.5 text-[11px] font-bold">
@@ -462,7 +456,6 @@
               <button onclick="toggleEditorPanel('panelEdit')" class="py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700">✂️ Speed/Mute</button>
             </div>
 
-            <!-- Sub-panel: Filters & Effects -->
             <div id="panelFilters" class="hidden flex gap-2 overflow-x-auto no-scrollbar pt-1">
               <button onclick="applyMediaFilter('filter-none', 'Normal')" class="px-3 py-1.5 rounded-lg bg-zinc-800 text-xs shrink-0">Normal</button>
               <button onclick="applyMediaFilter('filter-vivid', 'Vivid')" class="px-3 py-1.5 rounded-lg bg-zinc-800 text-xs shrink-0">Vivid</button>
@@ -473,7 +466,6 @@
               <button onclick="applyMediaFilter('filter-glow', 'Neon Glow')" class="px-3 py-1.5 rounded-lg bg-zinc-800 text-xs shrink-0">Glow</button>
             </div>
 
-            <!-- Sub-panel: Audio -->
             <div id="panelAudio" class="hidden space-y-1.5 pt-1">
               <div class="flex gap-1.5 overflow-x-auto no-scrollbar">
                 <button onclick="selectAudioTrack('Trending Lo-Fi Beats 🎧')" class="px-2.5 py-1.5 rounded-lg bg-zinc-800 text-[11px] shrink-0">🎧 Lo-Fi Beats</button>
@@ -483,7 +475,6 @@
               </div>
             </div>
 
-            <!-- Sub-panel: Stickers -->
             <div id="panelStickers" class="hidden flex gap-2 overflow-x-auto no-scrollbar pt-1 text-xl">
               <button onclick="applySticker('🔥')" class="p-1.5 bg-zinc-800 rounded-lg">🔥</button>
               <button onclick="applySticker('❤️')" class="p-1.5 bg-zinc-800 rounded-lg">❤️</button>
@@ -494,7 +485,6 @@
               <button onclick="applySticker('')" class="px-2 py-1 bg-rose-900/60 text-xs rounded-lg">Clear</button>
             </div>
 
-            <!-- Sub-panel: Video Speed / Mute Edit -->
             <div id="panelEdit" class="hidden flex items-center gap-2 pt-1 text-xs">
               <button onclick="setVideoSpeed(0.5)" class="px-2.5 py-1 bg-zinc-800 rounded-lg">0.5x Slow</button>
               <button onclick="setVideoSpeed(1)" class="px-2.5 py-1 bg-zinc-800 rounded-lg">1x Normal</button>
@@ -506,7 +496,6 @@
           <textarea id="createCaptionInput" rows="2" placeholder="Write a caption for ZestUp..." class="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500"></textarea>
         </div>
 
-        <!-- LIVE STREAM CAMERA -->
         <div id="liveStreamArea" class="hidden flex-col items-center justify-center space-y-4 text-center">
           <div class="relative w-full h-80 bg-zinc-900 rounded-3xl overflow-hidden border border-zinc-800 flex items-center justify-center">
             <video id="liveCameraVideo" autoplay muted playsinline class="w-full h-full object-cover"></video>
@@ -527,7 +516,7 @@
       </div>
     </section>
 
-    <!-- 8. SETTINGS AND ACTIVITY (Includes Help & ZestUp Help AI) -->
+    <!-- 8. SETTINGS AND ACTIVITY -->
     <section id="settingsPage" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col overflow-y-auto">
       <header class="sticky top-0 z-20 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
         <button onclick="closeSettings()" class="text-xl font-bold leading-none">←</button>
@@ -575,7 +564,6 @@
             <div class="flex items-center gap-3"><span class="text-lg">🛡️</span><span class="text-sm">Profile status & Strikes</span></div>
             <span class="text-slate-400">›</span>
           </div>
-          <!-- HELP & ZESTUP HELP AI -->
           <div onclick="closeSettings(); openHelpAiModal();" class="flex items-center justify-between cursor-pointer bg-indigo-50/70 p-2.5 rounded-xl">
             <div class="flex items-center gap-3">
               <span class="text-lg">🤖</span>
@@ -595,7 +583,7 @@
       </div>
     </section>
 
-    <!-- ACCOUNTS CENTER MODAL (Shows Linked Mobile Number, Linked Gmail & Date of Birth) -->
+    <!-- ACCOUNTS CENTER MODAL (Uses Real SIM SMS OTP when linking mobile) -->
     <section id="accountsCenterPage" class="hidden fixed inset-0 z-50 bg-slate-50 max-w-md mx-auto flex flex-col overflow-y-auto">
       <header class="sticky top-0 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
         <button onclick="document.getElementById('accountsCenterPage').classList.add('hidden')" class="text-xl font-bold">←</button>
@@ -620,13 +608,12 @@
             </label>
           </div>
 
-          <!-- Contact & Recovery Info (Private to Account Owner) -->
           <div>
             <p class="text-xs font-bold text-slate-500 mb-1.5 px-1">Account Recovery & Personal Info (Private)</p>
             <div class="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden shadow-xs text-sm">
               <div onclick="linkOrEditContact('phone')" class="px-4 py-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50">
                 <div>
-                  <p class="font-semibold text-slate-800">Mobile Number</p>
+                  <p class="font-semibold text-slate-800">Mobile Number (SIM SMS)</p>
                   <p id="acLinkedPhoneText" class="text-xs text-emerald-600 font-medium mt-0.5">Not linked</p>
                 </div>
                 <span id="acPhoneActionBadge" class="text-xs font-bold text-indigo-600">Link ›</span>
@@ -669,7 +656,7 @@
       </div>
     </div>
 
-    <!-- SUB-SETTING DETAIL MODAL (Saved, Creator Dashboard & Earnings, Blocked, Profile Status) -->
+    <!-- SUB-SETTING DETAIL MODAL -->
     <div id="subSettingModal" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col">
       <header class="sticky top-0 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
         <button onclick="document.getElementById('subSettingModal').classList.add('hidden')" class="text-xl font-bold">←</button>
@@ -678,7 +665,7 @@
       <div id="subSettingBody" class="p-4 flex-1 overflow-y-auto space-y-3 text-sm"></div>
     </div>
 
-    <!-- ACTIVITY / NOTIFICATIONS TAB (Includes New User Alerts for Owner + Warnings/Earnings) -->
+    <!-- ACTIVITY / NOTIFICATIONS TAB -->
     <section id="activityTab" class="hidden flex-1 pb-16">
       <header class="sticky top-0 bg-white px-4 py-3 border-b border-slate-100 flex items-center gap-3">
         <button onclick="switchTab('homeTab')" class="text-lg font-bold">←</button>
@@ -708,7 +695,7 @@
     </nav>
   </div>
 
-  <!-- FOUNDER ADMIN SUPER-PANEL MODAL (All Users, NEW Badges, Blue Tick, Copyright Strike, Report/Ban, Earnings, Help Tickets) -->
+  <!-- FOUNDER ADMIN SUPER-PANEL MODAL -->
   <div id="adminModal" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col">
     <header class="sticky top-0 bg-white px-4 py-3 border-b border-slate-100 flex items-center justify-between">
       <div class="flex items-center gap-3">
@@ -767,7 +754,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, linkWithPhoneNumber, EmailAuthProvider, linkWithCredential, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getFirestore, collection, addDoc, setDoc, getDoc, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, arrayUnion, arrayRemove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     if ('serviceWorker' in navigator) {
@@ -794,10 +781,10 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let authMode = 'login';      // 'login' | 'signup'
-    let authChannel = 'phone';   // 'phone' | 'gmail'
-    let loginSubType = 'password'; // 'password' | 'otp'
-    let generatedOtp = null;
+    let authMode = 'login';        // 'login' | 'signup'
+    let authChannel = 'phone';     // 'phone' | 'gmail'
+    let loginSubType = 'otp';      // 'otp' | 'password'
+    let confirmationResult = null; // Real Firebase SMS confirmation object
 
     let currentUser = null;
     let userProfileData = {};
@@ -816,7 +803,6 @@
     let createFile = null;
     let liveStreamObj = null;
 
-    // Creative Editor States
     let selectedFilterClass = 'filter-none';
     let selectedAudioName = '';
     let selectedSticker = '';
@@ -857,7 +843,6 @@
       return { text: 'Follow', cls: 'zest-gradient text-white' };
     }
 
-    // --- 6. REAL-TIME PRESENCE & LAST SEEN FORMATTER (Minutes, Hours, Days) ---
     function getPresenceInfo(u) {
       if (!u) return { isOnline: false, text: 'Offline' };
       const now = Date.now();
@@ -889,16 +874,33 @@
     });
     window.addEventListener('beforeunload', () => { if (currentUser) updateMyPresence(false); });
 
-    // --- 1. AUTHENTICATION LOGIC (Sign Up: Mobile+OTP+Create Password | Log In: Mobile+Password OR Mobile+OTP) ---
+    // --- INVISIBLE RECAPTCHA FOR REAL SIM SMS OTP ---
+    function initRecaptcha() {
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          size: 'invisible'
+        });
+      }
+    }
+
+    // --- 1. REAL SIM SMS OTP & PASSWORD AUTHENTICATION ---
     window.setAuthMode = (mode) => {
       authMode = mode;
       document.getElementById('modeLoginBtn').className = mode === 'login' ? 'py-2 rounded-lg bg-white text-indigo-600 shadow-sm' : 'py-2 rounded-lg text-slate-500';
       document.getElementById('modeSignupBtn').className = mode === 'signup' ? 'py-2 rounded-lg bg-white text-indigo-600 shadow-sm' : 'py-2 rounded-lg text-slate-500';
       document.getElementById('authFullName').classList.toggle('hidden', mode !== 'signup');
-      document.getElementById('loginMethodRow').classList.toggle('hidden', mode === 'signup');
+      document.getElementById('loginMethodRow').classList.toggle('hidden', mode === 'signup' || authChannel === 'gmail');
+
+      const showPassword = (mode === 'signup') || (authChannel === 'gmail') || (mode === 'login' && loginSubType === 'password');
+      document.getElementById('passwordFieldBox').classList.toggle('hidden', !showPassword);
       document.getElementById('passwordInput').placeholder = mode === 'signup' ? 'Create a New Password (min 6 chars)' : 'Enter Password';
-      document.getElementById('primaryAuthBtn').textContent = mode === 'signup' ? 'Send OTP to Sign Up' : (loginSubType === 'otp' ? 'Send Login OTP' : 'Log In');
-      document.getElementById('passwordFieldBox').classList.toggle('hidden', mode === 'login' && loginSubType === 'otp');
+
+      if (authChannel === 'phone') {
+        document.getElementById('primaryAuthBtn').textContent = (mode === 'signup' || loginSubType === 'otp') ? 'Send SMS OTP to SIM' : 'Log In with Password';
+      } else {
+        document.getElementById('primaryAuthBtn').textContent = mode === 'signup' ? 'Create Gmail Account' : 'Log In with Gmail';
+      }
+
       document.getElementById('otpBox').classList.add('hidden');
       document.getElementById('primaryAuthBtn').classList.remove('hidden');
       document.getElementById('verifyOtpAuthBtn').classList.add('hidden');
@@ -910,45 +912,82 @@
       document.getElementById('channelGmailBtn').className = ch === 'gmail' ? 'text-indigo-600 border-b-2 border-indigo-600 pb-1' : 'text-slate-400 pb-1';
       document.getElementById('phoneInputBox').classList.toggle('hidden', ch !== 'phone');
       document.getElementById('gmailInputBox').classList.toggle('hidden', ch !== 'gmail');
+      setAuthMode(authMode);
     };
 
     window.setLoginSubType = (sub) => {
       loginSubType = sub;
-      document.getElementById('loginViaPassBtn').className = sub === 'password' ? 'text-indigo-600 underline' : 'text-slate-400';
       document.getElementById('loginViaOtpBtn').className = sub === 'otp' ? 'text-indigo-600 underline' : 'text-slate-400';
+      document.getElementById('loginViaPassBtn').className = sub === 'password' ? 'text-indigo-600 underline' : 'text-slate-400';
       document.getElementById('passwordFieldBox').classList.toggle('hidden', sub === 'otp');
-      document.getElementById('primaryAuthBtn').textContent = sub === 'otp' ? 'Send Login OTP' : 'Log In';
+      document.getElementById('primaryAuthBtn').textContent = sub === 'otp' ? 'Send SMS OTP to SIM' : 'Log In with Password';
     };
-
-    function getAuthIdentifierEmail() {
-      if (authChannel === 'gmail') {
-        return document.getElementById('emailInput').value.trim().toLowerCase();
-      } else {
-        const phone = document.getElementById('phoneInput').value.trim();
-        return phone ? `${phone}@zestup.phone` : '';
-      }
-    }
 
     document.getElementById('primaryAuthBtn').onclick = async () => {
       const errEl = document.getElementById('authError');
       errEl.classList.add('hidden');
+      const btn = document.getElementById('primaryAuthBtn');
 
       const phone = document.getElementById('phoneInput').value.trim();
       const email = document.getElementById('emailInput').value.trim().toLowerCase();
       const pass = document.getElementById('passwordInput').value.trim();
       const fullName = document.getElementById('authFullName').value.trim();
 
-      if (authChannel === 'phone' && phone.length !== 10) {
+      // A. GMAIL CHANNEL
+      if (authChannel === 'gmail') {
+        if (!email.includes('@')) {
+          errEl.textContent = "Please enter a valid Gmail address.";
+          errEl.classList.remove('hidden');
+          return;
+        }
+        if (pass.length < 6) {
+          errEl.textContent = "Password must be at least 6 characters.";
+          errEl.classList.remove('hidden');
+          return;
+        }
+        try {
+          if (authMode === 'signup') {
+            if (!fullName) {
+              errEl.textContent = "Please enter your Full Name.";
+              errEl.classList.remove('hidden');
+              return;
+            }
+            const cred = await createUserWithEmailAndPassword(auth, email, pass);
+            await updateProfile(cred.user, { displayName: fullName });
+          } else {
+            await signInWithEmailAndPassword(auth, email, pass);
+          }
+        } catch (e) {
+          errEl.textContent = e.message;
+          errEl.classList.remove('hidden');
+        }
+        return;
+      }
+
+      // B. MOBILE NUMBER CHANNEL
+      if (phone.length !== 10) {
         errEl.textContent = "Please enter a valid 10-digit Mobile Number.";
         errEl.classList.remove('hidden');
         return;
       }
-      if (authChannel === 'gmail' && !email.includes('@')) {
-        errEl.textContent = "Please enter a valid Gmail address.";
-        errEl.classList.remove('hidden');
+
+      // Login via Mobile + Password
+      if (authMode === 'login' && loginSubType === 'password') {
+        if (pass.length < 6) {
+          errEl.textContent = "Enter your 6+ character password.";
+          errEl.classList.remove('hidden');
+          return;
+        }
+        try {
+          await signInWithEmailAndPassword(auth, `${phone}@zestup.phone`, pass);
+        } catch (e) {
+          errEl.textContent = "Incorrect password or password not set yet. Try 'SIM SMS OTP' to log in!";
+          errEl.classList.remove('hidden');
+        }
         return;
       }
 
+      // Sign Up OR Login via REAL SIM SMS OTP
       if (authMode === 'signup') {
         if (!fullName) {
           errEl.textContent = "Please enter your Full Name.";
@@ -956,36 +995,32 @@
           return;
         }
         if (pass.length < 6) {
-          errEl.textContent = "Create a New Password with at least 6 characters.";
+          errEl.textContent = "Create a New Password (min 6 chars) before verifying OTP.";
           errEl.classList.remove('hidden');
           return;
         }
-        generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-        document.getElementById('otpHintText').textContent = `ZestUp Verification OTP: ${generatedOtp}`;
+      }
+
+      try {
+        btn.textContent = "Sending Real SMS OTP...";
+        btn.disabled = true;
+        initRecaptcha();
+        const fullPhoneNumber = `+91${phone}`;
+        confirmationResult = await signInWithPhoneNumber(auth, fullPhoneNumber, window.recaptchaVerifier);
+        document.getElementById('otpHintText').textContent = `📩 Real SMS OTP sent to +91 ${phone}! Check your messages.`;
         document.getElementById('otpBox').classList.remove('hidden');
-        document.getElementById('primaryAuthBtn').classList.add('hidden');
+        btn.classList.add('hidden');
         document.getElementById('verifyOtpAuthBtn').classList.remove('hidden');
-      } else {
-        // Log In Mode
-        if (loginSubType === 'otp') {
-          generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-          document.getElementById('otpHintText').textContent = `Your ZestUp Login OTP: ${generatedOtp}`;
-          document.getElementById('otpBox').classList.remove('hidden');
-          document.getElementById('primaryAuthBtn').classList.add('hidden');
-          document.getElementById('verifyOtpAuthBtn').classList.remove('hidden');
-        } else {
-          if (pass.length < 6) {
-            errEl.textContent = "Enter your 6+ character password.";
-            errEl.classList.remove('hidden');
-            return;
-          }
-          try {
-            await signInWithEmailAndPassword(auth, getAuthIdentifierEmail(), pass);
-          } catch (e) {
-            errEl.textContent = "Invalid credentials. If you are new, switch to 'Sign Up (New)' above.";
-            errEl.classList.remove('hidden');
-          }
+      } catch (e) {
+        errEl.textContent = "SMS Error: " + e.message;
+        errEl.classList.remove('hidden');
+        if (window.recaptchaVerifier) {
+          window.recaptchaVerifier.clear();
+          window.recaptchaVerifier = null;
         }
+      } finally {
+        btn.textContent = "Send SMS OTP to SIM";
+        btn.disabled = false;
       }
     };
 
@@ -993,33 +1028,40 @@
       const code = document.getElementById('otpCodeInput').value.trim();
       const errEl = document.getElementById('authError');
       errEl.classList.add('hidden');
-
-      if (code !== generatedOtp) {
-        errEl.textContent = "Incorrect 6-digit OTP! Please check the OTP shown above.";
+      if (code.length !== 6 || !confirmationResult) {
+        errEl.textContent = "Please enter the 6-digit OTP received on your SIM.";
         errEl.classList.remove('hidden');
         return;
       }
 
-      const idEmail = getAuthIdentifierEmail();
-      const pass = document.getElementById('passwordInput').value.trim() || `zest_${document.getElementById('phoneInput').value.trim()}`;
-      const fullName = document.getElementById('authFullName').value.trim();
+      const verifyBtn = document.getElementById('verifyOtpAuthBtn');
+      verifyBtn.textContent = "Verifying OTP...";
+      verifyBtn.disabled = true;
 
       try {
-        if (authMode === 'signup') {
-          const cred = await createUserWithEmailAndPassword(auth, idEmail, pass);
-          await updateProfile(cred.user, { displayName: fullName });
-        } else {
-          // Login via OTP: try signing in with stored OTP pass or prompt password if needed
+        const result = await confirmationResult.confirm(code);
+        const user = result.user;
+        const phone = document.getElementById('phoneInput').value.trim();
+        const pass = document.getElementById('passwordInput').value.trim();
+        const fullName = document.getElementById('authFullName').value.trim();
+
+        if (fullName) {
+          await updateProfile(user, { displayName: fullName });
+        }
+
+        // Also link Password credential so user can log in with Password next time too
+        if (authMode === 'signup' && pass.length >= 6 && phone.length === 10) {
           try {
-            await signInWithEmailAndPassword(auth, idEmail, pass);
-          } catch (e) {
-            errEl.textContent = "Account found with custom password. Please log in with your Password or reset via Help.";
-            errEl.classList.remove('hidden');
-          }
+            const cred = EmailAuthProvider.credential(`${phone}@zestup.phone`, pass);
+            await linkWithCredential(user, cred);
+          } catch {}
         }
       } catch (e) {
-        errEl.textContent = e.message;
+        errEl.textContent = "Invalid or expired SMS OTP. Please check your SMS and try again.";
         errEl.classList.remove('hidden');
+      } finally {
+        verifyBtn.textContent = "Verify SIM OTP & Continue";
+        verifyBtn.disabled = false;
       }
     };
 
@@ -1035,21 +1077,23 @@
       document.getElementById('appShell').classList.toggle('hidden', !user);
       if (user) {
         const rawEmail = (user.email || "").toLowerCase();
-        const isPhoneAccount = rawEmail.endsWith("@zestup.phone");
-        const linkedPhone = isPhoneAccount ? "+91 " + rawEmail.split("@")[0] : (document.getElementById('phoneInput').value.trim() ? "+91 " + document.getElementById('phoneInput').value.trim() : "");
-        const linkedEmail = isPhoneAccount ? "" : rawEmail;
-        const isFounder = (linkedEmail === FOUNDER_EMAIL);
+        const isSyntheticPhoneEmail = rawEmail.endsWith("@zestup.phone");
+        const realEmail = isSyntheticPhoneEmail ? "" : rawEmail;
+        const realPhone = user.phoneNumber
+          ? user.phoneNumber.replace("+91", "+91 ")
+          : (isSyntheticPhoneEmail ? "+91 " + rawEmail.split("@")[0] : "");
+        const isFounder = (realEmail === FOUNDER_EMAIL);
 
         const userRef = doc(db, "users", user.uid);
         const snap = await getDoc(userRef);
 
         if (!snap.exists()) {
-          const fallbackName = document.getElementById('authFullName').value.trim() || user.displayName || (linkedEmail ? linkedEmail.split('@')[0] : 'zest_creator');
-          const baseUname = (linkedEmail ? linkedEmail.split('@')[0] : 'user_' + rawEmail.split('@')[0].slice(-5)).toLowerCase().replace(/[^a-z0-9_]/g, '');
+          const fallbackName = document.getElementById('authFullName').value.trim() || user.displayName || (realEmail ? realEmail.split('@')[0] : 'zest_creator');
+          const baseUname = (realEmail ? realEmail.split('@')[0] : 'user_' + (realPhone.replace(/\D/g, '').slice(-5) || user.uid.slice(0, 5))).toLowerCase().replace(/[^a-z0-9_]/g, '');
           await setDoc(userRef, {
             uid: user.uid,
-            email: linkedEmail,
-            phone: linkedPhone,
+            email: realEmail,
+            phone: realPhone,
             dob: "",
             name: fallbackName,
             username: baseUname,
@@ -1074,9 +1118,12 @@
             joinedAt: new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })
           });
         } else {
+          const existing = snap.data();
           await updateDoc(userRef, {
             isOnline: true,
             lastActive: Date.now(),
+            ...(realPhone && !existing.phone ? { phone: realPhone } : {}),
+            ...(realEmail && !existing.email ? { email: realEmail } : {}),
             ...(isFounder ? { verified: true, isFounder: true } : {})
           });
         }
@@ -1196,7 +1243,7 @@
       ).join('');
     }
 
-    // --- 2. ACCOUNTS CENTER (Linked Mobile, Linked Gmail, Date of Birth) ---
+    // --- 2. ACCOUNTS CENTER (Links Mobile via REAL SIM SMS OTP) ---
     window.openAccountsCenter = () => {
       document.getElementById('acAvatarImg').src = userProfileData.avatar || defaultAvatar(userProfileData.name);
       document.getElementById('acFullName').textContent = userProfileData.name || "User";
@@ -1209,7 +1256,7 @@
         phoneEl.className = "text-xs text-emerald-600 font-bold mt-0.5";
         phoneBadge.textContent = "Change ›";
       } else {
-        phoneEl.textContent = "⚠️ Not linked — Link now to protect your ID";
+        phoneEl.textContent = "⚠️ Not linked — Link now via SIM SMS OTP";
         phoneEl.className = "text-xs text-rose-500 font-semibold mt-0.5";
         phoneBadge.textContent = "Add ›";
       }
@@ -1232,30 +1279,28 @@
 
     window.linkOrEditContact = async (type) => {
       if (type === 'phone') {
-        const num = prompt("Enter 10-digit Mobile Number to link with your ZestUp ID:", (userProfileData.phone || "").replace("+91 ", ""));
+        const num = prompt("Enter 10-digit Mobile Number to receive real SIM SMS OTP:", (userProfileData.phone || "").replace("+91 ", ""));
         if (num && num.trim().length === 10) {
-          const otp = Math.floor(100000 + Math.random() * 900000).toString();
-          const entered = prompt(`Verification OTP is ${otp}. Enter OTP to confirm linking:`);
-          if (entered === otp) {
-            await updateDoc(doc(db, "users", currentUser.uid), { phone: "+91 " + num.trim() });
-            openAccountsCenter();
-            alert("Mobile Number linked successfully!");
-          } else {
-            alert("Invalid OTP.");
+          try {
+            initRecaptcha();
+            const confirmRes = await linkWithPhoneNumber(currentUser, `+91${num.trim()}`, window.recaptchaVerifier);
+            const entered = prompt(`Real SMS OTP sent to +91 ${num.trim()}! Enter the 6-digit OTP from your SMS:`);
+            if (entered) {
+              await confirmRes.confirm(entered.trim());
+              await updateDoc(doc(db, "users", currentUser.uid), { phone: "+91 " + num.trim() });
+              openAccountsCenter();
+              alert("Mobile Number verified via SIM SMS & linked!");
+            }
+          } catch (e) {
+            alert("SMS Verification Error: " + e.message);
           }
         }
       } else {
         const mail = prompt("Enter Gmail Address to link with your ZestUp ID:", userProfileData.email || "");
         if (mail && mail.includes("@")) {
-          const otp = Math.floor(100000 + Math.random() * 900000).toString();
-          const entered = prompt(`Verification OTP is ${otp}. Enter OTP to confirm linking Gmail:`);
-          if (entered === otp) {
-            await updateDoc(doc(db, "users", currentUser.uid), { email: mail.trim().toLowerCase() });
-            openAccountsCenter();
-            alert("Gmail linked successfully!");
-          } else {
-            alert("Invalid OTP.");
-          }
+          await updateDoc(doc(db, "users", currentUser.uid), { email: mail.trim().toLowerCase() });
+          openAccountsCenter();
+          alert("Gmail linked successfully!");
         }
       }
     };
@@ -1349,7 +1394,7 @@
       }).join('');
     };
 
-    // --- 4. SHARE PROFILE SHEET (WhatsApp, WhatsApp Status, SMS, Copy Link) ---
+    // --- 4. SHARE PROFILE SHEET ---
     window.openShareProfileSheet = (uid) => {
       const targetUid = uid || currentUser.uid;
       const u = usersMap[targetUid] || {};
@@ -1385,7 +1430,7 @@
       alert("Profile URL copied!");
     };
 
-    // --- OTHER USER PROFILE & 7. CUSTOM "ABOUT THIS ACCOUNT" (Privacy Protected) ---
+    // --- OTHER USER PROFILE & 7. CUSTOM "ABOUT THIS ACCOUNT" ---
     window.openOtherProfile = (uid) => {
       if (!uid || uid === currentUser.uid) {
         switchTab('profileTab');
@@ -1442,7 +1487,6 @@
       document.getElementById('otherUserSheet').classList.remove('hidden');
     };
 
-    // Custom "About this account" UI — strictly for the currently viewed account, hiding all private contact info
     window.openAboutAccountModal = (targetUid) => {
       document.getElementById('otherUserSheet').classList.add('hidden');
       const u = usersMap[targetUid];
@@ -1502,7 +1546,6 @@
     };
 
     window.showUserQrCode = () => {
-      const u = usersMap[viewingUserId] || {};
       document.getElementById('otherUserSheet').classList.add('hidden');
       openShareProfileSheet(viewingUserId);
     };
@@ -1534,7 +1577,7 @@
       });
     };
 
-    // --- 8. CREATIVE VIDEO & REELS STUDIO (Filter, Effect, Audio, Sticker, Text, Live Location, Speed/Mute) ---
+    // --- 8. CREATIVE VIDEO & REELS STUDIO ---
     window.openCreateScreen = (type = 'POST') => {
       setCreateType(type);
       document.getElementById('createScreen').classList.remove('hidden');
@@ -1554,7 +1597,7 @@
       });
     };
 
-    window.applyMediaFilter = (cls, label) => {
+    window.applyMediaFilter = (cls) => {
       selectedFilterClass = cls;
       document.getElementById('createImgPreview').className = `w-full max-h-64 object-contain mx-auto ${cls} ${document.getElementById('createImgPreview').classList.contains('hidden') ? 'hidden' : ''}`;
       document.getElementById('createVidPreview').className = `w-full max-h-64 mx-auto ${cls} ${document.getElementById('createVidPreview').classList.contains('hidden') ? 'hidden' : ''}`;
@@ -1957,7 +2000,7 @@
       });
     }
 
-    // --- 5. DM INBOX (ONLY PEOPLE YOU MESSAGED OR WHO MESSAGED YOU) & 6. REAL-TIME ACTIVE / LAST SEEN ---
+    // --- 5. DM INBOX & 6. REAL-TIME ACTIVE / LAST SEEN ---
     window.setDmFilter = (filterName) => {
       dmFilter = filterName;
       document.querySelectorAll('.dm-filter-btn').forEach(btn => {
@@ -1974,7 +2017,6 @@
       const threadsList = document.getElementById('dmThreadsList');
       const searchQ = (document.getElementById('dmSearchInput')?.value || "").toLowerCase().trim();
 
-      // Find unique partner UIDs who actually have messages with currentUser
       const chattedPartnerIds = new Set();
       allMessages.forEach(m => {
         if (m.senderId === currentUser.uid) chattedPartnerIds.add(m.receiverId);
@@ -1983,7 +2025,6 @@
 
       const allOtherUsers = Object.values(usersMap).filter(u => u.uid !== currentUser.uid && !(userProfileData.blockedUsers || []).includes(u.uid));
 
-      // Notes row shows own note + people you follow or have chatted with
       const noteUsers = allOtherUsers.filter(u => chattedPartnerIds.has(u.uid) || (userProfileData.following || []).includes(u.uid));
       notesRow.innerHTML = `
         <div onclick="updateMyNote()" class="flex flex-col items-center shrink-0 cursor-pointer">
@@ -2005,7 +2046,6 @@
             </div>`;
         }).join('');
 
-      // If searching, allow finding any user to start a new chat; otherwise ONLY show users with existing messages
       let listPool = searchQ
         ? allOtherUsers.filter(u => (u.name || "").toLowerCase().includes(searchQ) || (u.username || "").toLowerCase().includes(searchQ))
         : allOtherUsers.filter(u => chattedPartnerIds.has(u.uid));
@@ -2242,7 +2282,7 @@
       }
     };
 
-    // --- 9 & 10. FOUNDER ADMIN PANEL (All Users, NEW Badge, Blue Tick, Copyright Strike, Warning/Ban, Earnings) ---
+    // --- 9 & 10. FOUNDER ADMIN PANEL ---
     function renderNotifications() {
       const box = document.getElementById('notificationsList');
       if (!box) return;
@@ -2419,7 +2459,7 @@
       let reply = "I understand your concern! You can check your account settings or tap <b>Message Team</b> at the top right so our ZestUp Owner & Support Team can directly review your account.";
 
       if (lower.includes("password") || lower.includes("login") || lower.includes("recover") || lower.includes("id") || lower.includes("otp")) {
-        reply = "🔑 <b>Account Login & Recovery Solution:</b> Go to <b>Profile → Menu (☰) → Accounts Center</b> and make sure both your <b>Mobile Number</b> and <b>Gmail</b> are linked. You can log in anytime using either Mobile + Password or Mobile + OTP!";
+        reply = "🔑 <b>Account Login & Recovery Solution:</b> Go to <b>Profile → Menu (☰) → Accounts Center</b> and make sure both your <b>Mobile Number</b> and <b>Gmail</b> are linked. You can log in anytime using either Mobile + SIM SMS OTP or Mobile + Password!";
       } else if (lower.includes("blue") || lower.includes("tick") || lower.includes("verify")) {
         reply = "☑️ <b>Blue Verified Tick Solution:</b> Post original videos/reels regularly and keep a complete profile bio & picture. The ZestUp Founder reviews active creators and grants the Blue Tick directly!";
       } else if (lower.includes("earn") || lower.includes("money") || lower.includes("monetiz")) {
