@@ -21,10 +21,9 @@
 </head>
 <body class="min-h-screen flex flex-col items-center bg-slate-50 text-slate-900">
 
-  <!-- AUTH SCREEN (Mobile Number & Gmail + OTP) -->
-  <main id="authSection" class="w-full max-w-md px-5 py-10 flex-1 flex flex-col justify-center bg-white min-h-screen">
+  <!-- AUTH SCREEN (Hidden on load to prevent login flash) -->
+  <main id="authSection" class="hidden w-full max-w-md px-5 py-10 flex-1 flex flex-col justify-center bg-white min-h-screen">
     <div class="border border-slate-200/80 rounded-3xl p-7 shadow-sm bg-white">
-      <!-- ZestUp Signature Logo -->
       <div class="flex flex-col items-center mb-5">
         <svg class="w-16 h-16 mb-2 shadow-md rounded-full" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -43,7 +42,6 @@
         <p class="text-xs text-slate-500 mt-1 text-center">Share moments, reels & connect via OTP</p>
       </div>
 
-      <!-- Login Method Tabs (Gmail / Mobile Number) -->
       <div class="grid grid-cols-2 bg-slate-100 p-1 rounded-xl mb-4 text-xs font-bold">
         <button id="tabGmailAuth" onclick="setAuthMethod('gmail')" class="py-2 rounded-lg bg-white text-indigo-600 shadow-sm">Gmail + OTP</button>
         <button id="tabPhoneAuth" onclick="setAuthMethod('phone')" class="py-2 rounded-lg text-slate-500">Mobile + OTP</button>
@@ -52,13 +50,11 @@
       <div class="space-y-3">
         <input id="authFullName" type="text" placeholder="Full Name (for new account)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
 
-        <!-- Gmail Field -->
         <div id="gmailInputBox" class="space-y-2.5">
           <input id="emailInput" type="email" placeholder="Enter your Gmail (e.g. name@gmail.com)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
           <input id="passwordInput" type="password" placeholder="Password (min 6 chars)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
         </div>
 
-        <!-- Mobile Field -->
         <div id="phoneInputBox" class="hidden space-y-2.5">
           <div class="flex gap-2">
             <span class="px-3 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-sm font-semibold text-slate-700">+91</span>
@@ -67,7 +63,6 @@
           <div id="recaptcha-container"></div>
         </div>
 
-        <!-- OTP Verification Box -->
         <div id="otpBox" class="hidden space-y-2 pt-1">
           <p id="otpHintText" class="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg">Enter the 6-digit OTP sent to you</p>
           <input id="otpCodeInput" type="text" maxlength="6" placeholder="Enter 6-digit OTP" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-indigo-300 text-center tracking-[0.4em] font-bold text-base focus:outline-none" />
@@ -102,13 +97,9 @@
         </button>
       </header>
 
-      <!-- Live Streams Banner (If any user is Live) -->
       <div id="liveBannerRow" class="hidden px-3 py-2 bg-rose-50 border-b border-rose-100 flex items-center gap-3 overflow-x-auto no-scrollbar"></div>
-
-      <!-- Stories Row -->
       <div id="storiesRow" class="flex items-center gap-3.5 px-3 py-3 overflow-x-auto no-scrollbar border-b border-slate-100"></div>
 
-      <!-- Feed Posts -->
       <div id="feedContainer" class="divide-y divide-slate-100">
         <p class="text-center text-xs text-slate-400 py-12">Loading ZestUp feed...</p>
       </div>
@@ -125,7 +116,7 @@
       </div>
     </section>
 
-    <!-- 3. MESSAGES / DM INBOX TAB (Matches User Layout) -->
+    <!-- 3. MESSAGES / DM INBOX TAB -->
     <section id="chatTab" class="hidden flex-1 flex flex-col pb-16 min-h-screen bg-white">
       <header class="sticky top-0 z-40 bg-white px-4 py-3 flex items-center justify-between border-b border-slate-100">
         <button onclick="switchTab('profileTab')" class="p-1 text-slate-800">
@@ -141,7 +132,6 @@
         </button>
       </header>
 
-      <!-- Search DM -->
       <div class="px-4 pt-3 pb-2">
         <div class="relative">
           <input id="dmSearchInput" type="text" placeholder="Search messages or people..." class="w-full bg-slate-100 text-xs pl-9 pr-4 py-2.5 rounded-2xl focus:outline-none" />
@@ -149,10 +139,8 @@
         </div>
       </div>
 
-      <!-- Notes & Active Users Horizontal Bar -->
       <div id="dmNotesRow" class="flex items-center gap-4 px-4 py-2.5 overflow-x-auto no-scrollbar"></div>
 
-      <!-- Filter Tabs (Primary, General, Followers, Verified profiles) -->
       <div class="flex items-center gap-2 px-4 py-2 overflow-x-auto no-scrollbar border-b border-slate-100">
         <button onclick="setDmFilter('Primary')" class="dm-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shrink-0" data-filter="Primary">Primary</button>
         <button onclick="setDmFilter('General')" class="dm-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 shrink-0" data-filter="General">General</button>
@@ -160,7 +148,6 @@
         <button onclick="setDmFilter('Verified')" class="dm-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 shrink-0" data-filter="Verified">Verified profiles</button>
       </div>
 
-      <!-- DM Conversations List -->
       <div id="dmThreadsList" class="flex-1 divide-y divide-slate-50"></div>
     </section>
 
@@ -215,7 +202,6 @@
 
       <div class="px-4 pt-4 pb-3">
         <div class="flex items-center justify-between">
-          <!-- Profile Avatar with Dynamic Ring (Black for Owner, Colored if Story, Normal if None) -->
           <div class="relative">
             <div id="ownProfileRing" class="ring-none">
               <img id="profAvatarImg" src="" class="w-20 h-20 rounded-full object-cover bg-slate-200 border-2 border-white" />
@@ -278,7 +264,7 @@
       <div id="profileGrid" class="grid grid-cols-3 gap-0.5 pt-0.5"></div>
     </section>
 
-    <!-- 6. OTHER USER PROFILE MODAL (Follow/Follow Back + Message + 7-Option Menu) -->
+    <!-- 6. OTHER USER PROFILE MODAL -->
     <section id="otherProfileView" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col overflow-y-auto">
       <header class="sticky top-0 z-20 bg-white px-4 py-3 flex items-center justify-between border-b border-slate-100">
         <div class="flex items-center gap-3">
@@ -305,7 +291,6 @@
           <p id="otherProfBio" class="text-xs text-slate-700 whitespace-pre-line"></p>
         </div>
 
-        <!-- Follow / Follow back + Message Buttons -->
         <div class="flex items-center gap-2 mt-4">
           <button id="otherFollowBtn" class="flex-1 py-2 rounded-xl font-bold text-xs transition">Follow</button>
           <button id="otherMessageBtn" class="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-xs text-slate-900">Message</button>
@@ -316,7 +301,7 @@
       <div id="otherProfileGrid" class="grid grid-cols-3 gap-0.5 pt-2 border-t border-slate-100"></div>
     </section>
 
-    <!-- OTHER USER 7-OPTION BOTTOM SHEET (Block, Report, About, Hide Story, Copy URL, Share, QR Code) -->
+    <!-- OTHER USER 7-OPTION BOTTOM SHEET -->
     <div id="otherUserSheet" class="hidden fixed inset-0 z-50 bg-black/50 flex items-end justify-center" onclick="if(event.target===this)this.classList.add('hidden')">
       <div class="bg-white w-full max-w-md rounded-t-3xl p-5 space-y-3.5 text-sm font-medium">
         <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto mb-2"></div>
@@ -330,18 +315,15 @@
       </div>
     </div>
 
-    <!-- 7. CREATE SCREEN (POST / STORY / REEL / LIVE - No Instants) -->
+    <!-- 7. CREATE SCREEN -->
     <section id="createScreen" class="hidden fixed inset-0 z-50 bg-zinc-950 text-white max-w-md mx-auto flex flex-col justify-between">
-      <!-- Top Bar -->
       <header class="px-4 py-3.5 flex items-center justify-between border-b border-zinc-800">
         <button onclick="closeCreateScreen()" class="text-xl font-bold text-zinc-300">✕</button>
         <h3 id="createHeaderTitle" class="font-bold text-sm">New post</h3>
         <button id="publishContentBtn" class="text-sm font-bold text-indigo-400">Next ›</button>
       </header>
 
-      <!-- Main Create Content Area -->
       <div class="flex-1 overflow-y-auto p-4 flex flex-col justify-center">
-        <!-- Standard Post/Story/Reel Uploader -->
         <div id="mediaUploadArea" class="space-y-4">
           <div id="createPreviewBox" class="hidden relative rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800">
             <img id="createImgPreview" class="hidden w-full max-h-72 object-contain mx-auto" />
@@ -359,7 +341,6 @@
           <textarea id="createCaptionInput" rows="3" placeholder="Write a caption for ZestUp..." class="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-3.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500"></textarea>
         </div>
 
-        <!-- LIVE STREAMING MODE -->
         <div id="liveStreamArea" class="hidden flex-col items-center justify-center space-y-4 text-center">
           <div class="relative w-full h-80 bg-zinc-900 rounded-3xl overflow-hidden border border-zinc-800 flex items-center justify-center">
             <video id="liveCameraVideo" autoplay muted playsinline class="w-full h-full object-cover"></video>
@@ -370,7 +351,6 @@
         </div>
       </div>
 
-      <!-- Bottom Pill Switcher: POST | STORY | REEL | LIVE (No Instants) -->
       <div class="p-4 flex justify-center">
         <div class="bg-zinc-900/95 border border-zinc-800 rounded-full px-3 py-2 flex items-center gap-4 text-xs font-extrabold tracking-wider">
           <button onclick="setCreateType('POST')" class="create-tab-btn text-white" data-type="POST">POST</button>
@@ -446,7 +426,7 @@
       </div>
     </section>
 
-    <!-- ACCOUNTS CENTER MODAL (Exact Screenshot Layout without Avatar) -->
+    <!-- ACCOUNTS CENTER MODAL -->
     <section id="accountsCenterPage" class="hidden fixed inset-0 z-50 bg-slate-50 max-w-md mx-auto flex flex-col">
       <header class="bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
         <button onclick="document.getElementById('accountsCenterPage').classList.add('hidden')" class="text-xl font-bold">←</button>
@@ -457,7 +437,6 @@
         <p id="acFullName" class="font-bold text-base text-slate-900">Name</p>
         <p id="acSubText" class="text-xs text-slate-500 mb-6">username • ZestUp</p>
 
-        <!-- 3 Options Card (No Avatar Option) -->
         <div class="w-full bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden shadow-xs">
           <button onclick="editSingleField('name')" class="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium hover:bg-slate-50">
             <span>Name</span><span class="text-slate-400">›</span>
@@ -473,7 +452,7 @@
       </div>
     </section>
 
-    <!-- EDIT BIO MODAL (149 Character Limit) -->
+    <!-- EDIT BIO MODAL -->
     <div id="editBioModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
       <div class="bg-white w-full max-w-sm rounded-3xl p-5 space-y-3">
         <h3 class="font-bold text-base">Edit Profile Bio</h3>
@@ -561,7 +540,6 @@
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, RecaptchaVerifier, signInWithPhoneNumber, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getFirestore, collection, addDoc, setDoc, getDoc, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, arrayUnion, arrayRemove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // Register Service Worker for PWA App Install
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js').catch(() => {});
     }
@@ -624,14 +602,12 @@
       return allStories.some(s => s.authorId === uid);
     }
 
-    // Ring Class Logic: Black for Owner, Colored if Story, Normal if None
     function getProfileRingClass(uid) {
       if (isOwner(uid)) return 'ring-owner';
       if (userHasStory(uid)) return 'ring-story';
       return 'ring-none';
     }
 
-    // Smart Follow Button Text: "Following" | "Follow back" | "Follow"
     function getFollowButtonState(targetUid) {
       const iFollowThem = (userProfileData.following || []).includes(targetUid);
       const theyFollowMe = (userProfileData.followers || []).includes(targetUid);
@@ -640,7 +616,6 @@
       return { text: 'Follow', cls: 'zest-gradient text-white' };
     }
 
-    // ================= AUTH WITH GMAIL/MOBILE + OTP =================
     window.setAuthMethod = (method) => {
       authMethod = method;
       document.getElementById('tabGmailAuth').className = method === 'gmail' ? 'py-2 rounded-lg bg-white text-indigo-600 shadow-sm' : 'py-2 rounded-lg text-slate-500';
@@ -664,7 +639,6 @@
           errEl.classList.remove('hidden');
           return;
         }
-        // Generate 6-digit OTP for Gmail verification step
         generatedEmailOtp = Math.floor(100000 + Math.random() * 900000).toString();
         document.getElementById('otpHintText').textContent = `Your ZestUp Verification OTP is: ${generatedEmailOtp}`;
         document.getElementById('otpBox').classList.remove('hidden');
@@ -797,7 +771,6 @@
         if (activeChatPartnerId) renderPrivateChatMessages();
       });
 
-      // Live Streams Listener
       onSnapshot(collection(db, "liveStreams"), (snap) => {
         const banner = document.getElementById('liveBannerRow');
         const lives = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(l => l.isLive);
@@ -810,7 +783,6 @@
       });
     }
 
-    // ================= NAVIGATION =================
     window.switchTab = (tabId) => {
       ['homeTab', 'reelsTab', 'chatTab', 'searchTab', 'profileTab', 'activityTab'].forEach(id => {
         document.getElementById(id).classList.toggle('hidden', id !== tabId);
@@ -824,7 +796,6 @@
       if (tabId === 'chatTab') renderDmInbox();
     };
 
-    // ================= OWN PROFILE & ACCOUNTS CENTER & 149-CHAR BIO =================
     function updateOwnProfileUI() {
       const name = userProfileData.name || "User";
       const uname = userProfileData.username || "user";
@@ -839,8 +810,6 @@
       document.getElementById('navAvatarImg').src = avatar;
       document.getElementById('dmTopUsername').textContent = uname;
       document.getElementById('dmTopBadge').innerHTML = badge;
-
-      // Apply Black Ring for Owner, Colored if Story, Normal if None
       document.getElementById('ownProfileRing').className = getProfileRingClass(currentUser.uid);
 
       document.getElementById('statFollowers').textContent = (userProfileData.followers || []).length;
@@ -864,7 +833,6 @@
       ).join('');
     }
 
-    // Accounts Center (Name, Username, Profile Picture - No Avatar)
     window.openAccountsCenter = () => {
       document.getElementById('acAvatarImg').src = userProfileData.avatar || defaultAvatar(userProfileData.name);
       document.getElementById('acFullName').textContent = userProfileData.name || "User";
@@ -892,7 +860,6 @@
       }
     };
 
-    // 149-Character Bio Editor
     window.openEditBioModal = () => {
       const box = document.getElementById('bioInputBox');
       box.value = (userProfileData.bio || "").slice(0, 149);
@@ -910,7 +877,6 @@
       document.getElementById('editBioModal').classList.add('hidden');
     };
 
-    // ================= VISIT OTHER USER PROFILE + 7-OPTION SHEET =================
     window.openOtherProfile = (uid) => {
       if (!uid || uid === currentUser.uid) {
         switchTab('profileTab');
@@ -1008,7 +974,6 @@
       });
     }
 
-    // ================= CREATE SCREEN (POST / STORY / REEL / LIVE) =================
     window.openCreateScreen = (type = 'POST') => {
       setCreateType(type);
       document.getElementById('createScreen').classList.remove('hidden');
@@ -1151,7 +1116,6 @@
       }
     };
 
-    // ================= STORIES & HOME FEED (4 Action Icons + Follow/Follow Back + 3 Dots) =================
     function renderStories() {
       const row = document.getElementById('storiesRow');
       const myAvatar = userProfileData.avatar || defaultAvatar(userProfileData.name);
@@ -1159,7 +1123,7 @@
         <div onclick="openCreateScreen('STORY')" class="flex flex-col items-center gap-1 shrink-0 cursor-pointer">
           <div class="relative">
             <div class="${getProfileRingClass(currentUser.uid)}">
-              <img src="${myAvatar}" class="w-15 h-15 w-[60px] h-[60px] rounded-full object-cover border-2 border-white" />
+              <img src="${myAvatar}" class="w-[60px] h-[60px] rounded-full object-cover border-2 border-white" />
             </div>
             <span class="w-5 h-5 bg-indigo-600 text-white rounded-full text-xs font-bold flex items-center justify-center absolute bottom-0 right-0 border-2 border-white">+</span>
           </div>
@@ -1214,7 +1178,6 @@
         const card = document.createElement('article');
         card.className = "bg-white pb-3";
         card.innerHTML = `
-          <!-- Post Header: Avatar + Name + Follow/Follow Back + 3 Dots -->
           <div class="flex items-center justify-between px-3 py-2.5">
             <div onclick="openOtherProfile('${post.authorId}')" class="flex items-center gap-2.5 cursor-pointer">
               <div class="${getProfileRingClass(post.authorId)}">
@@ -1231,12 +1194,10 @@
             </div>
           </div>
 
-          <!-- Post Media -->
           ${post.mediaUrl ? (post.mediaType === 'video'
             ? `<video src="${post.mediaUrl}" controls playsinline class="w-full max-h-[480px] bg-black object-cover"></video>`
             : `<img src="${post.mediaUrl}" class="w-full max-h-[480px] object-cover bg-slate-100" />`) : ''}
 
-          <!-- 4 Action Bar: Like, Comment, Share (Left) + Save (Right) -->
           <div class="px-3 pt-2.5 space-y-1.5">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-4">
@@ -1325,7 +1286,6 @@
       });
     }
 
-    // ================= DM INBOX & 1-TO-1 PRIVATE MESSAGES =================
     window.setDmFilter = (filterName) => {
       dmFilter = filterName;
       document.querySelectorAll('.dm-filter-btn').forEach(btn => {
@@ -1343,7 +1303,6 @@
       const searchQ = (document.getElementById('dmSearchInput')?.value || "").toLowerCase().trim();
       const otherUsers = Object.values(usersMap).filter(u => u.uid !== currentUser.uid && !(userProfileData.blockedUsers || []).includes(u.uid));
 
-      // Top Notes & Active Users Row
       notesRow.innerHTML = `
         <div onclick="updateMyNote()" class="flex flex-col items-center shrink-0 cursor-pointer">
           <div class="relative">
@@ -1361,7 +1320,6 @@
             <span class="text-[11px] text-slate-800 max-w-[68px] truncate mt-1">${u.username || u.name}</span>
           </div>`).join('');
 
-      // Filter conversations based on tab
       let filteredUsers = otherUsers.filter(u => !searchQ || (u.name || "").toLowerCase().includes(searchQ) || (u.username || "").toLowerCase().includes(searchQ));
       if (dmFilter === 'Followers') {
         filteredUsers = filteredUsers.filter(u => (userProfileData.followers || []).includes(u.uid));
@@ -1447,7 +1405,6 @@
       });
     };
 
-    // ================= REELS & SEARCH & ADMIN =================
     function renderReels() {
       const container = document.getElementById('reelsContainer');
       const videos = allPosts.filter(p => p.mediaType === 'video' && p.mediaUrl);
