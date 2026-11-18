@@ -3,187 +3,271 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#ffffff" />
+  <meta name="theme-color" content="#4F46E5" />
   <title>ZestUp</title>
+  <link rel="manifest" href="manifest.json" />
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Inter', sans-serif; background-color: #ffffff; color: #0f172a; -webkit-tap-highlight-color: transparent; }
-    .brand-font { font-family: 'Grand Hotel', cursive; }
-    .story-ring { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); padding: 2.5px; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; -webkit-tap-highlight-color: transparent; }
+    .zest-gradient { background: linear-gradient(135deg, #4F46E5 0%, #9333EA 55%, #EC4899 100%); }
+    .zest-text-gradient { background: linear-gradient(135deg, #4F46E5 0%, #9333EA 55%, #EC4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .ring-story { background: linear-gradient(135deg, #4F46E5, #EC4899, #F59E0B); padding: 2.5px; border-radius: 9999px; }
+    .ring-owner { background: #09090b; padding: 2.5px; border-radius: 9999px; }
+    .ring-none { background: #e2e8f0; padding: 1.5px; border-radius: 9999px; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
-  <script>
-    const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="g" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#f09433"/><stop offset="50%" stop-color="#dc2743"/><stop offset="100%" stop-color="#bc1888"/></linearGradient></defs><rect width="512" height="512" rx="115" fill="url(#g)"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="sans-serif" font-weight="900" font-size="300">Z</text></svg>`;
-    const iconUrl = "data:image/svg+xml;base64," + btoa(iconSvg);
-    const manifest = {
-      name: "ZestUp", short_name: "ZestUp",
-      start_url: "https://akhtarhossain718-creator.github.io/zestup-app/",
-      display: "standalone", background_color: "#ffffff", theme_color: "#ffffff",
-      icons: [{ src: iconUrl, sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }]
-    };
-    const link = document.createElement('link');
-    link.rel = 'manifest';
-    link.href = 'data:application/manifest+json;base64,' + btoa(JSON.stringify(manifest));
-    document.head.appendChild(link);
-  </script>
 </head>
-<body class="min-h-screen flex flex-col items-center bg-white text-slate-900">
+<body class="min-h-screen flex flex-col items-center bg-slate-50 text-slate-900">
 
-  <!-- AUTH SCREEN -->
-  <main id="authSection" class="w-full max-w-md px-6 py-12 flex-1 flex flex-col justify-center">
-    <div class="border border-slate-200 rounded-2xl p-8 shadow-sm bg-white">
-      <h1 class="brand-font text-5xl text-center mb-2 text-slate-900">ZestUp</h1>
-      <p id="authSubtitle" class="text-xs text-slate-500 text-center mb-6">Sign in to see photos and videos from your friends.</p>
-
-      <div class="space-y-3">
-        <input id="userNameInput" type="text" placeholder="Full Name (e.g. Akhtar Hossain)" class="hidden w-full px-3.5 py-2.5 rounded-lg bg-slate-50 border border-slate-300 text-sm focus:outline-none focus:border-slate-500" />
-        <input id="emailInput" type="email" placeholder="Email address" class="w-full px-3.5 py-2.5 rounded-lg bg-slate-50 border border-slate-300 text-sm focus:outline-none focus:border-slate-500" />
-        <input id="passwordInput" type="password" placeholder="Password" class="w-full px-3.5 py-2.5 rounded-lg bg-slate-50 border border-slate-300 text-sm focus:outline-none focus:border-slate-500" />
-        <p id="authError" class="text-xs text-rose-500 hidden"></p>
-        <button id="authSubmitBtn" class="w-full py-2.5 rounded-lg bg-sky-500 hover:bg-sky-600 font-semibold text-white text-sm transition">Log In</button>
+  <!-- AUTH SCREEN (Mobile Number & Gmail + OTP) -->
+  <main id="authSection" class="w-full max-w-md px-5 py-10 flex-1 flex flex-col justify-center bg-white min-h-screen">
+    <div class="border border-slate-200/80 rounded-3xl p-7 shadow-sm bg-white">
+      <!-- ZestUp Signature Logo -->
+      <div class="flex flex-col items-center mb-5">
+        <svg class="w-16 h-16 mb-2 shadow-md rounded-full" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="zLogoGrad" x1="0" y1="120" x2="120" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#F59E0B"/>
+              <stop offset="45%" stop-color="#EC4899"/>
+              <stop offset="100%" stop-color="#4F46E5"/>
+            </linearGradient>
+          </defs>
+          <circle cx="60" cy="60" r="60" fill="url(#zLogoGrad)"/>
+          <rect x="27" y="27" width="66" height="66" rx="18" stroke="white" stroke-width="7"/>
+          <circle cx="80" cy="40" r="4" fill="white"/>
+          <path d="M46 46H74L46 74H74" stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h1 class="text-3xl font-extrabold tracking-tight zest-text-gradient">ZestUp</h1>
+        <p class="text-xs text-slate-500 mt-1 text-center">Share moments, reels & connect via OTP</p>
       </div>
 
-      <div class="text-center text-xs text-slate-500 mt-6 pt-4 border-t border-slate-100">
-        <span id="toggleText">Don't have an account?</span>
-        <button id="toggleAuthBtn" class="text-sky-500 font-bold ml-1">Sign up</button>
+      <!-- Login Method Tabs (Gmail / Mobile Number) -->
+      <div class="grid grid-cols-2 bg-slate-100 p-1 rounded-xl mb-4 text-xs font-bold">
+        <button id="tabGmailAuth" onclick="setAuthMethod('gmail')" class="py-2 rounded-lg bg-white text-indigo-600 shadow-sm">Gmail + OTP</button>
+        <button id="tabPhoneAuth" onclick="setAuthMethod('phone')" class="py-2 rounded-lg text-slate-500">Mobile + OTP</button>
+      </div>
+
+      <div class="space-y-3">
+        <input id="authFullName" type="text" placeholder="Full Name (for new account)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
+
+        <!-- Gmail Field -->
+        <div id="gmailInputBox" class="space-y-2.5">
+          <input id="emailInput" type="email" placeholder="Enter your Gmail (e.g. name@gmail.com)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
+          <input id="passwordInput" type="password" placeholder="Password (min 6 chars)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
+        </div>
+
+        <!-- Mobile Field -->
+        <div id="phoneInputBox" class="hidden space-y-2.5">
+          <div class="flex gap-2">
+            <span class="px-3 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-sm font-semibold text-slate-700">+91</span>
+            <input id="phoneInput" type="tel" maxlength="10" placeholder="10-digit Mobile Number" class="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
+          </div>
+          <div id="recaptcha-container"></div>
+        </div>
+
+        <!-- OTP Verification Box -->
+        <div id="otpBox" class="hidden space-y-2 pt-1">
+          <p id="otpHintText" class="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg">Enter the 6-digit OTP sent to you</p>
+          <input id="otpCodeInput" type="text" maxlength="6" placeholder="Enter 6-digit OTP" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-indigo-300 text-center tracking-[0.4em] font-bold text-base focus:outline-none" />
+        </div>
+
+        <p id="authError" class="text-xs text-rose-500 hidden"></p>
+
+        <button id="sendOtpBtn" class="w-full py-2.5 rounded-xl zest-gradient font-bold text-white text-sm shadow-sm">Send OTP</button>
+        <button id="verifyOtpBtn" class="hidden w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-bold text-white text-sm shadow-sm">Verify OTP & Continue</button>
       </div>
     </div>
   </main>
 
-  <!-- MAIN INSTAGRAM-STYLE APP -->
-  <div id="appShell" class="hidden w-full max-w-md flex-1 flex flex-col bg-white min-h-screen relative">
+  <!-- MAIN ZESTUP APP SHELL -->
+  <div id="appShell" class="hidden w-full max-w-md flex-1 flex flex-col bg-white min-h-screen relative shadow-sm">
 
     <!-- 1. HOME TAB -->
     <section id="homeTab" class="flex-1 pb-16">
       <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 px-4 py-2.5 flex items-center justify-between">
-        <button onclick="openCreateModal('post')" class="text-2xl font-light leading-none p-1">+</button>
-        <span class="brand-font text-3xl tracking-wide text-slate-900">ZestUp</span>
-        <button onclick="switchTab('activityTab')" class="relative p-1">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-          <span class="w-2 h-2 bg-rose-500 rounded-full absolute top-1 right-1"></span>
+        <button onclick="openCreateScreen('POST')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-xl font-semibold text-slate-900">+</button>
+        <div class="flex items-center gap-2">
+          <svg class="w-7 h-7 rounded-full" viewBox="0 0 120 120" fill="none">
+            <circle cx="60" cy="60" r="60" fill="url(#zLogoGrad)"/>
+            <rect x="27" y="27" width="66" height="66" rx="18" stroke="white" stroke-width="8"/>
+            <path d="M46 46H74L46 74H74" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="text-xl font-extrabold tracking-tight zest-text-gradient">ZestUp</span>
+        </div>
+        <button onclick="switchTab('activityTab')" class="relative p-1.5 rounded-xl hover:bg-slate-100">
+          <svg class="w-6 h-6 text-slate-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+          <span class="w-2 h-2 bg-pink-500 rounded-full absolute top-1.5 right-1.5"></span>
         </button>
       </header>
+
+      <!-- Live Streams Banner (If any user is Live) -->
+      <div id="liveBannerRow" class="hidden px-3 py-2 bg-rose-50 border-b border-rose-100 flex items-center gap-3 overflow-x-auto no-scrollbar"></div>
 
       <!-- Stories Row -->
       <div id="storiesRow" class="flex items-center gap-3.5 px-3 py-3 overflow-x-auto no-scrollbar border-b border-slate-100"></div>
 
       <!-- Feed Posts -->
       <div id="feedContainer" class="divide-y divide-slate-100">
-        <p class="text-center text-xs text-slate-400 py-12">Loading feed...</p>
+        <p class="text-center text-xs text-slate-400 py-12">Loading ZestUp feed...</p>
       </div>
     </section>
 
     <!-- 2. REELS TAB -->
-    <section id="reelsTab" class="hidden flex-1 bg-black text-white pb-14 min-h-screen">
-      <div class="sticky top-0 z-30 px-4 py-3 flex items-center justify-between bg-gradient-to-b from-black/70 to-transparent">
-        <h2 class="text-lg font-bold">Reels</h2>
-        <button onclick="openCreateModal('post')" class="text-xs bg-white/20 px-3 py-1.5 rounded-full font-semibold">+ Upload Reel</button>
+    <section id="reelsTab" class="hidden flex-1 bg-zinc-950 text-white pb-16 min-h-screen">
+      <div class="sticky top-0 z-30 px-4 py-3 flex items-center justify-between bg-gradient-to-b from-black/80 to-transparent">
+        <h2 class="text-lg font-extrabold tracking-tight">ZestUp Reels</h2>
+        <button onclick="openCreateScreen('REEL')" class="text-xs zest-gradient px-3.5 py-1.5 rounded-full font-bold">+ Create Reel</button>
       </div>
-      <div id="reelsContainer" class="space-y-4 px-2 pb-6">
-        <p class="text-center text-xs text-slate-400 py-20">No video reels yet. Upload a short video!</p>
+      <div id="reelsContainer" class="space-y-4 px-2.5 pb-6">
+        <p class="text-center text-xs text-zinc-400 py-20">No reels yet. Tap + Create Reel to upload!</p>
       </div>
     </section>
 
-    <!-- 3. MESSAGES / CHAT TAB -->
-    <section id="chatTab" class="hidden flex-1 flex flex-col pb-16 h-screen">
-      <header class="sticky top-0 z-40 bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between">
-        <span id="chatHeaderUser" class="font-bold text-base flex items-center gap-1">Messages</span>
-        <span class="text-xs text-emerald-500 font-semibold">● Community Live</span>
+    <!-- 3. MESSAGES / DM INBOX TAB (Matches User Layout) -->
+    <section id="chatTab" class="hidden flex-1 flex flex-col pb-16 min-h-screen bg-white">
+      <header class="sticky top-0 z-40 bg-white px-4 py-3 flex items-center justify-between border-b border-slate-100">
+        <button onclick="switchTab('profileTab')" class="p-1 text-slate-800">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h10M4 18h16"/></svg>
+        </button>
+        <div class="flex items-center gap-1 font-bold text-base">
+          <span id="dmTopUsername">username</span>
+          <span id="dmTopBadge"></span>
+          <span class="text-xs text-slate-400">▾</span>
+        </div>
+        <button onclick="switchTab('searchTab')" class="p-1 text-slate-800" title="New Message">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        </button>
       </header>
-      <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50"></div>
-      <div class="p-3 bg-white border-t border-slate-200 flex items-center gap-2 mb-12">
-        <input id="chatInput" type="text" placeholder="Message..." class="flex-1 bg-slate-100 text-sm px-4 py-2 rounded-full focus:outline-none" />
-        <button id="sendChatBtn" class="text-sky-500 font-bold text-sm px-3">Send</button>
+
+      <!-- Search DM -->
+      <div class="px-4 pt-3 pb-2">
+        <div class="relative">
+          <input id="dmSearchInput" type="text" placeholder="Search messages or people..." class="w-full bg-slate-100 text-xs pl-9 pr-4 py-2.5 rounded-2xl focus:outline-none" />
+          <span class="absolute left-3.5 top-2.5 text-slate-400 text-xs">🔍</span>
+        </div>
+      </div>
+
+      <!-- Notes & Active Users Horizontal Bar -->
+      <div id="dmNotesRow" class="flex items-center gap-4 px-4 py-2.5 overflow-x-auto no-scrollbar"></div>
+
+      <!-- Filter Tabs (Primary, General, Followers, Verified profiles) -->
+      <div class="flex items-center gap-2 px-4 py-2 overflow-x-auto no-scrollbar border-b border-slate-100">
+        <button onclick="setDmFilter('Primary')" class="dm-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shrink-0" data-filter="Primary">Primary</button>
+        <button onclick="setDmFilter('General')" class="dm-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 shrink-0" data-filter="General">General</button>
+        <button onclick="setDmFilter('Followers')" class="dm-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 shrink-0" data-filter="Followers">Followers</button>
+        <button onclick="setDmFilter('Verified')" class="dm-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 shrink-0" data-filter="Verified">Verified profiles</button>
+      </div>
+
+      <!-- DM Conversations List -->
+      <div id="dmThreadsList" class="flex-1 divide-y divide-slate-50"></div>
+    </section>
+
+    <!-- 1-TO-1 PRIVATE DM CONVERSATION DRAWER -->
+    <section id="privateChatView" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col">
+      <header class="sticky top-0 bg-white px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <button onclick="closePrivateChat()" class="text-xl font-bold">←</button>
+          <img id="chatTargetAvatar" class="w-9 h-9 rounded-full object-cover" />
+          <div>
+            <p id="chatTargetName" class="text-xs font-bold flex items-center gap-1">User</p>
+            <p class="text-[10px] text-emerald-500 font-semibold">● Active on ZestUp</p>
+          </div>
+        </div>
+        <button id="viewChatUserProfileBtn" class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg">Profile</button>
+      </header>
+      <div id="privateMessagesBox" class="flex-1 overflow-y-auto p-4 space-y-2.5 bg-slate-50"></div>
+      <div class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
+        <input id="privateMsgInput" type="text" placeholder="Write a message..." class="flex-1 bg-slate-100 text-sm px-4 py-2.5 rounded-full focus:outline-none" />
+        <button id="sendPrivateMsgBtn" class="px-4 py-2 rounded-full zest-gradient text-white font-bold text-xs">Send</button>
       </div>
     </section>
 
-    <!-- 4. SEARCH & ACCOUNTS TAB -->
+    <!-- 4. SEARCH & EXPLORE TAB -->
     <section id="searchTab" class="hidden flex-1 pb-16">
       <div class="sticky top-0 z-40 bg-white p-3 border-b border-slate-100 space-y-2.5">
         <div class="relative">
-          <input id="searchInput" type="text" placeholder="Search accounts or posts..." class="w-full bg-slate-100 text-sm pl-9 pr-4 py-2 rounded-xl focus:outline-none" />
-          <span class="absolute left-3 top-2.5 text-slate-400 text-xs">🔍</span>
+          <input id="searchInput" type="text" placeholder="Search people or posts..." class="w-full bg-slate-100 text-sm pl-9 pr-4 py-2 rounded-2xl focus:outline-none" />
+          <span class="absolute left-3.5 top-2.5 text-slate-400 text-xs">🔍</span>
         </div>
         <div class="flex gap-2 text-xs font-semibold">
-          <button id="filterAllBtn" onclick="setSearchFilter('all')" class="px-3 py-1 rounded-lg bg-slate-900 text-white">For you</button>
-          <button id="filterAccountsBtn" onclick="setSearchFilter('accounts')" class="px-3 py-1 rounded-lg bg-slate-100 text-slate-700">Accounts</button>
+          <button id="filterAllBtn" onclick="setSearchFilter('all')" class="px-3.5 py-1 rounded-xl bg-indigo-600 text-white">For you</button>
+          <button id="filterAccountsBtn" onclick="setSearchFilter('accounts')" class="px-3.5 py-1 rounded-xl bg-slate-100 text-slate-700">Accounts</button>
         </div>
       </div>
       <div id="searchAccountsBox" class="divide-y divide-slate-100"></div>
       <div id="exploreGrid" class="grid grid-cols-3 gap-0.5 pt-0.5"></div>
     </section>
 
-    <!-- 5. PROFILE TAB -->
+    <!-- 5. OWN PROFILE TAB -->
     <section id="profileTab" class="hidden flex-1 pb-16">
       <header class="sticky top-0 z-40 bg-white px-4 py-3 flex items-center justify-between border-b border-slate-100">
-        <button onclick="openCreateModal('post')" class="text-2xl font-light leading-none">+</button>
+        <button onclick="openCreateScreen('POST')" class="text-2xl font-light leading-none">+</button>
         <div class="flex items-center gap-1 font-bold text-base">
           <span id="profUsernameTop">username</span>
           <span id="profTopBadge"></span>
         </div>
-        <!-- Hamburger Menu -> Opens Settings and activity -->
-        <button onclick="openSettings()" class="p-1.5 text-slate-900" title="Settings and activity">
+        <button onclick="openSettings()" class="p-1.5 text-slate-900">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
       </header>
 
       <div class="px-4 pt-4 pb-3">
         <div class="flex items-center justify-between">
+          <!-- Profile Avatar with Dynamic Ring (Black for Owner, Colored if Story, Normal if None) -->
           <div class="relative">
-            <div class="story-ring rounded-full p-0.5">
+            <div id="ownProfileRing" class="ring-none">
               <img id="profAvatarImg" src="" class="w-20 h-20 rounded-full object-cover bg-slate-200 border-2 border-white" />
             </div>
-            <button onclick="openEditProfile()" class="absolute bottom-0 right-0 w-6 h-6 bg-slate-900 text-white rounded-full text-xs flex items-center justify-center border-2 border-white">+</button>
+            <button onclick="openAccountsCenter()" class="absolute bottom-0 right-0 w-6 h-6 bg-indigo-600 text-white rounded-full text-xs flex items-center justify-center border-2 border-white">+</button>
           </div>
 
           <div class="flex-1 flex justify-around text-center ml-4">
             <div>
               <p id="statPosts" class="font-bold text-base">0</p>
-              <p class="text-xs text-slate-600">posts</p>
+              <p class="text-xs text-slate-500">posts</p>
             </div>
             <div>
               <p id="statFollowers" class="font-bold text-base">0</p>
-              <p class="text-xs text-slate-600">followers</p>
+              <p class="text-xs text-slate-500">followers</p>
             </div>
             <div>
               <p id="statFollowing" class="font-bold text-base">0</p>
-              <p class="text-xs text-slate-600">following</p>
+              <p class="text-xs text-slate-500">following</p>
             </div>
           </div>
         </div>
 
         <div class="mt-3 space-y-0.5">
           <p id="profFullName" class="font-bold text-sm flex items-center gap-1">User</p>
-          <p id="profBio" class="text-xs text-slate-700 whitespace-pre-line">Digital Creator on ZestUp ✨</p>
+          <p id="profBio" class="text-xs text-slate-700 whitespace-pre-line">Creator on ZestUp ✨</p>
         </div>
 
-        <!-- Professional Dashboard Shortcut Card (Like Instagram Screenshot) -->
-        <div onclick="openSubSetting('dashboard')" class="mt-3 bg-slate-100 rounded-xl px-3.5 py-2.5 cursor-pointer hover:bg-slate-200/70 transition">
-          <p class="text-xs font-bold text-slate-900">Your dashboard</p>
+        <div onclick="openSubSetting('dashboard')" class="mt-3 bg-slate-100 rounded-2xl px-3.5 py-2.5 cursor-pointer">
+          <p class="text-xs font-bold text-slate-900">Creator dashboard</p>
           <p id="dashboardSummaryText" class="text-[11px] text-slate-500">↗ 0 engagements in the last 30 days.</p>
         </div>
 
         <div class="grid grid-cols-2 gap-2 mt-3">
-          <button onclick="openEditProfile()" class="py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Edit profile</button>
-          <button onclick="shareProfile()" class="py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Share profile</button>
+          <button onclick="openEditBioModal()" class="py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Edit Bio & Profile</button>
+          <button onclick="shareProfileUrl(currentUser.uid)" class="py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Share profile</button>
         </div>
 
-        <button id="adminPanelBtn" onclick="openAdminModal()" class="hidden w-full mt-2.5 py-2 rounded-lg bg-sky-50 border border-sky-200 text-sky-600 font-bold text-xs flex items-center justify-center gap-1.5">
+        <button id="adminPanelBtn" onclick="openAdminModal()" class="hidden w-full mt-2.5 py-2 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold text-xs flex items-center justify-center gap-1.5">
           <span>🛡️ Founder Admin: Manage Blue Ticks</span>
         </button>
 
         <div class="flex items-center gap-4 mt-4 overflow-x-auto no-scrollbar">
-          <div onclick="openCreateModal('story')" class="flex flex-col items-center gap-1 cursor-pointer">
+          <div onclick="openCreateScreen('STORY')" class="flex flex-col items-center gap-1 cursor-pointer">
             <div class="w-14 h-14 rounded-full border border-slate-300 flex items-center justify-center text-xl font-light">+</div>
-            <span class="text-[11px] text-slate-700">New</span>
+            <span class="text-[11px] text-slate-700">New Story</span>
           </div>
         </div>
       </div>
 
       <div class="grid grid-cols-2 border-t border-b border-slate-200 mt-2">
-        <button class="py-2.5 flex justify-center border-b-2 border-slate-900 text-slate-900">
+        <button class="py-2.5 flex justify-center border-b-2 border-indigo-600 text-indigo-600">
           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 3h7v7H3V3zm11 0h7v7h-7V3zM3 14h7v7H3v-7zm11 0h7v7h-7v-7z"/></svg>
         </button>
         <button onclick="switchTab('reelsTab')" class="py-2.5 flex justify-center text-slate-400">
@@ -194,140 +278,220 @@
       <div id="profileGrid" class="grid grid-cols-3 gap-0.5 pt-0.5"></div>
     </section>
 
-    <!-- 6. SETTINGS AND ACTIVITY FULLSCREEN PAGE (Matches User Screenshots) -->
+    <!-- 6. OTHER USER PROFILE MODAL (Follow/Follow Back + Message + 7-Option Menu) -->
+    <section id="otherProfileView" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col overflow-y-auto">
+      <header class="sticky top-0 z-20 bg-white px-4 py-3 flex items-center justify-between border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <button onclick="closeOtherProfile()" class="text-xl font-bold">←</button>
+          <span id="otherProfHeaderUser" class="font-bold text-base flex items-center gap-1">username</span>
+        </div>
+        <button onclick="openOtherUserMenu()" class="p-1.5 text-xl font-bold leading-none">⋮</button>
+      </header>
+
+      <div class="px-4 pt-4 pb-3">
+        <div class="flex items-center justify-between">
+          <div id="otherProfRing" class="ring-none cursor-pointer">
+            <img id="otherProfAvatar" class="w-20 h-20 rounded-full object-cover border-2 border-white bg-slate-200" />
+          </div>
+          <div class="flex-1 flex justify-around text-center ml-4">
+            <div><p id="otherStatPosts" class="font-bold text-base">0</p><p class="text-xs text-slate-500">posts</p></div>
+            <div><p id="otherStatFollowers" class="font-bold text-base">0</p><p class="text-xs text-slate-500">followers</p></div>
+            <div><p id="otherStatFollowing" class="font-bold text-base">0</p><p class="text-xs text-slate-500">following</p></div>
+          </div>
+        </div>
+
+        <div class="mt-3 space-y-0.5">
+          <p id="otherProfName" class="font-bold text-sm flex items-center gap-1">Name</p>
+          <p id="otherProfBio" class="text-xs text-slate-700 whitespace-pre-line"></p>
+        </div>
+
+        <!-- Follow / Follow back + Message Buttons -->
+        <div class="flex items-center gap-2 mt-4">
+          <button id="otherFollowBtn" class="flex-1 py-2 rounded-xl font-bold text-xs transition">Follow</button>
+          <button id="otherMessageBtn" class="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-xs text-slate-900">Message</button>
+          <button onclick="shareProfileUrl(viewingUserId)" class="px-3 py-2 rounded-xl bg-slate-100 text-xs font-bold">👤+</button>
+        </div>
+      </div>
+
+      <div id="otherProfileGrid" class="grid grid-cols-3 gap-0.5 pt-2 border-t border-slate-100"></div>
+    </section>
+
+    <!-- OTHER USER 7-OPTION BOTTOM SHEET (Block, Report, About, Hide Story, Copy URL, Share, QR Code) -->
+    <div id="otherUserSheet" class="hidden fixed inset-0 z-50 bg-black/50 flex items-end justify-center" onclick="if(event.target===this)this.classList.add('hidden')">
+      <div class="bg-white w-full max-w-md rounded-t-3xl p-5 space-y-3.5 text-sm font-medium">
+        <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto mb-2"></div>
+        <button id="sheetBlockBtn" onclick="toggleBlockViewingUser()" class="w-full text-left py-1.5 text-rose-600 font-bold">Block</button>
+        <button onclick="alert('Report submitted to ZestUp Safety Team.'); document.getElementById('otherUserSheet').classList.add('hidden');" class="w-full text-left py-1.5 text-rose-600">Report</button>
+        <button onclick="showAboutAccount()" class="w-full text-left py-1.5 text-slate-800">About this account</button>
+        <button id="sheetHideStoryBtn" onclick="toggleHideStoryViewingUser()" class="w-full text-left py-1.5 text-slate-800">Hide your story</button>
+        <button onclick="shareProfileUrl(viewingUserId); document.getElementById('otherUserSheet').classList.add('hidden');" class="w-full text-left py-1.5 text-slate-800">Copy profile URL</button>
+        <button onclick="shareProfileUrl(viewingUserId); document.getElementById('otherUserSheet').classList.add('hidden');" class="w-full text-left py-1.5 text-slate-800">Share this profile</button>
+        <button onclick="showUserQrCode()" class="w-full text-left py-1.5 text-slate-800">QR code</button>
+      </div>
+    </div>
+
+    <!-- 7. CREATE SCREEN (POST / STORY / REEL / LIVE - No Instants) -->
+    <section id="createScreen" class="hidden fixed inset-0 z-50 bg-zinc-950 text-white max-w-md mx-auto flex flex-col justify-between">
+      <!-- Top Bar -->
+      <header class="px-4 py-3.5 flex items-center justify-between border-b border-zinc-800">
+        <button onclick="closeCreateScreen()" class="text-xl font-bold text-zinc-300">✕</button>
+        <h3 id="createHeaderTitle" class="font-bold text-sm">New post</h3>
+        <button id="publishContentBtn" class="text-sm font-bold text-indigo-400">Next ›</button>
+      </header>
+
+      <!-- Main Create Content Area -->
+      <div class="flex-1 overflow-y-auto p-4 flex flex-col justify-center">
+        <!-- Standard Post/Story/Reel Uploader -->
+        <div id="mediaUploadArea" class="space-y-4">
+          <div id="createPreviewBox" class="hidden relative rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800">
+            <img id="createImgPreview" class="hidden w-full max-h-72 object-contain mx-auto" />
+            <video id="createVidPreview" controls class="hidden w-full max-h-72 mx-auto"></video>
+            <button onclick="clearCreateMedia()" class="absolute top-2 right-2 bg-black/70 text-white text-xs px-2.5 py-1 rounded-full">✕</button>
+          </div>
+
+          <label class="flex flex-col items-center justify-center h-44 rounded-2xl border-2 border-dashed border-zinc-700 bg-zinc-900/60 cursor-pointer hover:border-indigo-500 transition">
+            <span class="text-3xl mb-1">📷</span>
+            <span class="text-xs font-bold text-zinc-200">Select Photo or Video from Gallery</span>
+            <span class="text-[11px] text-zinc-500 mt-0.5">Supports HD Images & Reels Videos</span>
+            <input id="createFileInput" type="file" accept="image/*,video/*" class="hidden" />
+          </label>
+
+          <textarea id="createCaptionInput" rows="3" placeholder="Write a caption for ZestUp..." class="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-3.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500"></textarea>
+        </div>
+
+        <!-- LIVE STREAMING MODE -->
+        <div id="liveStreamArea" class="hidden flex-col items-center justify-center space-y-4 text-center">
+          <div class="relative w-full h-80 bg-zinc-900 rounded-3xl overflow-hidden border border-zinc-800 flex items-center justify-center">
+            <video id="liveCameraVideo" autoplay muted playsinline class="w-full h-full object-cover"></video>
+            <span id="liveBadgeIndicator" class="hidden absolute top-3 left-3 bg-rose-600 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-md animate-pulse">● LIVE</span>
+          </div>
+          <input id="liveTitleInput" type="text" placeholder="Add a Live stream title..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white" />
+          <button id="startLiveBtn" onclick="toggleGoLive()" class="w-full py-3 rounded-2xl zest-gradient font-bold text-sm">Go Live Now</button>
+        </div>
+      </div>
+
+      <!-- Bottom Pill Switcher: POST | STORY | REEL | LIVE (No Instants) -->
+      <div class="p-4 flex justify-center">
+        <div class="bg-zinc-900/95 border border-zinc-800 rounded-full px-3 py-2 flex items-center gap-4 text-xs font-extrabold tracking-wider">
+          <button onclick="setCreateType('POST')" class="create-tab-btn text-white" data-type="POST">POST</button>
+          <button onclick="setCreateType('STORY')" class="create-tab-btn text-zinc-500" data-type="STORY">STORY</button>
+          <button onclick="setCreateType('REEL')" class="create-tab-btn text-zinc-500" data-type="REEL">REEL</button>
+          <button onclick="setCreateType('LIVE')" class="create-tab-btn text-zinc-500" data-type="LIVE">LIVE</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. SETTINGS AND ACTIVITY -->
     <section id="settingsPage" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col overflow-y-auto">
       <header class="sticky top-0 z-20 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
         <button onclick="closeSettings()" class="text-xl font-bold leading-none">←</button>
         <h2 class="font-bold text-base">Settings and activity</h2>
       </header>
 
-      <!-- Search Settings -->
       <div class="p-3 border-b border-slate-100">
-        <div class="relative">
-          <input id="settingsSearchInput" type="text" placeholder="Search" class="w-full bg-slate-100 text-sm pl-9 pr-4 py-2 rounded-xl focus:outline-none" />
-          <span class="absolute left-3 top-2.5 text-slate-400 text-xs">🔍</span>
-        </div>
+        <input id="settingsSearchInput" type="text" placeholder="Search settings..." class="w-full bg-slate-100 text-sm px-4 py-2 rounded-xl focus:outline-none" />
       </div>
 
-      <div id="settingsListContainer" class="divide-y divide-slate-100 pb-10">
-        <!-- Section: Your account -->
-        <div class="p-4 space-y-3 settings-group">
+      <div class="divide-y divide-slate-100 pb-10">
+        <div class="p-4 space-y-3">
           <p class="text-xs font-semibold text-slate-500">Your account</p>
-          <div onclick="closeSettings(); openEditProfile();" class="settings-item flex items-center justify-between py-1 cursor-pointer">
+          <div onclick="closeSettings(); openAccountsCenter();" class="settings-item flex items-center justify-between py-1 cursor-pointer">
             <div class="flex items-center gap-3">
               <span class="text-lg">👤</span>
               <div>
-                <p class="text-sm font-semibold">Accounts Center</p>
-                <p class="text-[11px] text-slate-400">Password, security, personal details</p>
+                <p class="text-sm font-bold">Accounts Center</p>
+                <p class="text-[11px] text-slate-400">Name, Username, Profile picture</p>
               </div>
             </div>
             <span class="text-slate-400">›</span>
           </div>
         </div>
 
-        <!-- Section: How you use ZestUp -->
-        <div class="p-4 space-y-3.5 settings-group">
+        <div class="p-4 space-y-3.5">
           <p class="text-xs font-semibold text-slate-500">How you use ZestUp</p>
           <div onclick="openSubSetting('saved')" class="settings-item flex items-center justify-between cursor-pointer">
             <div class="flex items-center gap-3"><span class="text-lg">🔖</span><span class="text-sm">Saved</span></div>
             <span class="text-slate-400 text-xs" id="savedCountBadge">0 ›</span>
           </div>
-          <div onclick="openSubSetting('archive')" class="settings-item flex items-center justify-between cursor-pointer">
-            <div class="flex items-center gap-3"><span class="text-lg">🕒</span><span class="text-sm">Archive</span></div>
-            <span class="text-slate-400">›</span>
-          </div>
           <div onclick="openSubSetting('activity')" class="settings-item flex items-center justify-between cursor-pointer">
             <div class="flex items-center gap-3"><span class="text-lg">📈</span><span class="text-sm">Your activity</span></div>
             <span class="text-slate-400">›</span>
           </div>
-          <div onclick="toggleSettingPref('notificationsEnabled')" class="settings-item flex items-center justify-between cursor-pointer">
-            <div class="flex items-center gap-3"><span class="text-lg">🔔</span><span class="text-sm">Notifications</span></div>
-            <span id="pref_notificationsEnabled" class="text-xs font-bold text-sky-500">On ›</span>
-          </div>
-          <div onclick="openSubSetting('timemanagement')" class="settings-item flex items-center justify-between cursor-pointer">
-            <div class="flex items-center gap-3"><span class="text-lg">⏱️</span><span class="text-sm">Time management</span></div>
-            <span class="text-slate-400">›</span>
-          </div>
-        </div>
-
-        <!-- Section: Your insights and tools -->
-        <div class="p-4 space-y-3.5 settings-group">
-          <p class="text-xs font-semibold text-slate-500">Your insights and tools</p>
           <div onclick="openSubSetting('dashboard')" class="settings-item flex items-center justify-between cursor-pointer">
-            <div class="flex items-center gap-3"><span class="text-lg">📊</span><span class="text-sm">Professional dashboard</span></div>
+            <div class="flex items-center gap-3"><span class="text-lg">📊</span><span class="text-sm">Creator dashboard</span></div>
             <span class="text-slate-400">›</span>
-          </div>
-          <div onclick="openSubSetting('creator')" class="settings-item flex items-center justify-between cursor-pointer">
-            <div class="flex items-center gap-3"><span class="text-lg">🛠️</span><span class="text-sm">Profile type and tools</span></div>
-            <span class="text-xs text-slate-400">Creator ›</span>
           </div>
         </div>
 
-        <!-- Section: Who can see your content -->
-        <div class="p-4 space-y-3.5 settings-group">
-          <p class="text-xs font-semibold text-slate-500">Who can see your content</p>
+        <div class="p-4 space-y-3.5">
+          <p class="text-xs font-semibold text-slate-500">Privacy & Safety</p>
           <div onclick="toggleSettingPref('isPrivate')" class="settings-item flex items-center justify-between cursor-pointer">
             <div class="flex items-center gap-3"><span class="text-lg">🔒</span><span class="text-sm">Profile privacy</span></div>
-            <span id="pref_isPrivate" class="text-xs font-semibold text-slate-500">Public ›</span>
-          </div>
-          <div onclick="openSubSetting('closefriends')" class="settings-item flex items-center justify-between cursor-pointer">
-            <div class="flex items-center gap-3"><span class="text-lg">⭐</span><span class="text-sm">Close Friends</span></div>
-            <span class="text-xs text-slate-400">0 ›</span>
+            <span id="pref_isPrivate" class="text-xs font-semibold text-indigo-600">Public ›</span>
           </div>
           <div onclick="openSubSetting('blocked')" class="settings-item flex items-center justify-between cursor-pointer">
-            <div class="flex items-center gap-3"><span class="text-lg">🚫</span><span class="text-sm">Blocked</span></div>
+            <div class="flex items-center gap-3"><span class="text-lg">🚫</span><span class="text-sm">Blocked accounts</span></div>
             <span id="blockedCountBadge" class="text-xs text-slate-400">0 ›</span>
           </div>
-        </div>
-
-        <!-- Section: How others can interact with you -->
-        <div class="p-4 space-y-3.5 settings-group">
-          <p class="text-xs font-semibold text-slate-500">How others can interact with you</p>
-          <div onclick="toggleSettingPref('allowComments')" class="settings-item flex items-center justify-between cursor-pointer">
-            <div class="flex items-center gap-3"><span class="text-lg">💬</span><span class="text-sm">Comments</span></div>
-            <span id="pref_allowComments" class="text-xs font-bold text-sky-500">Everyone ›</span>
-          </div>
-          <div onclick="toggleSettingPref('allowSharing')" class="settings-item flex items-center justify-between cursor-pointer">
-            <div class="flex items-center gap-3"><span class="text-lg">🔄</span><span class="text-sm">Sharing and reuse</span></div>
-            <span id="pref_allowSharing" class="text-xs font-bold text-sky-500">On ›</span>
-          </div>
-        </div>
-
-        <!-- Section: Your app and media -->
-        <div class="p-4 space-y-3.5 settings-group">
-          <p class="text-xs font-semibold text-slate-500">Your app and media</p>
-          <div onclick="toggleSettingPref('highQualityMedia')" class="settings-item flex items-center justify-between cursor-pointer">
-            <div class="flex items-center gap-3"><span class="text-lg">📶</span><span class="text-sm">Data usage and media quality</span></div>
-            <span id="pref_highQualityMedia" class="text-xs font-bold text-sky-500">HD ›</span>
-          </div>
-          <div onclick="openSubSetting('language')" class="settings-item flex items-center justify-between cursor-pointer">
-            <div class="flex items-center gap-3"><span class="text-lg">🌐</span><span class="text-sm">Language and translations</span></div>
-            <span class="text-xs text-slate-400">English / বাংলা ›</span>
-          </div>
-        </div>
-
-        <!-- Section: More info and support -->
-        <div class="p-4 space-y-3.5 settings-group">
-          <p class="text-xs font-semibold text-slate-500">More info and support</p>
           <div onclick="openSubSetting('profilestatus')" class="settings-item flex items-center justify-between cursor-pointer">
             <div class="flex items-center gap-3"><span class="text-lg">🛡️</span><span class="text-sm">Profile status</span></div>
             <span class="text-slate-400">›</span>
           </div>
-          <div onclick="openSubSetting('about')" class="settings-item flex items-center justify-between cursor-pointer">
-            <div class="flex items-center gap-3"><span class="text-lg">ℹ️</span><span class="text-sm">About</span></div>
-            <span class="text-slate-400">›</span>
-          </div>
         </div>
 
-        <!-- Section: Login (Log out) -->
-        <div class="p-4 space-y-3 settings-group">
+        <div class="p-4 space-y-3">
           <p class="text-xs font-semibold text-slate-500">Login</p>
           <button id="logoutBtn" class="settings-item w-full text-left text-sm font-bold text-rose-500 py-1">Log out</button>
         </div>
       </div>
     </section>
 
-    <!-- SUB-SETTING DETAIL VIEW MODAL -->
+    <!-- ACCOUNTS CENTER MODAL (Exact Screenshot Layout without Avatar) -->
+    <section id="accountsCenterPage" class="hidden fixed inset-0 z-50 bg-slate-50 max-w-md mx-auto flex flex-col">
+      <header class="bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
+        <button onclick="document.getElementById('accountsCenterPage').classList.add('hidden')" class="text-xl font-bold">←</button>
+        <h3 class="font-bold text-base">Accounts Center</h3>
+      </header>
+      <div class="p-6 flex flex-col items-center">
+        <img id="acAvatarImg" class="w-20 h-20 rounded-full object-cover border-2 border-white shadow-sm mb-3" />
+        <p id="acFullName" class="font-bold text-base text-slate-900">Name</p>
+        <p id="acSubText" class="text-xs text-slate-500 mb-6">username • ZestUp</p>
+
+        <!-- 3 Options Card (No Avatar Option) -->
+        <div class="w-full bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden shadow-xs">
+          <button onclick="editSingleField('name')" class="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium hover:bg-slate-50">
+            <span>Name</span><span class="text-slate-400">›</span>
+          </button>
+          <button onclick="editSingleField('username')" class="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium hover:bg-slate-50">
+            <span>Username</span><span class="text-slate-400">›</span>
+          </button>
+          <label class="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium hover:bg-slate-50 cursor-pointer">
+            <span>Profile picture</span><span class="text-slate-400">›</span>
+            <input id="acPhotoUploadInput" type="file" accept="image/*" class="hidden" />
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- EDIT BIO MODAL (149 Character Limit) -->
+    <div id="editBioModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+      <div class="bg-white w-full max-w-sm rounded-3xl p-5 space-y-3">
+        <h3 class="font-bold text-base">Edit Profile Bio</h3>
+        <div>
+          <div class="flex justify-between text-xs text-slate-500 mb-1">
+            <span>Bio (Max 149 characters)</span>
+            <span id="bioCharCount" class="font-bold text-indigo-600">0/149</span>
+          </div>
+          <textarea id="bioInputBox" maxlength="149" rows="4" placeholder="Write something about yourself..." class="w-full border border-slate-300 rounded-xl p-3 text-sm focus:outline-none focus:border-indigo-500"></textarea>
+        </div>
+        <div class="flex justify-end gap-2 pt-1">
+          <button onclick="document.getElementById('editBioModal').classList.add('hidden')" class="px-4 py-2 text-xs font-semibold text-slate-500">Cancel</button>
+          <button id="saveBioBtn" class="px-4 py-2 rounded-xl zest-gradient text-white text-xs font-bold">Save Bio</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUB-SETTING DETAIL MODAL -->
     <div id="subSettingModal" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col">
       <header class="sticky top-0 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
         <button onclick="document.getElementById('subSettingModal').classList.add('hidden')" class="text-xl font-bold">←</button>
@@ -342,14 +506,14 @@
         <button onclick="switchTab('homeTab')" class="text-lg font-bold">←</button>
         <span class="font-bold text-base">Notifications</span>
       </header>
-      <div class="p-4 space-y-3 text-xs text-slate-600">
-        <p>Welcome to ZestUp! Like, follow, and post to see updates here.</p>
+      <div id="notificationsList" class="p-4 space-y-3 text-xs text-slate-600">
+        <p>Welcome to ZestUp! Follow creators, like posts, and send messages.</p>
       </div>
     </section>
 
     <!-- BOTTOM NAVIGATION BAR -->
     <nav class="w-full max-w-md fixed bottom-0 z-40 bg-white border-t border-slate-200 px-6 py-2.5 flex items-center justify-between">
-      <button onclick="switchTab('homeTab')" class="nav-icon text-slate-900" data-tab="homeTab">
+      <button onclick="switchTab('homeTab')" class="nav-icon text-indigo-600" data-tab="homeTab">
         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.1L1 12h3v9h7v-6h2v6h7v-9h3L12 2.1z"/></svg>
       </button>
       <button onclick="switchTab('reelsTab')" class="nav-icon text-slate-400" data-tab="reelsTab">
@@ -357,7 +521,7 @@
       </button>
       <button onclick="switchTab('chatTab')" class="nav-icon text-slate-400 relative" data-tab="chatTab">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-        <span class="w-2 h-2 bg-rose-500 rounded-full absolute -top-0.5 -right-0.5"></span>
+        <span class="w-2 h-2 bg-pink-500 rounded-full absolute -top-0.5 -right-0.5"></span>
       </button>
       <button onclick="switchTab('searchTab')" class="nav-icon text-slate-400" data-tab="searchTab">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
@@ -368,58 +532,14 @@
     </nav>
   </div>
 
-  <!-- CREATE MODAL -->
-  <div id="createModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center">
-    <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <button onclick="closeCreateModal()" class="text-sm text-slate-500">Cancel</button>
-        <h3 id="createModalTitle" class="font-bold text-sm">New Post</h3>
-        <button id="publishBtn" class="text-sm font-bold text-sky-500">Share</button>
-      </div>
-      <textarea id="postText" rows="3" placeholder="Write a caption..." class="w-full text-sm focus:outline-none resize-none"></textarea>
-      <div id="previewContainer" class="hidden relative">
-        <img id="imagePreview" class="w-full max-h-60 object-cover rounded-xl" />
-        <button id="removeImgBtn" class="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">✕</button>
-      </div>
-      <label class="flex items-center gap-2 text-xs font-semibold text-sky-500 cursor-pointer pt-2 border-t border-slate-100">
-        <span>📷 Select Photo or Video</span>
-        <input id="mediaInput" type="file" accept="image/*,video/*" class="hidden" />
-      </label>
-    </div>
-  </div>
-
-  <!-- EDIT PROFILE MODAL -->
-  <div id="editProfileModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-sm rounded-2xl p-5 space-y-3">
-      <h3 class="font-bold text-base">Edit Profile</h3>
-      <div>
-        <label class="text-xs text-slate-500">Profile Photo</label>
-        <input id="editAvatarFile" type="file" accept="image/*" class="w-full text-xs mt-1" />
-      </div>
-      <div>
-        <label class="text-xs text-slate-500">Name</label>
-        <input id="editNameInput" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mt-1" />
-      </div>
-      <div>
-        <label class="text-xs text-slate-500">Bio</label>
-        <textarea id="editBioInput" rows="3" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mt-1"></textarea>
-      </div>
-      <div class="flex justify-end gap-2 pt-2">
-        <button onclick="document.getElementById('editProfileModal').classList.add('hidden')" class="px-4 py-2 text-xs font-semibold text-slate-500">Cancel</button>
-        <button id="saveProfileBtn" class="px-4 py-2 rounded-lg bg-sky-500 text-white text-xs font-bold">Save</button>
-      </div>
-    </div>
-  </div>
-
   <!-- FOUNDER ADMIN MODAL -->
   <div id="adminModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-sm rounded-2xl p-5 max-h-[80vh] flex flex-col">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-5 max-h-[80vh] flex flex-col">
       <div class="flex items-center justify-between pb-3 border-b border-slate-100">
         <h3 class="font-bold text-sm">🛡️ Manage Blue Verified Ticks</h3>
         <button onclick="document.getElementById('adminModal').classList.add('hidden')" class="text-slate-400 font-bold">✕</button>
       </div>
-      <p class="text-[11px] text-slate-500 mt-2 mb-3">Tap "Give Blue Tick" to verify any user. Everyone on ZestUp will see their badge.</p>
-      <div id="adminUsersList" class="flex-1 overflow-y-auto space-y-2.5"></div>
+      <div id="adminUsersList" class="flex-1 overflow-y-auto space-y-2.5 mt-3"></div>
     </div>
   </div>
 
@@ -438,8 +558,13 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, RecaptchaVerifier, signInWithPhoneNumber, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getFirestore, collection, addDoc, setDoc, getDoc, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, arrayUnion, arrayRemove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Register Service Worker for PWA App Install
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
 
     const firebaseConfig = {
       apiKey: "AIzaSyASSXnd4iUaOXAeWohsLwzU6Z7LA2Ca0-I",
@@ -461,156 +586,139 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let isSignUp = false;
+    let authMethod = 'gmail';
+    let generatedEmailOtp = null;
+    let phoneConfirmationResult = null;
+
     let currentUser = null;
     let userProfileData = {};
     let usersMap = {};
     let allPosts = [];
     let allStories = [];
-    let createMode = 'post';
-    let selectedFile = null;
+    let allMessages = [];
+    let viewingUserId = null;
+    let activeChatPartnerId = null;
+    let dmFilter = 'Primary';
     let searchFilter = 'all';
+    let createType = 'POST';
+    let createFile = null;
+    let liveStreamObj = null;
 
-    const defaultAvatar = (name) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'U')}&background=0ea5e9&color=fff&bold=true`;
+    const defaultAvatar = (name) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Z')}&background=4F46E5&color=fff&bold=true`;
+
+    function isOwner(uid) {
+      const u = usersMap[uid];
+      return u && (u.email === FOUNDER_EMAIL || u.isFounder === true);
+    }
 
     function isUserVerified(uid) {
       const u = usersMap[uid];
-      if (!u) return false;
-      return u.email === FOUNDER_EMAIL || u.isFounder === true || u.verified === true;
+      return u && (isOwner(uid) || u.verified === true);
     }
 
     function getBadgeHTML(uid) {
       return isUserVerified(uid) ? BLUE_TICK_SVG : '';
     }
 
-    window.switchTab = (tabId) => {
-      ['homeTab', 'reelsTab', 'chatTab', 'searchTab', 'profileTab', 'activityTab'].forEach(id => {
-        document.getElementById(id).classList.toggle('hidden', id !== tabId);
-      });
-      document.querySelectorAll('.nav-icon').forEach(btn => {
-        const active = btn.dataset.tab === tabId;
-        btn.classList.toggle('text-slate-900', active);
-        btn.classList.toggle('text-slate-400', !active);
-      });
-      if (tabId === 'searchTab') renderSearchAndExplore();
+    function userHasStory(uid) {
+      return allStories.some(s => s.authorId === uid);
+    }
+
+    // Ring Class Logic: Black for Owner, Colored if Story, Normal if None
+    function getProfileRingClass(uid) {
+      if (isOwner(uid)) return 'ring-owner';
+      if (userHasStory(uid)) return 'ring-story';
+      return 'ring-none';
+    }
+
+    // Smart Follow Button Text: "Following" | "Follow back" | "Follow"
+    function getFollowButtonState(targetUid) {
+      const iFollowThem = (userProfileData.following || []).includes(targetUid);
+      const theyFollowMe = (userProfileData.followers || []).includes(targetUid);
+      if (iFollowThem) return { text: 'Following', cls: 'bg-slate-100 text-slate-800' };
+      if (theyFollowMe) return { text: 'Follow back', cls: 'zest-gradient text-white' };
+      return { text: 'Follow', cls: 'zest-gradient text-white' };
+    }
+
+    // ================= AUTH WITH GMAIL/MOBILE + OTP =================
+    window.setAuthMethod = (method) => {
+      authMethod = method;
+      document.getElementById('tabGmailAuth').className = method === 'gmail' ? 'py-2 rounded-lg bg-white text-indigo-600 shadow-sm' : 'py-2 rounded-lg text-slate-500';
+      document.getElementById('tabPhoneAuth').className = method === 'phone' ? 'py-2 rounded-lg bg-white text-indigo-600 shadow-sm' : 'py-2 rounded-lg text-slate-500';
+      document.getElementById('gmailInputBox').classList.toggle('hidden', method !== 'gmail');
+      document.getElementById('phoneInputBox').classList.toggle('hidden', method !== 'phone');
+      document.getElementById('otpBox').classList.add('hidden');
+      document.getElementById('sendOtpBtn').classList.remove('hidden');
+      document.getElementById('verifyOtpBtn').classList.add('hidden');
     };
 
-    // Settings Controls
-    window.openSettings = () => document.getElementById('settingsPage').classList.remove('hidden');
-    window.closeSettings = () => document.getElementById('settingsPage').classList.add('hidden');
+    document.getElementById('sendOtpBtn').onclick = async () => {
+      const errEl = document.getElementById('authError');
+      errEl.classList.add('hidden');
 
-    document.getElementById('settingsSearchInput').oninput = (e) => {
-      const q = e.target.value.toLowerCase().trim();
-      document.querySelectorAll('.settings-item').forEach(item => {
-        item.classList.toggle('hidden', q && !item.textContent.toLowerCase().includes(q));
-      });
-    };
-
-    window.toggleSettingPref = async (key) => {
-      const currentVal = userProfileData[key] !== undefined ? userProfileData[key] : (key === 'isPrivate' ? false : true);
-      await updateDoc(doc(db, "users", currentUser.uid), { [key]: !currentVal });
-    };
-
-    window.openSubSetting = (type) => {
-      const modal = document.getElementById('subSettingModal');
-      const title = document.getElementById('subSettingTitle');
-      const body = document.getElementById('subSettingBody');
-      modal.classList.remove('hidden');
-
-      if (type === 'saved') {
-        title.textContent = "Saved Posts";
-        const savedIds = userProfileData.savedPosts || [];
-        const savedPosts = allPosts.filter(p => savedIds.includes(p.id));
-        body.innerHTML = savedPosts.length
-          ? `<div class="grid grid-cols-3 gap-1">${savedPosts.map(p => p.mediaUrl ? `<img src="${p.mediaUrl}" class="aspect-square object-cover rounded" />` : `<div class="aspect-square bg-slate-100 p-2 text-xs flex items-center justify-center text-center">${p.text}</div>`).join('')}</div>`
-          : `<p class="text-slate-400 text-center py-12">No saved posts yet. Tap the bookmark icon on any post to save it here.</p>`;
-      } else if (type === 'dashboard') {
-        title.textContent = "Professional dashboard";
-        const myPosts = allPosts.filter(p => p.authorId === currentUser.uid);
-        const totalLikes = myPosts.reduce((s, p) => s + (p.likes?.length || 0), 0);
-        const totalComments = myPosts.reduce((s, p) => s + (p.comments?.length || 0), 0);
-        body.innerHTML = `
-          <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
-            <p class="font-bold text-base">Account Insights (Last 30 Days)</p>
-            <div class="grid grid-cols-3 gap-2 text-center">
-              <div class="bg-white p-3 rounded-xl border border-slate-100"><p class="font-bold text-lg text-sky-500">${myPosts.length}</p><p class="text-[11px] text-slate-500">Posts</p></div>
-              <div class="bg-white p-3 rounded-xl border border-slate-100"><p class="font-bold text-lg text-rose-500">${totalLikes}</p><p class="text-[11px] text-slate-500">Likes</p></div>
-              <div class="bg-white p-3 rounded-xl border border-slate-100"><p class="font-bold text-lg text-emerald-500">${totalComments}</p><p class="text-[11px] text-slate-500">Comments</p></div>
-            </div>
-          </div>`;
-      } else if (type === 'profilestatus') {
-        title.textContent = "Profile status";
-        const verified = isUserVerified(currentUser.uid);
-        body.innerHTML = `
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
-            <p class="font-bold flex items-center gap-1.5">${userProfileData.name || 'User'} ${verified ? BLUE_TICK_SVG : ''}</p>
-            <p class="text-xs text-emerald-600 font-semibold">✔ Your account is in good standing and meets all ZestUp community guidelines.</p>
-            <p class="text-xs text-slate-500">Verification status: <strong>${verified ? 'Verified Creator ✔' : 'Standard Account'}</strong></p>
-          </div>`;
-      } else if (type === 'about') {
-        title.textContent = "About ZestUp";
-        body.innerHTML = `
-          <div class="p-4 rounded-2xl bg-slate-50 space-y-2 text-xs text-slate-600">
-            <p class="font-bold text-base text-slate-900">ZestUp v5.0</p>
-            <p>Created & Founded by <strong>Akhtar Hossain</strong>.</p>
-            <p>Share photos, reels, stories, and connect with your community in real time.</p>
-          </div>`;
-      } else if (type === 'activity') {
-        title.textContent = "Your activity";
-        const likedPosts = allPosts.filter(p => (p.likes || []).includes(currentUser.uid));
-        body.innerHTML = `<p class="text-xs text-slate-500 mb-2">Posts you liked (${likedPosts.length})</p>` +
-          (likedPosts.length ? likedPosts.map(p => `<div class="p-3 bg-slate-50 rounded-xl text-xs">❤️ Liked <strong>${p.authorName}</strong>'s post: "${p.text || 'Media post'}"</div>`).join('') : `<p class="text-xs text-slate-400">No recent activity.</p>`);
+      if (authMethod === 'gmail') {
+        const email = document.getElementById('emailInput').value.trim().toLowerCase();
+        const pass = document.getElementById('passwordInput').value.trim();
+        if (!email || pass.length < 6) {
+          errEl.textContent = "Enter valid Gmail and password (min 6 characters).";
+          errEl.classList.remove('hidden');
+          return;
+        }
+        // Generate 6-digit OTP for Gmail verification step
+        generatedEmailOtp = Math.floor(100000 + Math.random() * 900000).toString();
+        document.getElementById('otpHintText').textContent = `Your ZestUp Verification OTP is: ${generatedEmailOtp}`;
+        document.getElementById('otpBox').classList.remove('hidden');
+        document.getElementById('sendOtpBtn').classList.add('hidden');
+        document.getElementById('verifyOtpBtn').classList.remove('hidden');
       } else {
-        title.textContent = "Settings Info";
-        body.innerHTML = `<p class="text-xs text-slate-500 py-8 text-center">All preferences are synced automatically to your ZestUp account.</p>`;
+        const phone = document.getElementById('phoneInput').value.trim();
+        if (phone.length !== 10) {
+          errEl.textContent = "Enter a valid 10-digit mobile number.";
+          errEl.classList.remove('hidden');
+          return;
+        }
+        try {
+          if (!window.recaptchaVerifier) {
+            window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
+          }
+          phoneConfirmationResult = await signInWithPhoneNumber(auth, '+91' + phone, window.recaptchaVerifier);
+          document.getElementById('otpHintText').textContent = `SMS OTP sent to +91 ${phone}`;
+          document.getElementById('otpBox').classList.remove('hidden');
+          document.getElementById('sendOtpBtn').classList.add('hidden');
+          document.getElementById('verifyOtpBtn').classList.remove('hidden');
+        } catch (e) {
+          errEl.textContent = e.message;
+          errEl.classList.remove('hidden');
+        }
       }
     };
 
-    window.openCreateModal = (mode = 'post') => {
-      createMode = mode;
-      document.getElementById('createModalTitle').textContent = mode === 'story' ? 'Add to Your Story' : 'New Post';
-      document.getElementById('createModal').classList.remove('hidden');
-    };
-    window.closeCreateModal = () => {
-      document.getElementById('createModal').classList.add('hidden');
-      selectedFile = null;
-      document.getElementById('postText').value = '';
-      document.getElementById('previewContainer').classList.add('hidden');
-    };
-
-    // Auth
-    document.getElementById('toggleAuthBtn').onclick = () => {
-      isSignUp = !isSignUp;
-      document.getElementById('authSubtitle').textContent = isSignUp ? "Sign up to see photos and videos from your friends." : "Sign in to see photos and videos from your friends.";
-      document.getElementById('authSubmitBtn').textContent = isSignUp ? "Sign Up" : "Log In";
-      document.getElementById('toggleText').textContent = isSignUp ? "Have an account?" : "Don't have an account?";
-      document.getElementById('toggleAuthBtn').textContent = isSignUp ? "Log in" : "Sign up";
-      document.getElementById('userNameInput').classList.toggle('hidden', !isSignUp);
-    };
-
-    document.getElementById('authSubmitBtn').onclick = async () => {
-      const email = document.getElementById('emailInput').value.trim().toLowerCase();
-      const password = document.getElementById('passwordInput').value.trim();
-      const name = document.getElementById('userNameInput').value.trim();
+    document.getElementById('verifyOtpBtn').onclick = async () => {
+      const code = document.getElementById('otpCodeInput').value.trim();
+      const nameInput = document.getElementById('authFullName').value.trim();
       const errEl = document.getElementById('authError');
       errEl.classList.add('hidden');
 
       try {
-        if (isSignUp) {
-          const cred = await createUserWithEmailAndPassword(auth, email, password);
-          const displayName = name || email.split('@')[0];
-          const isFounder = (email === FOUNDER_EMAIL);
-          await updateProfile(cred.user, { displayName });
-          await setDoc(doc(db, "users", cred.user.uid), {
-            uid: cred.user.uid, email, name: displayName,
-            username: email.split('@')[0].toLowerCase(),
-            bio: "Digital Creator on ZestUp ✨",
-            avatar: defaultAvatar(displayName),
-            verified: isFounder, isFounder,
-            followers: [], following: [], savedPosts: []
-          });
+        if (authMethod === 'gmail') {
+          if (code !== generatedEmailOtp) {
+            errEl.textContent = "Invalid OTP! Please check and enter the 6-digit OTP.";
+            errEl.classList.remove('hidden');
+            return;
+          }
+          const email = document.getElementById('emailInput').value.trim().toLowerCase();
+          const pass = document.getElementById('passwordInput').value.trim();
+          try {
+            await signInWithEmailAndPassword(auth, email, pass);
+          } catch (loginErr) {
+            const cred = await createUserWithEmailAndPassword(auth, email, pass);
+            const displayName = nameInput || email.split('@')[0];
+            await updateProfile(cred.user, { displayName });
+            await sendEmailVerification(cred.user).catch(() => {});
+          }
         } else {
-          await signInWithEmailAndPassword(auth, email, password);
+          const cred = await phoneConfirmationResult.confirm(code);
+          if (nameInput) await updateProfile(cred.user, { displayName: nameInput });
         }
       } catch (e) {
         errEl.textContent = e.message;
@@ -634,14 +742,17 @@
         const snap = await getDoc(userRef);
 
         if (!snap.exists()) {
-          const displayName = user.displayName || email.split('@')[0];
+          const fallbackName = document.getElementById('authFullName').value.trim() || user.displayName || (email ? email.split('@')[0] : 'zest_user');
+          const uname = (email ? email.split('@')[0] : 'user_' + user.uid.slice(0, 5)).toLowerCase();
           await setDoc(userRef, {
-            uid: user.uid, email, name: displayName,
-            username: email.split('@')[0].toLowerCase(),
-            bio: "Digital Creator on ZestUp ✨",
-            avatar: defaultAvatar(displayName),
+            uid: user.uid, email, phone: user.phoneNumber || "",
+            name: fallbackName, username: uname,
+            bio: "Creator on ZestUp ✨",
+            avatar: defaultAvatar(fallbackName),
             verified: isFounder, isFounder,
-            followers: [], following: [], savedPosts: []
+            followers: [], following: [], savedPosts: [], blockedUsers: [], hiddenStoryFrom: [],
+            note: "Sharing vibes ✨",
+            joinedAt: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
           });
         } else if (isFounder && !snap.data().isFounder) {
           await updateDoc(userRef, { verified: true, isFounder: true, email });
@@ -657,11 +768,13 @@
         usersMap = {};
         snap.forEach(d => usersMap[d.id] = { uid: d.id, ...d.data() });
         userProfileData = usersMap[currentUser.uid] || {};
-        updateProfileUI();
+        updateOwnProfileUI();
         renderFeed();
         renderStories();
         renderSearchAndExplore();
+        renderDmInbox();
         renderAdminUsersList();
+        if (viewingUserId) openOtherProfile(viewingUserId);
       });
 
       onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "desc")), (snap) => {
@@ -669,121 +782,320 @@
         renderFeed();
         renderReels();
         renderSearchAndExplore();
-        renderProfileGrid();
-        updateDashboardStats();
+        renderOwnProfileGrid();
       });
 
       onSnapshot(query(collection(db, "stories"), orderBy("createdAt", "desc")), (snap) => {
         allStories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         renderStories();
+        updateOwnProfileUI();
       });
 
-      onSnapshot(query(collection(db, "messages"), orderBy("createdAt", "asc")), (snap) => {
-        const box = document.getElementById('chatMessages');
-        box.innerHTML = "";
-        snap.forEach(d => {
-          const m = d.data();
-          const isMe = m.senderId === currentUser.uid;
-          const badge = getBadgeHTML(m.senderId);
-          box.innerHTML += `
-            <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
-              <span class="text-[10px] text-slate-500 mb-0.5 px-1 flex items-center gap-1">${m.senderName} ${badge}</span>
-              <div class="px-3.5 py-2 rounded-2xl text-xs max-w-[75%] ${isMe ? 'bg-sky-500 text-white' : 'bg-white border border-slate-200 text-slate-800'}">${m.text}</div>
-            </div>`;
-        });
-        box.scrollTop = box.scrollHeight;
+      onSnapshot(query(collection(db, "directMessages"), orderBy("createdAt", "asc")), (snap) => {
+        allMessages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderDmInbox();
+        if (activeChatPartnerId) renderPrivateChatMessages();
+      });
+
+      // Live Streams Listener
+      onSnapshot(collection(db, "liveStreams"), (snap) => {
+        const banner = document.getElementById('liveBannerRow');
+        const lives = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(l => l.isLive);
+        banner.classList.toggle('hidden', lives.length === 0);
+        banner.innerHTML = lives.map(l => `
+          <div onclick="alert('Watching ${l.hostName}\\'s Live: ${l.title}')" class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full border border-rose-200 shrink-0 cursor-pointer">
+            <span class="w-2 h-2 bg-rose-600 rounded-full animate-ping"></span>
+            <span class="text-xs font-bold text-rose-600">${l.hostName} is LIVE</span>
+          </div>`).join('');
       });
     }
 
-    function updateDashboardStats() {
-      const myPosts = allPosts.filter(p => p.authorId === currentUser.uid);
-      const totalEngagements = myPosts.reduce((s, p) => s + (p.likes?.length || 0) + (p.comments?.length || 0), 0);
-      document.getElementById('dashboardSummaryText').textContent = `↗ ${totalEngagements} engagements in the last 30 days.`;
-    }
+    // ================= NAVIGATION =================
+    window.switchTab = (tabId) => {
+      ['homeTab', 'reelsTab', 'chatTab', 'searchTab', 'profileTab', 'activityTab'].forEach(id => {
+        document.getElementById(id).classList.toggle('hidden', id !== tabId);
+      });
+      document.querySelectorAll('.nav-icon').forEach(btn => {
+        const active = btn.dataset.tab === tabId;
+        btn.classList.toggle('text-indigo-600', active);
+        btn.classList.toggle('text-slate-400', !active);
+      });
+      if (tabId === 'searchTab') renderSearchAndExplore();
+      if (tabId === 'chatTab') renderDmInbox();
+    };
 
-    function updateProfileUI() {
-      const name = userProfileData.name || currentUser.displayName || "User";
+    // ================= OWN PROFILE & ACCOUNTS CENTER & 149-CHAR BIO =================
+    function updateOwnProfileUI() {
+      const name = userProfileData.name || "User";
+      const uname = userProfileData.username || "user";
       const avatar = userProfileData.avatar || defaultAvatar(name);
       const badge = getBadgeHTML(currentUser.uid);
 
-      document.getElementById('profUsernameTop').textContent = userProfileData.username || name.toLowerCase().replace(/\s+/g, '_');
+      document.getElementById('profUsernameTop').textContent = uname;
       document.getElementById('profTopBadge').innerHTML = badge;
       document.getElementById('profFullName').innerHTML = `${name} ${badge}`;
-      document.getElementById('profBio').textContent = userProfileData.bio || "Digital Creator on ZestUp ✨";
+      document.getElementById('profBio').textContent = userProfileData.bio || "Creator on ZestUp ✨";
       document.getElementById('profAvatarImg').src = avatar;
       document.getElementById('navAvatarImg').src = avatar;
+      document.getElementById('dmTopUsername').textContent = uname;
+      document.getElementById('dmTopBadge').innerHTML = badge;
+
+      // Apply Black Ring for Owner, Colored if Story, Normal if None
+      document.getElementById('ownProfileRing').className = getProfileRingClass(currentUser.uid);
+
       document.getElementById('statFollowers').textContent = (userProfileData.followers || []).length;
       document.getElementById('statFollowing').textContent = (userProfileData.following || []).length;
-      document.getElementById('chatHeaderUser').innerHTML = `${userProfileData.username || name} ${badge}`;
-
-      // Sync Settings Badges
       document.getElementById('savedCountBadge').textContent = `${(userProfileData.savedPosts || []).length} ›`;
+      document.getElementById('blockedCountBadge').textContent = `${(userProfileData.blockedUsers || []).length} ›`;
       document.getElementById('pref_isPrivate').textContent = userProfileData.isPrivate ? 'Private ›' : 'Public ›';
-      document.getElementById('pref_allowComments').textContent = userProfileData.allowComments === false ? 'Off ›' : 'Everyone ›';
-      document.getElementById('pref_allowSharing').textContent = userProfileData.allowSharing === false ? 'Off ›' : 'On ›';
-      document.getElementById('pref_notificationsEnabled').textContent = userProfileData.notificationsEnabled === false ? 'Off ›' : 'On ›';
-      document.getElementById('pref_highQualityMedia').textContent = userProfileData.highQualityMedia === false ? 'Data Saver ›' : 'HD ›';
     }
 
-    window.openAdminModal = () => {
-      renderAdminUsersList();
-      document.getElementById('adminModal').classList.remove('hidden');
-    };
+    function renderOwnProfileGrid() {
+      const myPosts = allPosts.filter(p => p.authorId === currentUser.uid);
+      document.getElementById('statPosts').textContent = myPosts.length;
+      const totalEng = myPosts.reduce((s, p) => s + (p.likes?.length || 0) + (p.comments?.length || 0), 0);
+      document.getElementById('dashboardSummaryText').textContent = `↗ ${totalEng} engagements in the last 30 days.`;
 
-    function renderAdminUsersList() {
-      const list = document.getElementById('adminUsersList');
-      if (!list) return;
-      list.innerHTML = Object.values(usersMap).map(u => {
-        const isFounder = u.email === FOUNDER_EMAIL || u.isFounder;
-        const verified = isUserVerified(u.uid);
-        return `
-          <div class="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-100">
-            <div class="flex items-center gap-2.5 min-w-0">
-              <img src="${u.avatar || defaultAvatar(u.name)}" class="w-9 h-9 rounded-full object-cover shrink-0" />
-              <div class="truncate">
-                <p class="text-xs font-bold flex items-center gap-1 truncate">${u.name || u.username} ${verified ? BLUE_TICK_SVG : ''}</p>
-                <p class="text-[10px] text-slate-400 truncate">@${u.username || ''}</p>
-              </div>
-            </div>
-            ${isFounder
-              ? `<span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-sky-100 text-sky-700 shrink-0">Founder</span>`
-              : `<button data-uid="${u.uid}" data-verified="${verified}" class="toggle-verify-btn text-[11px] font-bold px-3 py-1.5 rounded-lg shrink-0 ${verified ? 'bg-rose-100 text-rose-600' : 'bg-sky-500 text-white'}">${verified ? 'Remove' : 'Give Blue Tick'}</button>`
-            }
-          </div>`;
-      }).join('');
-
-      list.querySelectorAll('.toggle-verify-btn').forEach(btn => {
-        btn.onclick = async () => {
-          await updateDoc(doc(db, "users", btn.dataset.uid), { verified: btn.dataset.verified !== 'true' });
-        };
-      });
+      document.getElementById('profileGrid').innerHTML = myPosts.map(p => p.mediaUrl
+        ? (p.mediaType === 'video'
+          ? `<video src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover bg-black"></video>`
+          : `<img src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover bg-slate-100" />`)
+        : `<div class="aspect-[3/4] bg-slate-100 p-2 flex items-center justify-center text-center text-[11px] font-medium">${p.text}</div>`
+      ).join('');
     }
 
-    window.openEditProfile = () => {
-      document.getElementById('editNameInput').value = userProfileData.name || "";
-      document.getElementById('editBioInput').value = userProfileData.bio || "";
-      document.getElementById('editProfileModal').classList.remove('hidden');
+    // Accounts Center (Name, Username, Profile Picture - No Avatar)
+    window.openAccountsCenter = () => {
+      document.getElementById('acAvatarImg').src = userProfileData.avatar || defaultAvatar(userProfileData.name);
+      document.getElementById('acFullName').textContent = userProfileData.name || "User";
+      document.getElementById('acSubText').textContent = `${userProfileData.username || 'user'} • ZestUp`;
+      document.getElementById('accountsCenterPage').classList.remove('hidden');
     };
 
-    document.getElementById('saveProfileBtn').onclick = async () => {
-      const btn = document.getElementById('saveProfileBtn');
-      btn.textContent = "Saving...";
-      let avatarUrl = userProfileData.avatar;
-      const file = document.getElementById('editAvatarFile').files[0];
-      if (file) avatarUrl = await uploadToCloudinary(file);
+    window.editSingleField = async (field) => {
+      const currentVal = userProfileData[field] || "";
+      const newVal = prompt(`Enter new ${field}:`, currentVal);
+      if (newVal && newVal.trim()) {
+        const cleaned = field === 'username' ? newVal.trim().toLowerCase().replace(/\s+/g, '_') : newVal.trim();
+        await updateDoc(doc(db, "users", currentUser.uid), { [field]: cleaned });
+        openAccountsCenter();
+      }
+    };
 
+    document.getElementById('acPhotoUploadInput').onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const url = await uploadToCloudinary(file);
+      if (url) {
+        await updateDoc(doc(db, "users", currentUser.uid), { avatar: url });
+        openAccountsCenter();
+      }
+    };
+
+    // 149-Character Bio Editor
+    window.openEditBioModal = () => {
+      const box = document.getElementById('bioInputBox');
+      box.value = (userProfileData.bio || "").slice(0, 149);
+      document.getElementById('bioCharCount').textContent = `${box.value.length}/149`;
+      document.getElementById('editBioModal').classList.remove('hidden');
+    };
+
+    document.getElementById('bioInputBox').oninput = (e) => {
+      document.getElementById('bioCharCount').textContent = `${e.target.value.length}/149`;
+    };
+
+    document.getElementById('saveBioBtn').onclick = async () => {
+      const bioText = document.getElementById('bioInputBox').value.slice(0, 149);
+      await updateDoc(doc(db, "users", currentUser.uid), { bio: bioText });
+      document.getElementById('editBioModal').classList.add('hidden');
+    };
+
+    // ================= VISIT OTHER USER PROFILE + 7-OPTION SHEET =================
+    window.openOtherProfile = (uid) => {
+      if (!uid || uid === currentUser.uid) {
+        switchTab('profileTab');
+        return;
+      }
+      viewingUserId = uid;
+      const u = usersMap[uid] || {};
+      const badge = getBadgeHTML(uid);
+      const userPosts = allPosts.filter(p => p.authorId === uid);
+
+      document.getElementById('otherProfHeaderUser').innerHTML = `${u.username || u.name || 'User'} ${badge}`;
+      document.getElementById('otherProfAvatar').src = u.avatar || defaultAvatar(u.name);
+      document.getElementById('otherProfRing').className = getProfileRingClass(uid);
+      document.getElementById('otherProfName').innerHTML = `${u.name || 'User'} ${badge}`;
+      document.getElementById('otherProfBio').textContent = u.bio || "";
+      document.getElementById('otherStatPosts').textContent = userPosts.length;
+      document.getElementById('otherStatFollowers').textContent = (u.followers || []).length;
+      document.getElementById('otherStatFollowing').textContent = (u.following || []).length;
+
+      const fState = getFollowButtonState(uid);
+      const fBtn = document.getElementById('otherFollowBtn');
+      fBtn.textContent = fState.text;
+      fBtn.className = `flex-1 py-2 rounded-xl font-bold text-xs transition ${fState.cls}`;
+      fBtn.onclick = () => toggleFollowUser(uid);
+
+      document.getElementById('otherMessageBtn').onclick = () => {
+        closeOtherProfile();
+        openPrivateChat(uid);
+      };
+
+      document.getElementById('otherProfileGrid').innerHTML = userPosts.map(p => p.mediaUrl
+        ? (p.mediaType === 'video' ? `<video src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover bg-black"></video>` : `<img src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover" />`)
+        : `<div class="aspect-[3/4] bg-slate-100 p-2 text-[11px] flex items-center justify-center text-center">${p.text}</div>`
+      ).join('');
+
+      document.getElementById('otherProfileView').classList.remove('hidden');
+    };
+
+    window.closeOtherProfile = () => {
+      viewingUserId = null;
+      document.getElementById('otherProfileView').classList.add('hidden');
+    };
+
+    window.openOtherUserMenu = () => {
+      const isBlocked = (userProfileData.blockedUsers || []).includes(viewingUserId);
+      const isHidden = (userProfileData.hiddenStoryFrom || []).includes(viewingUserId);
+      document.getElementById('sheetBlockBtn').textContent = isBlocked ? 'Unblock' : 'Block';
+      document.getElementById('sheetHideStoryBtn').textContent = isHidden ? 'Unhide your story' : 'Hide your story';
+      document.getElementById('otherUserSheet').classList.remove('hidden');
+    };
+
+    window.toggleBlockViewingUser = async () => {
+      const isBlocked = (userProfileData.blockedUsers || []).includes(viewingUserId);
       await updateDoc(doc(db, "users", currentUser.uid), {
-        name: document.getElementById('editNameInput').value.trim() || userProfileData.name,
-        bio: document.getElementById('editBioInput').value.trim(),
-        avatar: avatarUrl
+        blockedUsers: isBlocked ? arrayRemove(viewingUserId) : arrayUnion(viewingUserId)
       });
-      btn.textContent = "Save";
-      document.getElementById('editProfileModal').classList.add('hidden');
+      document.getElementById('otherUserSheet').classList.add('hidden');
+      alert(isBlocked ? "User unblocked." : "User blocked.");
     };
 
-    window.shareProfile = () => {
-      navigator.clipboard?.writeText(window.location.href);
-      alert("Profile link copied to clipboard!");
+    window.toggleHideStoryViewingUser = async () => {
+      const isHidden = (userProfileData.hiddenStoryFrom || []).includes(viewingUserId);
+      await updateDoc(doc(db, "users", currentUser.uid), {
+        hiddenStoryFrom: isHidden ? arrayRemove(viewingUserId) : arrayUnion(viewingUserId)
+      });
+      document.getElementById('otherUserSheet').classList.add('hidden');
+      alert(isHidden ? "Story unhidden for this user." : "Your story is now hidden from this user.");
+    };
+
+    window.showAboutAccount = () => {
+      const u = usersMap[viewingUserId] || {};
+      document.getElementById('otherUserSheet').classList.add('hidden');
+      alert(`About @${u.username || u.name}\nJoined ZestUp: ${u.joinedAt || '2026'}\nStatus: ${isUserVerified(viewingUserId) ? 'Verified Account ✔' : 'Member'}`);
+    };
+
+    window.showUserQrCode = () => {
+      const u = usersMap[viewingUserId] || {};
+      document.getElementById('otherUserSheet').classList.add('hidden');
+      alert(`ZestUp Profile QR Code for @${u.username || u.name}\nLink: ${window.location.origin}${window.location.pathname}?user=${viewingUserId}`);
+    };
+
+    window.shareProfileUrl = (uid) => {
+      const url = `${window.location.origin}${window.location.pathname}?user=${uid}`;
+      navigator.clipboard?.writeText(url);
+      alert("Profile link copied: " + url);
+    };
+
+    async function toggleFollowUser(targetUid) {
+      const isFollowing = (userProfileData.following || []).includes(targetUid);
+      await updateDoc(doc(db, "users", currentUser.uid), {
+        following: isFollowing ? arrayRemove(targetUid) : arrayUnion(targetUid)
+      });
+      await updateDoc(doc(db, "users", targetUid), {
+        followers: isFollowing ? arrayRemove(currentUser.uid) : arrayUnion(currentUser.uid)
+      });
+    }
+
+    // ================= CREATE SCREEN (POST / STORY / REEL / LIVE) =================
+    window.openCreateScreen = (type = 'POST') => {
+      setCreateType(type);
+      document.getElementById('createScreen').classList.remove('hidden');
+    };
+
+    window.closeCreateScreen = () => {
+      document.getElementById('createScreen').classList.add('hidden');
+      clearCreateMedia();
+      stopLiveCamera();
+    };
+
+    window.setCreateType = async (type) => {
+      createType = type;
+      document.querySelectorAll('.create-tab-btn').forEach(btn => {
+        btn.classList.toggle('text-white', btn.dataset.type === type);
+        btn.classList.toggle('text-zinc-500', btn.dataset.type !== type);
+      });
+
+      const titles = { POST: 'New post', STORY: 'Add to story', REEL: 'New reel', LIVE: 'Go Live' };
+      document.getElementById('createHeaderTitle').textContent = titles[type];
+
+      const isLive = (type === 'LIVE');
+      document.getElementById('mediaUploadArea').classList.toggle('hidden', isLive);
+      document.getElementById('liveStreamArea').classList.toggle('hidden', !isLive);
+      document.getElementById('publishContentBtn').classList.toggle('hidden', isLive);
+
+      if (isLive) {
+        try {
+          liveStreamObj = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+          document.getElementById('liveCameraVideo').srcObject = liveStreamObj;
+        } catch (e) {
+          alert("Camera permission needed for Live stream.");
+        }
+      } else {
+        stopLiveCamera();
+      }
+    };
+
+    function stopLiveCamera() {
+      if (liveStreamObj) {
+        liveStreamObj.getTracks().forEach(t => t.stop());
+        liveStreamObj = null;
+      }
+    }
+
+    window.toggleGoLive = async () => {
+      const btn = document.getElementById('startLiveBtn');
+      const badge = document.getElementById('liveBadgeIndicator');
+      const liveRef = doc(db, "liveStreams", currentUser.uid);
+
+      if (badge.classList.contains('hidden')) {
+        await setDoc(liveRef, {
+          hostId: currentUser.uid,
+          hostName: userProfileData.username || userProfileData.name,
+          title: document.getElementById('liveTitleInput').value.trim() || "Live on ZestUp!",
+          isLive: true
+        });
+        badge.classList.remove('hidden');
+        btn.textContent = "End Live Stream";
+      } else {
+        await updateDoc(liveRef, { isLive: false });
+        badge.classList.add('hidden');
+        btn.textContent = "Go Live Now";
+        closeCreateScreen();
+      }
+    };
+
+    document.getElementById('createFileInput').onchange = (e) => {
+      createFile = e.target.files[0];
+      if (!createFile) return;
+      const url = URL.createObjectURL(createFile);
+      document.getElementById('createPreviewBox').classList.remove('hidden');
+      if (createFile.type.startsWith('video')) {
+        document.getElementById('createVidPreview').src = url;
+        document.getElementById('createVidPreview').classList.remove('hidden');
+        document.getElementById('createImgPreview').classList.add('hidden');
+      } else {
+        document.getElementById('createImgPreview').src = url;
+        document.getElementById('createImgPreview').classList.remove('hidden');
+        document.getElementById('createVidPreview').classList.add('hidden');
+      }
+    };
+
+    window.clearCreateMedia = () => {
+      createFile = null;
+      document.getElementById('createPreviewBox').classList.add('hidden');
+      document.getElementById('createCaptionInput').value = '';
     };
 
     async function uploadToCloudinary(file) {
@@ -796,86 +1108,67 @@
       return data.secure_url || "";
     }
 
-    document.getElementById('mediaInput').onchange = (e) => {
-      selectedFile = e.target.files[0];
-      if (selectedFile) {
-        document.getElementById('imagePreview').src = URL.createObjectURL(selectedFile);
-        document.getElementById('previewContainer').classList.remove('hidden');
-      }
-    };
-    document.getElementById('removeImgBtn').onclick = () => {
-      selectedFile = null;
-      document.getElementById('previewContainer').classList.add('hidden');
-    };
-
-    document.getElementById('publishBtn').onclick = async () => {
-      const text = document.getElementById('postText').value.trim();
-      if (!text && !selectedFile) return;
-      const btn = document.getElementById('publishBtn');
-      btn.textContent = "Sharing...";
+    document.getElementById('publishContentBtn').onclick = async () => {
+      const caption = document.getElementById('createCaptionInput').value.trim();
+      if (!caption && !createFile) return;
+      const btn = document.getElementById('publishContentBtn');
+      btn.textContent = "Posting...";
       btn.disabled = true;
 
       try {
         let mediaUrl = "";
-        let mediaType = "image";
-        if (selectedFile) {
-          mediaType = selectedFile.type.startsWith("video") ? "video" : "image";
-          mediaUrl = await uploadToCloudinary(selectedFile);
+        let mediaType = createType === 'REEL' ? "video" : "image";
+        if (createFile) {
+          mediaType = createFile.type.startsWith("video") ? "video" : "image";
+          mediaUrl = await uploadToCloudinary(createFile);
         }
 
-        if (createMode === 'story' && mediaUrl) {
+        if (createType === 'STORY' && mediaUrl) {
           await addDoc(collection(db, "stories"), {
-            mediaUrl, caption: text,
+            mediaUrl, caption,
+            authorId: currentUser.uid,
             authorName: userProfileData.username || userProfileData.name,
             authorAvatar: userProfileData.avatar || defaultAvatar(userProfileData.name),
-            authorId: currentUser.uid,
             createdAt: serverTimestamp()
           });
         } else {
           await addDoc(collection(db, "posts"), {
-            text, mediaUrl, mediaType,
+            text: caption, mediaUrl, mediaType,
+            isReel: createType === 'REEL',
+            authorId: currentUser.uid,
             authorName: userProfileData.username || userProfileData.name,
             authorAvatar: userProfileData.avatar || defaultAvatar(userProfileData.name),
-            authorId: currentUser.uid,
-            likes: [], comments: [],
+            likes: [], comments: [], shares: 0,
             createdAt: serverTimestamp()
           });
         }
-        closeCreateModal();
+        closeCreateScreen();
       } catch (e) {
-        alert("Failed: " + e.message);
+        alert("Upload failed: " + e.message);
       } finally {
-        btn.textContent = "Share";
+        btn.textContent = "Next ›";
         btn.disabled = false;
       }
     };
 
-    document.getElementById('sendChatBtn').onclick = async () => {
-      const input = document.getElementById('chatInput');
-      const text = input.value.trim();
-      if (!text) return;
-      input.value = "";
-      await addDoc(collection(db, "messages"), {
-        text, senderId: currentUser.uid,
-        senderName: userProfileData.username || userProfileData.name,
-        createdAt: serverTimestamp()
-      });
-    };
-
+    // ================= STORIES & HOME FEED (4 Action Icons + Follow/Follow Back + 3 Dots) =================
     function renderStories() {
       const row = document.getElementById('storiesRow');
       const myAvatar = userProfileData.avatar || defaultAvatar(userProfileData.name);
       row.innerHTML = `
-        <div onclick="openCreateModal('story')" class="flex flex-col items-center gap-1 shrink-0 cursor-pointer">
+        <div onclick="openCreateScreen('STORY')" class="flex flex-col items-center gap-1 shrink-0 cursor-pointer">
           <div class="relative">
-            <img src="${myAvatar}" class="w-16 h-16 rounded-full object-cover border border-slate-200" />
-            <span class="w-5 h-5 bg-sky-500 text-white rounded-full text-xs font-bold flex items-center justify-center absolute bottom-0 right-0 border-2 border-white">+</span>
+            <div class="${getProfileRingClass(currentUser.uid)}">
+              <img src="${myAvatar}" class="w-15 h-15 w-[60px] h-[60px] rounded-full object-cover border-2 border-white" />
+            </div>
+            <span class="w-5 h-5 bg-indigo-600 text-white rounded-full text-xs font-bold flex items-center justify-center absolute bottom-0 right-0 border-2 border-white">+</span>
           </div>
           <span class="text-[11px] text-slate-600">Your story</span>
         </div>`;
 
       allStories.forEach(s => {
         const u = usersMap[s.authorId] || {};
+        if ((u.hiddenStoryFrom || []).includes(currentUser.uid)) return;
         const name = u.username || s.authorName;
         const avatar = u.avatar || s.authorAvatar || defaultAvatar(name);
         const badge = getBadgeHTML(s.authorId);
@@ -883,7 +1176,7 @@
         const el = document.createElement('div');
         el.className = "flex flex-col items-center gap-1 shrink-0 cursor-pointer";
         el.innerHTML = `
-          <div class="story-ring rounded-full">
+          <div class="${isOwner(s.authorId) ? 'ring-owner' : 'ring-story'}">
             <img src="${avatar}" class="w-[60px] h-[60px] rounded-full object-cover border-2 border-white" />
           </div>
           <span class="text-[11px] text-slate-800 max-w-[70px] truncate flex items-center gap-0.5">${name} ${badge}</span>`;
@@ -901,63 +1194,77 @@
     function renderFeed() {
       const feed = document.getElementById('feedContainer');
       feed.innerHTML = "";
-      if (!allPosts.length) {
-        feed.innerHTML = `<p class="text-center text-xs text-slate-400 py-12">No posts yet. Tap + at the top to share!</p>`;
+      const visiblePosts = allPosts.filter(p => !(userProfileData.blockedUsers || []).includes(p.authorId));
+
+      if (!visiblePosts.length) {
+        feed.innerHTML = `<p class="text-center text-xs text-slate-400 py-12">No posts yet. Tap + to create your first post!</p>`;
         return;
       }
 
-      allPosts.forEach(post => {
+      visiblePosts.forEach(post => {
         const u = usersMap[post.authorId] || {};
         const authorName = u.username || post.authorName;
         const authorAvatar = u.avatar || post.authorAvatar || defaultAvatar(authorName);
         const badge = getBadgeHTML(post.authorId);
         const isLiked = post.likes?.includes(currentUser.uid);
         const isSaved = (userProfileData.savedPosts || []).includes(post.id);
-        const isFollowing = (userProfileData.following || []).includes(post.authorId);
         const isMine = post.authorId === currentUser.uid;
+        const fState = getFollowButtonState(post.authorId);
 
         const card = document.createElement('article');
         card.className = "bg-white pb-3";
         card.innerHTML = `
+          <!-- Post Header: Avatar + Name + Follow/Follow Back + 3 Dots -->
           <div class="flex items-center justify-between px-3 py-2.5">
-            <div class="flex items-center gap-2.5">
-              <div class="story-ring rounded-full p-[1.5px]">
+            <div onclick="openOtherProfile('${post.authorId}')" class="flex items-center gap-2.5 cursor-pointer">
+              <div class="${getProfileRingClass(post.authorId)}">
                 <img src="${authorAvatar}" class="w-8 h-8 rounded-full object-cover border border-white" />
               </div>
               <div>
                 <p class="text-xs font-bold leading-tight flex items-center gap-1">${authorName} ${badge}</p>
-                <p class="text-[10px] text-slate-400">Suggested for you</p>
+                <p class="text-[10px] text-slate-400">Trending on ZestUp</p>
               </div>
             </div>
             <div class="flex items-center gap-2">
-              ${!isMine ? `<button data-uid="${post.authorId}" class="follow-btn text-xs font-semibold px-3 py-1 rounded-lg ${isFollowing ? 'bg-slate-100 text-slate-700' : 'bg-sky-500 text-white'}">${isFollowing ? 'Following' : 'Follow'}</button>` : ''}
-              ${isMine ? `<button data-id="${post.id}" class="del-btn text-xs text-rose-500 px-1">•••</button>` : ''}
+              ${!isMine ? `<button data-uid="${post.authorId}" class="follow-btn text-xs font-bold px-3 py-1 rounded-xl ${fState.cls}">${fState.text}</button>` : ''}
+              <button data-id="${post.id}" data-mine="${isMine}" class="post-dots-btn text-slate-600 px-1.5 font-bold">•••</button>
             </div>
           </div>
 
+          <!-- Post Media -->
           ${post.mediaUrl ? (post.mediaType === 'video'
             ? `<video src="${post.mediaUrl}" controls playsinline class="w-full max-h-[480px] bg-black object-cover"></video>`
             : `<img src="${post.mediaUrl}" class="w-full max-h-[480px] object-cover bg-slate-100" />`) : ''}
 
+          <!-- 4 Action Bar: Like, Comment, Share (Left) + Save (Right) -->
           <div class="px-3 pt-2.5 space-y-1.5">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-4">
-                <button data-id="${post.id}" data-liked="${isLiked}" class="like-btn text-xl">${isLiked ? '❤️' : '🤍'}</button>
-                <span class="text-lg">💬</span>
-                <span class="text-lg">✈️</span>
+                <button data-id="${post.id}" data-liked="${isLiked}" class="like-btn flex items-center gap-1 text-slate-800">
+                  <svg class="w-6 h-6 ${isLiked ? 'text-rose-500 fill-rose-500' : ''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                  <span class="text-xs font-bold">${(post.likes || []).length}</span>
+                </button>
+                <button onclick="this.closest('article').querySelector('.comment-input').focus()" class="flex items-center gap-1 text-slate-800">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                  <span class="text-xs font-bold">${(post.comments || []).length}</span>
+                </button>
+                <button data-id="${post.id}" class="share-post-btn flex items-center gap-1 text-slate-800">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                  <span class="text-xs font-bold">${post.shares || 0}</span>
+                </button>
               </div>
-              <button data-id="${post.id}" data-saved="${isSaved}" class="save-btn text-lg" title="Save">${isSaved ? '🔖' : '📑'}</button>
+              <button data-id="${post.id}" data-saved="${isSaved}" class="save-btn text-slate-800" title="Save post">
+                <svg class="w-6 h-6 ${isSaved ? 'fill-slate-900' : ''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+              </button>
             </div>
-            <p class="text-xs font-bold">${(post.likes || []).length} likes</p>
-            ${post.text ? `<p class="text-xs"><span class="font-bold mr-1 inline-flex items-center gap-0.5">${authorName} ${badge}</span>${post.text}</p>` : ''}
+
+            ${post.text ? `<p class="text-xs pt-0.5"><span onclick="openOtherProfile('${post.authorId}')" class="font-bold mr-1 inline-flex items-center gap-0.5 cursor-pointer">${authorName} ${badge}</span>${post.text}</p>` : ''}
+
             <div class="space-y-1 pt-1">
-              ${(post.comments || []).map(c => {
-                const cBadge = c.uid ? getBadgeHTML(c.uid) : '';
-                return `<p class="text-xs text-slate-700"><span class="font-bold inline-flex items-center gap-0.5">${c.user} ${cBadge}</span> ${c.text}</p>`;
-              }).join('')}
+              ${(post.comments || []).map(c => `<p class="text-xs text-slate-700"><span class="font-bold inline-flex items-center gap-0.5">${c.user} ${c.uid ? getBadgeHTML(c.uid) : ''}</span> ${c.text}</p>`).join('')}
               <div class="flex items-center gap-2 pt-1">
                 <input type="text" placeholder="Add a comment..." class="comment-input flex-1 text-xs py-1 focus:outline-none" />
-                <button data-id="${post.id}" class="comment-btn text-xs font-bold text-sky-500">Post</button>
+                <button data-id="${post.id}" class="comment-btn text-xs font-bold text-indigo-600">Post</button>
               </div>
             </div>
           </div>`;
@@ -982,17 +1289,17 @@
         };
       });
 
-      feed.querySelectorAll('.follow-btn').forEach(btn => {
+      feed.querySelectorAll('.share-post-btn').forEach(btn => {
         btn.onclick = async () => {
-          const targetId = btn.dataset.uid;
-          const following = (userProfileData.following || []).includes(targetId);
-          await updateDoc(doc(db, "users", currentUser.uid), {
-            following: following ? arrayRemove(targetId) : arrayUnion(targetId)
-          });
-          await updateDoc(doc(db, "users", targetId), {
-            followers: following ? arrayRemove(currentUser.uid) : arrayUnion(currentUser.uid)
-          });
+          const p = allPosts.find(x => x.id === btn.dataset.id);
+          await updateDoc(doc(db, "posts", btn.dataset.id), { shares: (p?.shares || 0) + 1 });
+          navigator.clipboard?.writeText(window.location.href);
+          alert("Post link copied to share!");
         };
+      });
+
+      feed.querySelectorAll('.follow-btn').forEach(btn => {
+        btn.onclick = () => toggleFollowUser(btn.dataset.uid);
       });
 
       feed.querySelectorAll('.comment-btn').forEach(btn => {
@@ -1000,45 +1307,165 @@
           const input = btn.previousElementSibling;
           if (!input.value.trim()) return;
           await updateDoc(doc(db, "posts", btn.dataset.id), {
-            comments: arrayUnion({
-              uid: currentUser.uid,
-              user: userProfileData.username || userProfileData.name,
-              text: input.value.trim()
-            })
+            comments: arrayUnion({ uid: currentUser.uid, user: userProfileData.username || userProfileData.name, text: input.value.trim() })
           });
           input.value = "";
         };
       });
 
-      feed.querySelectorAll('.del-btn').forEach(btn => {
+      feed.querySelectorAll('.post-dots-btn').forEach(btn => {
         btn.onclick = async () => {
-          if (confirm("Delete this post?")) await deleteDoc(doc(db, "posts", btn.dataset.id));
+          if (btn.dataset.mine === 'true') {
+            if (confirm("Delete this post?")) await deleteDoc(doc(db, "posts", btn.dataset.id));
+          } else {
+            navigator.clipboard?.writeText(window.location.href);
+            alert("Post link copied.");
+          }
         };
       });
     }
 
-    function renderReels() {
-      const container = document.getElementById('reelsContainer');
-      const videos = allPosts.filter(p => p.mediaType === 'video' && p.mediaUrl);
-      if (!videos.length) return;
-      container.innerHTML = videos.map(v => {
-        const u = usersMap[v.authorId] || {};
-        const badge = getBadgeHTML(v.authorId);
-        return `
-          <div class="relative rounded-2xl overflow-hidden bg-slate-900">
-            <video src="${v.mediaUrl}" controls loop playsinline class="w-full h-[72vh] object-cover"></video>
-            <div class="p-3 bg-gradient-to-t from-black/90 to-transparent absolute bottom-0 inset-x-0">
-              <p class="text-xs font-bold flex items-center gap-1">@${u.username || v.authorName} ${badge}</p>
-              <p class="text-xs text-slate-200 mt-0.5">${v.text || ''}</p>
+    // ================= DM INBOX & 1-TO-1 PRIVATE MESSAGES =================
+    window.setDmFilter = (filterName) => {
+      dmFilter = filterName;
+      document.querySelectorAll('.dm-filter-btn').forEach(btn => {
+        const active = btn.dataset.filter === filterName;
+        btn.className = active
+          ? 'dm-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shrink-0'
+          : 'dm-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 shrink-0';
+      });
+      renderDmInbox();
+    };
+
+    function renderDmInbox() {
+      const notesRow = document.getElementById('dmNotesRow');
+      const threadsList = document.getElementById('dmThreadsList');
+      const searchQ = (document.getElementById('dmSearchInput')?.value || "").toLowerCase().trim();
+      const otherUsers = Object.values(usersMap).filter(u => u.uid !== currentUser.uid && !(userProfileData.blockedUsers || []).includes(u.uid));
+
+      // Top Notes & Active Users Row
+      notesRow.innerHTML = `
+        <div onclick="updateMyNote()" class="flex flex-col items-center shrink-0 cursor-pointer">
+          <div class="relative">
+            <span class="block text-[10px] bg-slate-100 text-slate-700 px-2 py-1 rounded-xl mb-1 max-w-[74px] truncate shadow-xs">${userProfileData.note || 'Your note'}</span>
+            <img src="${userProfileData.avatar || defaultAvatar(userProfileData.name)}" class="w-14 h-14 rounded-full object-cover mx-auto border border-slate-200" />
+          </div>
+          <span class="text-[11px] text-slate-500 mt-1">Your note</span>
+        </div>` +
+        otherUsers.map(u => `
+          <div onclick="openPrivateChat('${u.uid}')" class="flex flex-col items-center shrink-0 cursor-pointer">
+            <div class="relative mt-4">
+              <img src="${u.avatar || defaultAvatar(u.name)}" class="w-14 h-14 rounded-full object-cover border border-slate-200" />
+              <span class="w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full absolute bottom-0 right-0"></span>
             </div>
+            <span class="text-[11px] text-slate-800 max-w-[68px] truncate mt-1">${u.username || u.name}</span>
+          </div>`).join('');
+
+      // Filter conversations based on tab
+      let filteredUsers = otherUsers.filter(u => !searchQ || (u.name || "").toLowerCase().includes(searchQ) || (u.username || "").toLowerCase().includes(searchQ));
+      if (dmFilter === 'Followers') {
+        filteredUsers = filteredUsers.filter(u => (userProfileData.followers || []).includes(u.uid));
+      } else if (dmFilter === 'Verified') {
+        filteredUsers = filteredUsers.filter(u => isUserVerified(u.uid));
+      }
+
+      threadsList.innerHTML = filteredUsers.map(u => {
+        const badge = getBadgeHTML(u.uid);
+        const convo = allMessages.filter(m =>
+          (m.senderId === currentUser.uid && m.receiverId === u.uid) ||
+          (m.senderId === u.uid && m.receiverId === currentUser.uid)
+        );
+        const lastMsg = convo[convo.length - 1];
+        return `
+          <div onclick="openPrivateChat('${u.uid}')" class="flex items-center justify-between px-4 py-3 hover:bg-slate-50 cursor-pointer">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="relative shrink-0">
+                <img src="${u.avatar || defaultAvatar(u.name)}" class="w-12 h-12 rounded-full object-cover" />
+                <span class="w-3 h-3 bg-emerald-500 border-2 border-white rounded-full absolute bottom-0 right-0"></span>
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs font-bold flex items-center gap-1 truncate">${u.username || u.name} ${badge}</p>
+                <p class="text-[11px] text-slate-500 truncate">${lastMsg ? lastMsg.text : 'Active now • Tap to chat'}</p>
+              </div>
+            </div>
+            <span class="text-slate-400 text-lg">📷</span>
           </div>`;
       }).join('');
     }
 
+    document.getElementById('dmSearchInput').oninput = () => renderDmInbox();
+
+    window.updateMyNote = async () => {
+      const n = prompt("Share a short status note (max 30 chars):", userProfileData.note || "");
+      if (n !== null) await updateDoc(doc(db, "users", currentUser.uid), { note: n.slice(0, 30) });
+    };
+
+    window.openPrivateChat = (targetUid) => {
+      activeChatPartnerId = targetUid;
+      const u = usersMap[targetUid] || {};
+      document.getElementById('chatTargetAvatar').src = u.avatar || defaultAvatar(u.name);
+      document.getElementById('chatTargetName').innerHTML = `${u.username || u.name} ${getBadgeHTML(targetUid)}`;
+      document.getElementById('viewChatUserProfileBtn').onclick = () => {
+        closePrivateChat();
+        openOtherProfile(targetUid);
+      };
+      renderPrivateChatMessages();
+      document.getElementById('privateChatView').classList.remove('hidden');
+    };
+
+    window.closePrivateChat = () => {
+      activeChatPartnerId = null;
+      document.getElementById('privateChatView').classList.add('hidden');
+    };
+
+    function renderPrivateChatMessages() {
+      const box = document.getElementById('privateMessagesBox');
+      const convo = allMessages.filter(m =>
+        (m.senderId === currentUser.uid && m.receiverId === activeChatPartnerId) ||
+        (m.senderId === activeChatPartnerId && m.receiverId === currentUser.uid)
+      );
+      box.innerHTML = convo.length ? convo.map(m => {
+        const isMe = m.senderId === currentUser.uid;
+        return `
+          <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+            <div class="px-3.5 py-2 rounded-2xl text-xs max-w-[75%] ${isMe ? 'zest-gradient text-white' : 'bg-white border border-slate-200 text-slate-800'}">${m.text}</div>
+          </div>`;
+      }).join('') : `<p class="text-center text-xs text-slate-400 py-10">Say hi to start a private conversation!</p>`;
+      box.scrollTop = box.scrollHeight;
+    }
+
+    document.getElementById('sendPrivateMsgBtn').onclick = async () => {
+      const input = document.getElementById('privateMsgInput');
+      const text = input.value.trim();
+      if (!text || !activeChatPartnerId) return;
+      input.value = "";
+      await addDoc(collection(db, "directMessages"), {
+        senderId: currentUser.uid,
+        receiverId: activeChatPartnerId,
+        text,
+        createdAt: serverTimestamp()
+      });
+    };
+
+    // ================= REELS & SEARCH & ADMIN =================
+    function renderReels() {
+      const container = document.getElementById('reelsContainer');
+      const videos = allPosts.filter(p => p.mediaType === 'video' && p.mediaUrl);
+      if (!videos.length) return;
+      container.innerHTML = videos.map(v => `
+        <div class="relative rounded-2xl overflow-hidden bg-zinc-900">
+          <video src="${v.mediaUrl}" controls loop playsinline class="w-full h-[72vh] object-cover"></video>
+          <div onclick="openOtherProfile('${v.authorId}')" class="p-3 bg-gradient-to-t from-black/90 to-transparent absolute bottom-0 inset-x-0 cursor-pointer">
+            <p class="text-xs font-bold flex items-center gap-1">@${v.authorName} ${getBadgeHTML(v.authorId)}</p>
+            <p class="text-xs text-zinc-200 mt-0.5">${v.text || ''}</p>
+          </div>
+        </div>`).join('');
+    }
+
     window.setSearchFilter = (type) => {
       searchFilter = type;
-      document.getElementById('filterAllBtn').className = type === 'all' ? 'px-3 py-1 rounded-lg bg-slate-900 text-white' : 'px-3 py-1 rounded-lg bg-slate-100 text-slate-700';
-      document.getElementById('filterAccountsBtn').className = type === 'accounts' ? 'px-3 py-1 rounded-lg bg-slate-900 text-white' : 'px-3 py-1 rounded-lg bg-slate-100 text-slate-700';
+      document.getElementById('filterAllBtn').className = type === 'all' ? 'px-3.5 py-1 rounded-xl bg-indigo-600 text-white' : 'px-3.5 py-1 rounded-xl bg-slate-100 text-slate-700';
+      document.getElementById('filterAccountsBtn').className = type === 'accounts' ? 'px-3.5 py-1 rounded-xl bg-indigo-600 text-white' : 'px-3.5 py-1 rounded-xl bg-slate-100 text-slate-700';
       renderSearchAndExplore();
     };
 
@@ -1050,9 +1477,9 @@
       const matchedUsers = Object.values(usersMap)
         .filter(u => !term || (u.name || "").toLowerCase().includes(term) || (u.username || "").toLowerCase().includes(term))
         .sort((a, b) => {
-          const aFounder = (a.email === FOUNDER_EMAIL || a.isFounder) ? 100 : 0;
-          const bFounder = (b.email === FOUNDER_EMAIL || b.isFounder) ? 100 : 0;
-          if (aFounder !== bFounder) return bFounder - aFounder;
+          const aOwner = isOwner(a.uid) ? 100 : 0;
+          const bOwner = isOwner(b.uid) ? 100 : 0;
+          if (aOwner !== bOwner) return bOwner - aOwner;
           const aVer = isUserVerified(a.uid) ? 50 : 0;
           const bVer = isUserVerified(b.uid) ? 50 : 0;
           if (aVer !== bVer) return bVer - aVer;
@@ -1061,36 +1488,22 @@
 
       if (term || searchFilter === 'accounts') {
         accountsBox.innerHTML = matchedUsers.map(u => {
-          const badge = getBadgeHTML(u.uid);
           const isMe = u.uid === currentUser.uid;
-          const isFollowing = (userProfileData.following || []).includes(u.uid);
+          const fState = getFollowButtonState(u.uid);
           return `
             <div class="flex items-center justify-between px-4 py-3 bg-white">
-              <div class="flex items-center gap-3">
-                <div class="story-ring rounded-full p-[1.5px]">
+              <div onclick="openOtherProfile('${u.uid}')" class="flex items-center gap-3 cursor-pointer">
+                <div class="${getProfileRingClass(u.uid)}">
                   <img src="${u.avatar || defaultAvatar(u.name)}" class="w-11 h-11 rounded-full object-cover border border-white" />
                 </div>
                 <div>
-                  <p class="text-xs font-bold flex items-center gap-1">${u.username || u.name} ${badge}</p>
+                  <p class="text-xs font-bold flex items-center gap-1">${u.username || u.name} ${getBadgeHTML(u.uid)}</p>
                   <p class="text-[11px] text-slate-500">${u.name || ''} • ${(u.followers || []).length} followers</p>
                 </div>
               </div>
-              ${!isMe ? `<button data-uid="${u.uid}" class="search-follow-btn text-xs font-semibold px-4 py-1.5 rounded-lg ${isFollowing ? 'bg-slate-100 text-slate-800' : 'bg-sky-500 text-white'}">${isFollowing ? 'Following' : 'Follow'}</button>` : ''}
+              ${!isMe ? `<button onclick="toggleFollowUser('${u.uid}')" class="text-xs font-bold px-3.5 py-1.5 rounded-xl ${fState.cls}">${fState.text}</button>` : ''}
             </div>`;
         }).join('');
-
-        accountsBox.querySelectorAll('.search-follow-btn').forEach(btn => {
-          btn.onclick = async () => {
-            const targetId = btn.dataset.uid;
-            const following = (userProfileData.following || []).includes(targetId);
-            await updateDoc(doc(db, "users", currentUser.uid), {
-              following: following ? arrayRemove(targetId) : arrayUnion(targetId)
-            });
-            await updateDoc(doc(db, "users", targetId), {
-              followers: following ? arrayRemove(currentUser.uid) : arrayUnion(currentUser.uid)
-            });
-          };
-        });
       } else {
         accountsBox.innerHTML = "";
       }
@@ -1098,7 +1511,7 @@
       if (searchFilter === 'accounts') {
         grid.innerHTML = "";
       } else {
-        const filteredPosts = allPosts.filter(p => p.mediaUrl && (!term || (p.text || "").toLowerCase().includes(term) || (p.authorName || "").toLowerCase().includes(term)));
+        const filteredPosts = allPosts.filter(p => p.mediaUrl && (!term || (p.text || "").toLowerCase().includes(term)));
         grid.innerHTML = filteredPosts.map(p => p.mediaType === 'video'
           ? `<video src="${p.mediaUrl}" class="aspect-square w-full object-cover bg-black"></video>`
           : `<img src="${p.mediaUrl}" class="aspect-square w-full object-cover bg-slate-100" />`).join('');
@@ -1107,17 +1520,65 @@
 
     document.getElementById('searchInput').oninput = () => renderSearchAndExplore();
 
-    function renderProfileGrid() {
-      const myPosts = allPosts.filter(p => p.authorId === currentUser.uid);
-      document.getElementById('statPosts').textContent = myPosts.length;
-      const grid = document.getElementById('profileGrid');
-      grid.innerHTML = myPosts.map(p => p.mediaUrl
-        ? (p.mediaType === 'video'
-          ? `<video src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover bg-black"></video>`
-          : `<img src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover bg-slate-100" />`)
-        : `<div class="aspect-[3/4] bg-slate-100 p-2 flex items-center justify-center text-center text-[11px] font-medium">${p.text}</div>`
-      ).join('');
+    window.openSettings = () => document.getElementById('settingsPage').classList.remove('hidden');
+    window.closeSettings = () => document.getElementById('settingsPage').classList.add('hidden');
+
+    window.toggleSettingPref = async (key) => {
+      await updateDoc(doc(db, "users", currentUser.uid), { [key]: !userProfileData[key] });
+    };
+
+    window.openSubSetting = (type) => {
+      const modal = document.getElementById('subSettingModal');
+      const title = document.getElementById('subSettingTitle');
+      const body = document.getElementById('subSettingBody');
+      modal.classList.remove('hidden');
+
+      if (type === 'saved') {
+        title.textContent = "Saved Posts";
+        const saved = allPosts.filter(p => (userProfileData.savedPosts || []).includes(p.id));
+        body.innerHTML = saved.length
+          ? `<div class="grid grid-cols-3 gap-1">${saved.map(p => p.mediaUrl ? `<img src="${p.mediaUrl}" class="aspect-square object-cover rounded" />` : `<div class="aspect-square bg-slate-100 p-2 text-xs flex items-center justify-center text-center">${p.text}</div>`).join('')}</div>`
+          : `<p class="text-slate-400 text-center py-12">No saved posts yet.</p>`;
+      } else if (type === 'blocked') {
+        title.textContent = "Blocked Accounts";
+        const blocked = (userProfileData.blockedUsers || []).map(id => usersMap[id]).filter(Boolean);
+        body.innerHTML = blocked.length
+          ? blocked.map(u => `<div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl"><span class="font-bold text-xs">${u.username || u.name}</span><button onclick="updateDoc(doc(db,'users',currentUser.uid),{blockedUsers:arrayRemove('${u.uid}')})" class="text-xs text-indigo-600 font-bold">Unblock</button></div>`).join('')
+          : `<p class="text-slate-400 text-center py-12">No blocked accounts.</p>`;
+      } else {
+        title.textContent = "Account Details";
+        body.innerHTML = `<div class="p-4 bg-slate-50 rounded-2xl text-xs space-y-2"><p class="font-bold">${userProfileData.name}</p><p>Status: ${isUserVerified(currentUser.uid) ? 'Verified Creator ✔' : 'Active Member'}</p></div>`;
+      }
+    };
+
+    window.openAdminModal = () => {
+      renderAdminUsersList();
+      document.getElementById('adminModal').classList.remove('hidden');
+    };
+
+    function renderAdminUsersList() {
+      const list = document.getElementById('adminUsersList');
+      if (!list) return;
+      list.innerHTML = Object.values(usersMap).map(u => {
+        const owner = isOwner(u.uid);
+        const verified = isUserVerified(u.uid);
+        return `
+          <div class="flex items-center justify-between p-2 rounded-xl bg-slate-50">
+            <div class="flex items-center gap-2 min-w-0">
+              <img src="${u.avatar || defaultAvatar(u.name)}" class="w-8 h-8 rounded-full object-cover" />
+              <span class="text-xs font-bold truncate">${u.username || u.name} ${verified ? BLUE_TICK_SVG : ''}</span>
+            </div>
+            ${owner
+              ? `<span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-zinc-900 text-white">Owner</span>`
+              : `<button onclick="toggleVerifyUser('${u.uid}', ${verified})" class="text-[11px] font-bold px-3 py-1 rounded-lg ${verified ? 'bg-rose-100 text-rose-600' : 'bg-indigo-600 text-white'}">${verified ? 'Remove' : 'Give Blue Tick'}</button>`
+            }
+          </div>`;
+      }).join('');
     }
+
+    window.toggleVerifyUser = async (uid, current) => {
+      await updateDoc(doc(db, "users", uid), { verified: !current });
+    };
   </script>
 </body>
 </html>
