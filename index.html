@@ -15,7 +15,6 @@
     body.dark-mode .bg-slate-50, body.dark-mode .bg-slate-100 { background-color: #262626 !important; color: #e4e4e7 !important; }
     body.dark-mode .border-slate-100, body.dark-mode .border-slate-200 { border-color: #262626 !important; }
     body.dark-mode .text-slate-900, body.dark-mode .text-slate-800 { color: #f8fafc !important; }
-    .ig-gradient { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
     .zest-gradient { background: linear-gradient(135deg, #4F46E5 0%, #9333EA 55%, #EC4899 100%); }
     .zest-text-gradient { background: linear-gradient(135deg, #4F46E5 0%, #EC4899 60%, #F59E0B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .ring-story { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); padding: 2.5px; border-radius: 9999px; }
@@ -46,17 +45,16 @@
 <body class="min-h-screen flex flex-col items-center bg-slate-50 text-slate-900">
 
   <div id="recaptcha-container"></div>
-  <!-- Global Real Audio & YouTube Music Engine -->
-  <audio id="globalAudioPlayer" loop class="hidden"></audio>
-  <div id="globalYtContainer" class="fixed -top-96 -left-96 w-1 h-1 opacity-0 pointer-events-none"></div>
+  <!-- Ad-Free Direct Audio Engine (Zero Audio Ads!) -->
+  <audio id="globalAudioPlayer" loop preload="auto" class="hidden"></audio>
 
-  <!-- INSTAGRAM-STYLE FLOATING TOAST PILL (Replaces all ugly black browser alerts!) -->
-  <div id="igToast" class="hidden fixed top-14 left-1/2 -translate-x-1/2 z-[100] bg-zinc-900/95 text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-xl border border-white/10 backdrop-blur-md transition-all">
+  <!-- INSTAGRAM FLOATING TOAST PILL (Zero Black Browser Popups!) -->
+  <div id="igToast" class="hidden fixed top-14 left-1/2 -translate-x-1/2 z-[110] bg-zinc-900/95 text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-xl border border-white/10 backdrop-blur-md">
     <span id="igToastText">Saved!</span>
   </div>
 
-  <!-- INSTAGRAM-STYLE CUSTOM INPUT & CONFIRMATION SHEET (Replaces all prompt() and confirm()!) -->
-  <div id="igDialogModal" class="hidden fixed inset-0 z-[95] bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+  <!-- INSTAGRAM CUSTOM INPUT & CONFIRMATION SHEET -->
+  <div id="igDialogModal" class="hidden fixed inset-0 z-[105] bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 space-y-4 shadow-2xl">
       <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto sm:hidden"></div>
       <div class="space-y-1">
@@ -136,7 +134,7 @@
     </div>
   </main>
 
-  <!-- MAIN ZESTUP APP SHELL (100% Instagram UI/Tools + Facebook Monetization Missions) -->
+  <!-- MAIN ZESTUP APP SHELL -->
   <div id="appShell" class="hidden w-full max-w-md flex-1 flex flex-col bg-white min-h-screen relative shadow-sm">
 
     <!-- 1. INSTAGRAM HOME TAB -->
@@ -165,7 +163,6 @@
       <div id="liveBannerRow" class="hidden px-3 py-2 bg-rose-50 border-b border-rose-100 flex items-center gap-3 overflow-x-auto no-scrollbar"></div>
       <div id="storiesRow" class="bg-white flex items-center gap-3.5 px-3 py-3 overflow-x-auto no-scrollbar border-b border-slate-100"></div>
 
-      <!-- INSTAGRAM FEED -->
       <div id="feedContainer" class="divide-y divide-slate-100">
         <p class="text-center text-xs text-slate-400 py-12">Loading ZestUp feed...</p>
       </div>
@@ -256,7 +253,7 @@
       <div id="exploreGrid" class="grid grid-cols-3 gap-0.5 pt-0.5"></div>
     </section>
 
-    <!-- 5. INSTAGRAM PROFILE TAB + FACEBOOK MONETIZATION DASHBOARD -->
+    <!-- 5. INSTAGRAM PROFILE TAB (With Category, Links, AI Label, QR Share & Full Edit Profile) -->
     <section id="profileTab" class="hidden flex-1 pb-16 bg-white">
       <header class="sticky top-0 z-40 bg-white px-4 py-3 flex items-center justify-between border-b border-slate-100">
         <button onclick="openCreateStudio('REEL')" class="text-2xl font-light leading-none">+</button>
@@ -275,7 +272,7 @@
             <div id="ownProfileRing" class="ring-none">
               <img id="profAvatarImg" src="" class="w-20 h-20 rounded-full object-cover bg-slate-200 border-2 border-white" />
             </div>
-            <button onclick="openAccountsCenter()" class="absolute bottom-0 right-0 w-6 h-6 bg-indigo-600 text-white rounded-full text-xs flex items-center justify-center border-2 border-white">+</button>
+            <button onclick="openFullEditProfile()" class="absolute bottom-0 right-0 w-6 h-6 bg-indigo-600 text-white rounded-full text-xs flex items-center justify-center border-2 border-white">+</button>
           </div>
 
           <div class="flex-1 flex justify-around text-center ml-4">
@@ -286,11 +283,18 @@
         </div>
 
         <div class="mt-3 space-y-0.5">
-          <p id="profFullName" class="font-bold text-sm flex items-center gap-1">User</p>
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <p id="profFullName" class="font-bold text-sm flex items-center gap-1">User</p>
+            <span id="profPronounsSpan" class="text-xs text-slate-400"></span>
+          </div>
+          <p id="profCategoryText" class="text-xs font-semibold text-indigo-600 hidden"></p>
+          <p id="profAiLabelText" class="text-[11px] text-slate-500 font-medium hidden">✨ AI-generated profile</p>
           <p id="profBio" class="text-xs text-slate-700 whitespace-pre-line">Creator on ZestUp ✨</p>
+          <a id="profLinkAnchor" href="#" target="_blank" class="hidden text-xs font-bold text-sky-600 block pt-0.5 truncate">🔗 Link</a>
+          <p id="profBannerText" class="hidden text-[11px] font-semibold text-slate-600 pt-0.5">🎵 Profile Banner</p>
         </div>
 
-        <!-- FACEBOOK-STYLE PROFESSIONAL DASHBOARD & MONETIZATION MISSIONS -->
+        <!-- FACEBOOK-STYLE PROFESSIONAL DASHBOARD -->
         <div onclick="openFbMonetizationHub()" class="mt-3 bg-slate-100 hover:bg-slate-200/80 rounded-2xl px-3.5 py-2.5 cursor-pointer flex items-center justify-between">
           <div>
             <p class="text-xs font-extrabold text-slate-900">Professional dashboard</p>
@@ -300,8 +304,8 @@
         </div>
 
         <div class="grid grid-cols-2 gap-2 mt-2.5">
-          <button onclick="openEditBioModal()" class="py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Edit profile</button>
-          <button onclick="openShareSheet(null, currentUser.uid)" class="py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Share profile</button>
+          <button onclick="openFullEditProfile()" class="py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Edit profile</button>
+          <button onclick="openQrShareProfile(currentUser.uid)" class="py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Share profile</button>
         </div>
 
         <button id="adminPanelBtn" onclick="openAdminModal()" class="hidden w-full mt-2.5 py-2.5 rounded-xl bg-zinc-900 text-white font-bold text-xs flex items-center justify-center gap-1.5">
@@ -324,7 +328,132 @@
       <div id="profileGrid" class="grid grid-cols-3 gap-0.5 pt-0.5"></div>
     </section>
 
-    <!-- 6. OTHER USER PROFILE MODAL -->
+    <!-- ========================================================================= -->
+    <!-- COMPLETE INSTAGRAM "EDIT PROFILE" PAGE (As shown in your video!)          -->
+    <!-- ========================================================================= -->
+    <section id="fullEditProfileModal" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col overflow-y-auto">
+      <header class="sticky top-0 z-20 bg-white px-4 py-3 flex items-center justify-between border-b border-slate-100">
+        <div class="flex items-center gap-4">
+          <button onclick="document.getElementById('fullEditProfileModal').classList.add('hidden')" class="text-xl font-bold">←</button>
+          <h3 class="font-bold text-base">Edit profile</h3>
+        </div>
+        <button onclick="saveFullEditProfile()" class="text-sm font-extrabold text-indigo-600">Done</button>
+      </header>
+
+      <div class="p-4 space-y-4 pb-12">
+        <div class="flex flex-col items-center py-2">
+          <img id="epAvatarPreview" class="w-20 h-20 rounded-full object-cover border border-slate-200 mb-2" />
+          <label class="text-xs font-bold text-sky-600 cursor-pointer">
+            Edit picture or avatar
+            <input id="epPhotoInput" type="file" accept="image/*" class="hidden" />
+          </label>
+        </div>
+
+        <div class="space-y-3">
+          <div class="border border-slate-200 rounded-xl px-3.5 py-2">
+            <label class="text-[11px] text-slate-400 block">Name</label>
+            <input id="epNameInput" type="text" class="w-full text-sm font-medium focus:outline-none" />
+          </div>
+          <div class="border border-slate-200 rounded-xl px-3.5 py-2">
+            <label class="text-[11px] text-slate-400 block">Username</label>
+            <input id="epUsernameInput" type="text" class="w-full text-sm font-medium focus:outline-none" />
+          </div>
+          <div class="border border-slate-200 rounded-xl px-3.5 py-2">
+            <label class="text-[11px] text-slate-400 block">Pronouns (e.g. he/him, she/her)</label>
+            <input id="epPronounsInput" type="text" placeholder="Add pronouns" class="w-full text-sm font-medium focus:outline-none" />
+          </div>
+          <div class="border border-slate-200 rounded-xl px-3.5 py-2">
+            <label class="text-[11px] text-slate-400 block">Bio</label>
+            <textarea id="epBioInput" rows="2" maxlength="149" class="w-full text-sm font-medium focus:outline-none resize-none"></textarea>
+          </div>
+          <div class="border border-slate-200 rounded-xl px-3.5 py-2">
+            <label class="text-[11px] text-slate-400 block">Links (YouTube, Website, Social URL)</label>
+            <input id="epLinkInput" type="url" placeholder="https://youtube.com/@yourchannel" class="w-full text-sm font-medium text-sky-600 focus:outline-none" />
+          </div>
+          <div class="border border-slate-200 rounded-xl px-3.5 py-2">
+            <label class="text-[11px] text-slate-400 block">Banners (Featured Song or Announcement)</label>
+            <input id="epBannerInput" type="text" placeholder="e.g. Watch my latest Reel!" class="w-full text-sm font-medium focus:outline-none" />
+          </div>
+          <div class="border border-slate-200 rounded-xl px-3.5 py-2 flex items-center justify-between">
+            <span class="text-sm font-medium">Gender</span>
+            <select id="epGenderSelect" class="text-sm font-bold text-slate-700 bg-transparent focus:outline-none">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Custom">Custom</option>
+              <option value="Prefer not to say">Prefer not to say</option>
+            </select>
+          </div>
+          <div class="border border-slate-200 rounded-xl px-3.5 py-3 flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium">AI-generated profile</p>
+              <p class="text-[11px] text-slate-400">Show AI label on your profile</p>
+            </div>
+            <input id="epAiProfileToggle" type="checkbox" class="w-5 h-5 accent-indigo-600" />
+          </div>
+          <div class="border border-slate-200 rounded-xl px-3.5 py-2 flex items-center justify-between">
+            <span class="text-sm font-medium">Category</span>
+            <select id="epCategorySelect" class="text-sm font-bold text-indigo-600 bg-transparent focus:outline-none">
+              <option value="Digital creator">Digital creator</option>
+              <option value="Video creator">Video creator</option>
+              <option value="Artist">Artist</option>
+              <option value="Gamer">Gamer</option>
+              <option value="Entrepreneur">Entrepreneur</option>
+              <option value="">None</option>
+            </select>
+          </div>
+          <button onclick="document.getElementById('fullEditProfileModal').classList.add('hidden'); openAccountsCenter();" class="w-full py-3 text-left text-sm font-bold text-sky-600 px-1">
+            Personal information settings (Mobile, Gmail, Birthday) ›
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- INSTAGRAM COLOR-CHANGING QR CODE "SHARE PROFILE" PAGE (From your video!)  -->
+    <!-- ========================================================================= -->
+    <section id="qrShareProfileModal" class="hidden fixed inset-0 z-50 max-w-md mx-auto flex flex-col justify-between p-5 text-white transition-all duration-300" style="background: linear-gradient(135deg, #F59E0B 0%, #EC4899 55%, #9333EA 100%);">
+      <header class="flex items-center justify-between">
+        <button onclick="document.getElementById('qrShareProfileModal').classList.add('hidden')" class="text-2xl font-bold">✕</button>
+        <button onclick="cycleQrBgColor()" class="px-4 py-1 rounded-full border border-white/60 text-xs font-extrabold tracking-widest uppercase backdrop-blur-xs">COLOR</button>
+        <span class="w-6"></span>
+      </header>
+
+      <div class="flex flex-col items-center space-y-4 my-auto">
+        <!-- White QR Card -->
+        <div class="bg-white text-slate-900 rounded-3xl p-6 shadow-2xl flex flex-col items-center w-64 space-y-3">
+          <div class="relative w-44 h-44 flex items-center justify-center">
+            <img id="qrCodeImg" src="" class="w-full h-full object-contain" />
+            <div class="absolute w-11 h-11 rounded-full bg-white p-1 shadow flex items-center justify-center">
+              <svg class="w-9 h-9 rounded-full" viewBox="0 0 120 120" fill="none">
+                <circle cx="60" cy="60" r="60" fill="url(#zLogoGrad)"/>
+                <path d="M46 46H74L46 74H74" stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+          <p id="qrUsernameLabel" class="text-base font-extrabold tracking-wide zest-text-gradient">@USERNAME</p>
+        </div>
+
+        <!-- Bottom Action Card -->
+        <div class="bg-white text-slate-900 rounded-3xl p-4 shadow-xl w-72 grid grid-cols-3 gap-2 text-center text-[11px] font-bold">
+          <button id="qrShareActionBtn" class="flex flex-col items-center gap-1.5 py-1">
+            <span class="w-11 h-11 rounded-full border border-slate-200 flex items-center justify-center text-lg">📤</span>
+            <span>Share profile</span>
+          </button>
+          <button id="qrCopyActionBtn" class="flex flex-col items-center gap-1.5 py-1">
+            <span class="w-11 h-11 rounded-full border border-slate-200 flex items-center justify-center text-lg">🔗</span>
+            <span>Copy link</span>
+          </button>
+          <button id="qrDownloadActionBtn" class="flex flex-col items-center gap-1.5 py-1">
+            <span class="w-11 h-11 rounded-full border border-slate-200 flex items-center justify-center text-lg">⬇️</span>
+            <span>Download</span>
+          </button>
+        </div>
+      </div>
+
+      <p class="text-center text-[11px] opacity-80 font-semibold">Scan this ZestUp QR code to follow instantly</p>
+    </section>
+
+    <!-- 6. OTHER USER PROFILE MODAL (Strict Stars Mission Lock Applied!) -->
     <section id="otherProfileView" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col overflow-y-auto">
       <header class="sticky top-0 z-20 bg-white px-4 py-3 flex items-center justify-between border-b border-slate-100">
         <div class="flex items-center gap-3">
@@ -354,20 +483,23 @@
 
         <div class="mt-3 space-y-0.5">
           <p id="otherProfName" class="font-bold text-sm flex items-center gap-1">Name</p>
+          <p id="otherProfCategory" class="text-xs font-semibold text-indigo-600 hidden"></p>
           <p id="otherProfBio" class="text-xs text-slate-700 whitespace-pre-line"></p>
+          <a id="otherProfLink" href="#" target="_blank" class="hidden text-xs font-bold text-sky-600 block pt-0.5 truncate"></a>
         </div>
 
         <div class="flex items-center gap-2 mt-4">
           <button id="otherFollowBtn" class="flex-1 py-2 rounded-xl font-bold text-xs transition">Follow</button>
           <button id="otherMessageBtn" class="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-xs text-slate-900">Message</button>
-          <button onclick="sendCreatorStar(viewingUserId)" class="px-3 py-2 rounded-xl bg-amber-100 text-amber-800 text-xs font-bold">⭐ Star</button>
+          <!-- ONLY VISIBLE IF THIS CREATOR HAS COMPLETED ALL 4 STARS MISSIONS OR IS OWNER! -->
+          <button id="otherStarBtn" onclick="sendCreatorStar(viewingUserId)" class="hidden px-3 py-2 rounded-xl bg-amber-100 text-amber-800 text-xs font-bold">⭐ Star</button>
         </div>
       </div>
 
       <div id="otherProfileGrid" class="grid grid-cols-3 gap-0.5 pt-2 border-t border-slate-100"></div>
     </section>
 
-    <!-- OTHER USER 7-OPTION BOTTOM SHEET -->
+    <!-- OTHER USER BOTTOM SHEET -->
     <div id="otherUserSheet" class="hidden fixed inset-0 z-50 bg-black/50 flex items-end justify-center" onclick="if(event.target===this)this.classList.add('hidden')">
       <div class="bg-white w-full max-w-md rounded-t-3xl p-5 space-y-3.5 text-sm font-medium">
         <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto mb-2"></div>
@@ -376,11 +508,11 @@
         <button onclick="openAboutAccountModal(viewingUserId)" class="w-full text-left py-1.5 text-slate-800 font-semibold">About this account</button>
         <button id="sheetHideStoryBtn" onclick="toggleHideStoryViewingUser()" class="w-full text-left py-1.5 text-slate-800">Hide your story</button>
         <button onclick="copyProfileLink(viewingUserId); document.getElementById('otherUserSheet').classList.add('hidden');" class="w-full text-left py-1.5 text-slate-800">Copy profile URL</button>
-        <button onclick="document.getElementById('otherUserSheet').classList.add('hidden'); openShareSheet(null, viewingUserId);" class="w-full text-left py-1.5 text-slate-800">Share this profile</button>
+        <button onclick="document.getElementById('otherUserSheet').classList.add('hidden'); openQrShareProfile(viewingUserId);" class="w-full text-left py-1.5 text-slate-800">Share this profile (QR)</button>
       </div>
     </div>
 
-    <!-- CUSTOM "ABOUT THIS ACCOUNT" MODAL -->
+    <!-- ABOUT THIS ACCOUNT MODAL -->
     <div id="aboutAccountModal" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col">
       <header class="sticky top-0 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
         <button onclick="document.getElementById('aboutAccountModal').classList.add('hidden')" class="text-xl font-bold">←</button>
@@ -389,22 +521,26 @@
       <div id="aboutAccountBody" class="p-6 flex-1 overflow-y-auto space-y-5"></div>
     </div>
 
-    <!-- FOLLOWERS / FOLLOWING INTERACTIVE MODAL -->
+    <!-- ========================================================================= -->
+    <!-- INSTAGRAM FOLLOWERS / FOLLOWING / SUBSCRIPTIONS MODAL (From your video!)  -->
+    <!-- ========================================================================= -->
     <div id="followListModal" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col">
       <header class="sticky top-0 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
         <button onclick="document.getElementById('followListModal').classList.add('hidden')" class="text-xl font-bold">←</button>
         <h3 id="followListHeaderTitle" class="font-bold text-base">Connections</h3>
       </header>
-      <div class="grid grid-cols-2 border-b border-slate-100 text-xs font-bold">
-        <button id="tabListFollowers" onclick="switchFollowListTab('followers')" class="py-3 border-b-2 border-indigo-600 text-indigo-600">Followers</button>
+      <div class="grid grid-cols-3 border-b border-slate-100 text-xs font-bold">
+        <button id="tabListFollowers" onclick="switchFollowListTab('followers')" class="py-3 border-b-2 border-slate-900 text-slate-900">Followers</button>
         <button id="tabListFollowing" onclick="switchFollowListTab('following')" class="py-3 text-slate-400">Following</button>
+        <button id="tabListSubs" onclick="switchFollowListTab('subscriptions')" class="py-3 text-slate-400">Subscriptions</button>
+      </div>
+      <div class="p-3 border-b border-slate-100">
+        <input id="followListSearchInput" type="text" placeholder="Search..." class="w-full bg-slate-100 text-xs px-3.5 py-2 rounded-xl focus:outline-none" />
       </div>
       <div id="followListContainer" class="flex-1 overflow-y-auto divide-y divide-slate-100"></div>
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- INSTAGRAM-STYLE SHARE BOTTOM SHEET (DM Friends Grid + External Actions)   -->
-    <!-- ========================================================================= -->
+    <!-- INSTAGRAM SHARE BOTTOM SHEET -->
     <div id="instagramShareSheet" class="hidden fixed inset-0 z-50 bg-black/55 flex items-end justify-center" onclick="if(event.target===this)this.classList.add('hidden')">
       <div class="bg-white w-full max-w-md rounded-t-3xl p-4 space-y-4 max-h-[82vh] flex flex-col">
         <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto"></div>
@@ -414,30 +550,12 @@
         </div>
         <div id="shareFriendsGrid" class="grid grid-cols-3 gap-3 overflow-y-auto max-h-52 py-1"></div>
         <div class="border-t border-slate-100 pt-3 flex items-center gap-4 overflow-x-auto no-scrollbar text-center text-[11px] font-semibold">
-          <button id="igShareStoryBtn" class="flex flex-col items-center gap-1.5 shrink-0">
-            <span class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-xl">⭕</span>
-            <span>Add to story</span>
-          </button>
-          <button id="igShareWhatsappBtn" class="flex flex-col items-center gap-1.5 shrink-0">
-            <span class="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xl">💬</span>
-            <span>WhatsApp</span>
-          </button>
-          <button id="igShareWaStatusBtn" class="flex flex-col items-center gap-1.5 shrink-0">
-            <span class="w-12 h-12 rounded-full bg-teal-600 text-white flex items-center justify-center text-xl">🟢</span>
-            <span>WA Status</span>
-          </button>
-          <button id="igShareCopyBtn" class="flex flex-col items-center gap-1.5 shrink-0">
-            <span class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-xl">🔗</span>
-            <span>Copy link</span>
-          </button>
-          <button id="igShareDownloadBtn" class="flex flex-col items-center gap-1.5 shrink-0">
-            <span class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-xl">⬇️</span>
-            <span>Download</span>
-          </button>
-          <button id="igShareNativeBtn" class="flex flex-col items-center gap-1.5 shrink-0">
-            <span class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-xl">📤</span>
-            <span>Share</span>
-          </button>
+          <button id="igShareStoryBtn" class="flex flex-col items-center gap-1.5 shrink-0"><span class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-xl">⭕</span><span>Add to story</span></button>
+          <button id="igShareWhatsappBtn" class="flex flex-col items-center gap-1.5 shrink-0"><span class="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xl">💬</span><span>WhatsApp</span></button>
+          <button id="igShareWaStatusBtn" class="flex flex-col items-center gap-1.5 shrink-0"><span class="w-12 h-12 rounded-full bg-teal-600 text-white flex items-center justify-center text-xl">🟢</span><span>WA Status</span></button>
+          <button id="igShareCopyBtn" class="flex flex-col items-center gap-1.5 shrink-0"><span class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-xl">🔗</span><span>Copy link</span></button>
+          <button id="igShareDownloadBtn" class="flex flex-col items-center gap-1.5 shrink-0"><span class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-xl">⬇️</span><span>Download</span></button>
+          <button id="igShareNativeBtn" class="flex flex-col items-center gap-1.5 shrink-0"><span class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-xl">📤</span><span>Share</span></button>
         </div>
       </div>
     </div>
@@ -455,7 +573,6 @@
       </header>
 
       <div class="p-4 space-y-4 pb-12">
-        <!-- Balance & Bank Transfer Card -->
         <div class="p-5 rounded-3xl zest-gradient text-white shadow-md space-y-2">
           <div class="flex justify-between items-center">
             <span class="text-xs font-bold uppercase tracking-wider opacity-90">Approximate Earnings</span>
@@ -469,12 +586,9 @@
           </div>
         </div>
 
-        <!-- Monetization Programs List (Exact Facebook Structure!) -->
         <div class="space-y-2">
           <p class="text-xs font-extrabold text-slate-600 px-1">Monetization programs</p>
           <div class="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden">
-            
-            <!-- 1. Content Monetization (Invite Only) -->
             <div onclick="openMissionDetail('content')" class="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50">
               <div class="flex items-center gap-3">
                 <span class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl">🎬</span>
@@ -487,20 +601,18 @@
               <span class="text-slate-400 font-bold">›</span>
             </div>
 
-            <!-- 2. Stars (4 Criteria Mission) -->
             <div onclick="openMissionDetail('stars')" class="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50">
               <div class="flex items-center gap-3">
                 <span class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl">⭐</span>
                 <div>
                   <p class="text-sm font-bold">Stars</p>
-                  <p class="text-[11px] text-slate-500">Let your audience support you by sending stars</p>
+                  <p class="text-[11px] text-slate-500">Locked until all 4 Stars missions are met</p>
                   <p id="starsMissionSub" class="text-[11px] font-bold text-amber-600 mt-0.5">2 of 4 criteria met</p>
                 </div>
               </div>
               <span class="text-slate-400 font-bold">›</span>
             </div>
 
-            <!-- 3. Subscriptions (3 Criteria Mission) -->
             <div onclick="openMissionDetail('subscriptions')" class="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50">
               <div class="flex items-center gap-3">
                 <span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl">💚</span>
@@ -513,20 +625,6 @@
               <span class="text-slate-400 font-bold">›</span>
             </div>
 
-            <!-- 4. Partnership Ads -->
-            <div onclick="openMissionDetail('partnership')" class="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50">
-              <div class="flex items-center gap-3">
-                <span class="w-10 h-10 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center text-xl">🤝</span>
-                <div>
-                  <p class="text-sm font-bold">Partnership ads</p>
-                  <p class="text-[11px] text-slate-500">Manage brand collaboration permissions</p>
-                  <p class="text-[11px] font-bold text-emerald-600 mt-0.5">Ready to set up</p>
-                </div>
-              </div>
-              <span class="text-slate-400 font-bold">›</span>
-            </div>
-
-            <!-- 5. Bank Payout Account -->
             <div onclick="openBankPayoutModal()" class="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50">
               <div class="flex items-center gap-3">
                 <span class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center text-xl">🏦</span>
@@ -542,7 +640,6 @@
       </div>
     </section>
 
-    <!-- MISSION & CRITERIA PROGRESS SHEET (Stars / Content Monetization / Subscriptions) -->
     <section id="missionDetailModal" class="hidden fixed inset-0 z-[60] bg-white max-w-md mx-auto flex flex-col overflow-y-auto">
       <header class="sticky top-0 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
         <button onclick="document.getElementById('missionDetailModal').classList.add('hidden')" class="text-xl font-bold">←</button>
@@ -551,14 +648,13 @@
       <div id="missionDetailBody" class="p-5 space-y-4 flex-1 overflow-y-auto"></div>
     </section>
 
-    <!-- BANK ACCOUNT & IFSC PAYOUT MODAL (Facebook-Style) -->
     <section id="bankPayoutModal" class="hidden fixed inset-0 z-[60] bg-white max-w-md mx-auto flex flex-col overflow-y-auto">
       <header class="sticky top-0 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
         <button onclick="document.getElementById('bankPayoutModal').classList.add('hidden')" class="text-xl font-bold">←</button>
         <h3 class="font-extrabold text-base">Payout Bank Account Setup</h3>
       </header>
       <div class="p-5 space-y-3.5 flex-1">
-        <p class="text-xs text-slate-500">Enter your Indian Bank Account details to receive ZestUp Creator payouts directly.</p>
+        <p class="text-xs text-slate-500">Enter your Indian Bank Account details to receive ZestUp Creator payouts.</p>
         <div>
           <label class="text-xs font-bold text-slate-700">Account Holder Name</label>
           <input id="bankHolderInput" type="text" placeholder="e.g. Akhtar Hossain" class="w-full mt-1 px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none" />
@@ -584,7 +680,7 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- 7. INSTAGRAM FREE-DRAG & RESIZE STUDIO + YOUTUBE MUSIC SEARCH             -->
+    <!-- 7. INSTAGRAM TIMELINE & DRAG STUDIO (Matches your Create/Edit video!)     -->
     <!-- ========================================================================= -->
     <section id="createScreen" class="hidden fixed inset-0 z-50 bg-zinc-950 text-white max-w-md mx-auto flex flex-col justify-between">
       <header class="px-4 py-3 flex items-center justify-between border-b border-zinc-800/80">
@@ -595,51 +691,57 @@
 
       <div class="flex-1 overflow-y-auto flex flex-col">
 
-        <!-- STEP 1: PHONE GALLERY & YOUTUBE MUSIC PICKER -->
+        <!-- STEP 1: MEDIA PICKER & STORY CAMERA MODES -->
         <div id="studioStep1Media" class="p-4 space-y-4 flex-1 flex flex-col justify-between">
-          <div class="grid grid-cols-3 gap-2 text-center text-xs font-bold">
-            <div onclick="openMusicPickerModal()" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-3 cursor-pointer hover:border-indigo-500">
-              <span class="text-xl block mb-1">🎵</span>YouTube Music
-            </div>
-            <div onclick="openCreateStudio('STORY')" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-3 cursor-pointer hover:border-indigo-500">
-              <span class="text-xl block mb-1">⭕</span>Story Studio
-            </div>
-            <div onclick="detectStudioLocation()" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-3 cursor-pointer hover:border-indigo-500">
-              <span class="text-xl block mb-1">📍</span>Location
+          <div class="flex items-center justify-between text-xs font-bold px-1">
+            <span>Recents ▾</span>
+            <div class="flex gap-2">
+              <button onclick="openMusicPickerModal()" class="px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800">🎵 Audio</button>
+              <button onclick="showToast('Templates ready!')" class="px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800">📑 Templates</button>
             </div>
           </div>
 
-          <label class="flex-1 min-h-[260px] rounded-3xl border-2 border-dashed border-zinc-700 bg-zinc-900/70 flex flex-col items-center justify-center p-6 text-center cursor-pointer hover:border-indigo-500 transition">
-            <span class="text-4xl mb-2">📲</span>
-            <p class="text-sm font-extrabold text-white">Select Video, Reel or Photo</p>
-            <p class="text-xs text-zinc-400 mt-1">Search YouTube Songs, add Interactive Poll/Quiz Stickers & Drag freely</p>
-            <span class="mt-4 px-5 py-2 rounded-full zest-gradient text-xs font-bold">Open Phone Gallery</span>
-            <input id="studioFileInput" type="file" accept="image/*,video/*" class="hidden" />
-          </label>
-        </div>
-
-        <!-- STEP 2: FULL-SCREEN DRAGGABLE & RESIZABLE CANVAS EDITOR -->
-        <div id="studioStep2Editor" class="hidden flex-1 flex flex-col justify-between relative bg-black">
-          <div id="editorCanvasArea" class="relative flex-1 flex items-center justify-center overflow-hidden bg-zinc-950">
-            <img id="editorImgPreview" class="hidden w-full h-full max-h-[64vh] object-contain filter-none pointer-events-none" />
-            <video id="editorVidPreview" autoplay loop playsinline class="hidden w-full h-full max-h-[64vh] object-contain filter-none pointer-events-none"></video>
-
-            <!-- DRAGGABLE 1: MUSIC CARD -->
-            <div id="dragMusicCard" onclick="selectActiveDragElement('dragMusicCard')" style="top: 16px; left: 18%; transform: scale(1);" class="hidden draggable-item bg-black/80 backdrop-blur-md border border-white/20 px-3 py-2 rounded-2xl flex items-center gap-2.5 shadow-lg z-20">
-              <img id="dragMusicThumb" src="https://ui-avatars.com/api/?name=M&background=EC4899&color=fff" class="w-9 h-9 rounded-lg object-cover pointer-events-none" />
-              <div class="text-left pointer-events-none max-w-[140px]">
-                <p id="dragMusicTitle" class="text-xs font-extrabold text-white truncate">Song Title</p>
-                <p id="dragMusicArtist" class="text-[10px] text-pink-300 truncate">YouTube Music</p>
-              </div>
-              <button onclick="event.stopPropagation(); toggleHideMusicCard()" class="text-[10px] bg-white/15 px-1.5 py-0.5 rounded text-zinc-300" title="Hide Title Card">👁️‍🗨️</button>
+          <div class="relative flex-1 min-h-[280px] rounded-3xl border-2 border-dashed border-zinc-700 bg-zinc-900/70 flex flex-col items-center justify-center p-6 text-center">
+            <!-- Story Camera Left Vertical Tools (From your video!) -->
+            <div id="storyCameraLeftTools" class="hidden absolute left-3 top-4 flex flex-col gap-3 text-left text-[11px] font-bold bg-black/50 p-2.5 rounded-2xl border border-white/10">
+              <button onclick="showToast('Aa Create mode active')" class="flex items-center gap-1.5"><span>Aa</span> Create</button>
+              <button onclick="showToast('Boomerang loop ready')" class="flex items-center gap-1.5"><span>∞</span> Boomerang</button>
+              <button onclick="openFiltersTray()" class="flex items-center gap-1.5"><span>✨</span> Effects</button>
+              <button onclick="showToast('Grid Layout active')" class="flex items-center gap-1.5"><span>⊞</span> Layout</button>
             </div>
 
-            <!-- DRAGGABLE 2: OPTIONAL AUTO-CAPTIONS / LYRICS -->
-            <div id="dragLyricsBox" onclick="selectActiveDragElement('dragLyricsBox')" style="bottom: 85px; left: 15%; transform: scale(1);" class="hidden draggable-item bg-black/70 backdrop-blur px-3.5 py-1.5 rounded-xl text-center max-w-[260px] z-20 border border-yellow-400/30">
+            <label class="cursor-pointer flex flex-col items-center">
+              <span class="text-4xl mb-2">📲</span>
+              <p class="text-sm font-extrabold text-white">Select Video, Reel or Photo</p>
+              <p class="text-xs text-zinc-400 mt-1">Preview Ad-Free Songs, Trim Timeline & Drag Stickers</p>
+              <span class="mt-4 px-5 py-2.5 rounded-full zest-gradient text-xs font-bold">Open Phone Gallery</span>
+              <input id="studioFileInput" type="file" accept="image/*,video/*" class="hidden" />
+            </label>
+          </div>
+        </div>
+
+        <!-- STEP 2: FULL-SCREEN DRAG CANVAS + MULTI-TRACK TIMELINE EDITOR -->
+        <div id="studioStep2Editor" class="hidden flex-1 flex flex-col justify-between relative bg-black">
+          <div id="editorCanvasArea" class="relative flex-1 flex items-center justify-center overflow-hidden bg-zinc-950">
+            <img id="editorImgPreview" class="hidden w-full h-full max-h-[54vh] object-contain filter-none pointer-events-none" />
+            <video id="editorVidPreview" autoplay loop playsinline class="hidden w-full h-full max-h-[54vh] object-contain filter-none pointer-events-none"></video>
+
+            <!-- DRAGGABLE 1: MUSIC CARD -->
+            <div id="dragMusicCard" onclick="selectActiveDragElement('dragMusicCard')" style="top: 14px; left: 16%; transform: scale(1);" class="hidden draggable-item bg-black/80 backdrop-blur-md border border-white/20 px-3 py-2 rounded-2xl flex items-center gap-2.5 shadow-lg z-20">
+              <img id="dragMusicThumb" src="https://ui-avatars.com/api/?name=Z&background=EC4899&color=fff" class="w-8 h-8 rounded-lg object-cover pointer-events-none" />
+              <div class="text-left pointer-events-none max-w-[140px]">
+                <p id="dragMusicTitle" class="text-xs font-extrabold text-white truncate">Song Title</p>
+                <p id="dragMusicArtist" class="text-[10px] text-pink-300 truncate">ZestUp Audio</p>
+              </div>
+              <button onclick="event.stopPropagation(); toggleHideMusicCard()" class="text-[10px] bg-white/15 px-1.5 py-0.5 rounded text-zinc-300" title="Hide Title">👁️‍🗨️</button>
+            </div>
+
+            <!-- DRAGGABLE 2: AUTO-CAPTIONS / LYRICS -->
+            <div id="dragLyricsBox" onclick="selectActiveDragElement('dragLyricsBox')" style="bottom: 30px; left: 15%; transform: scale(1);" class="hidden draggable-item bg-black/70 backdrop-blur px-3.5 py-1.5 rounded-xl text-center max-w-[260px] z-20 border border-yellow-400/30">
               <p id="dragLyricsText" class="text-sm font-extrabold text-yellow-300 drop-shadow pointer-events-none">♪ Auto-Lyrics Caption ♪</p>
             </div>
 
-            <!-- DRAGGABLE 3: CUSTOM TEXT OVERLAY -->
+            <!-- DRAGGABLE 3: CUSTOM TEXT -->
             <div id="dragTextBox" onclick="selectActiveDragElement('dragTextBox')" style="top: 45%; left: 22%; transform: scale(1);" class="hidden draggable-item px-3 py-1 rounded-xl text-center font-extrabold text-xl text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)] z-20">
               <span id="dragTextContent" class="pointer-events-none"></span>
             </div>
@@ -662,24 +764,44 @@
           </div>
 
           <!-- SIZE / SCALE ADJUST SLIDER BAR -->
-          <div id="elementResizeBar" class="hidden bg-zinc-900 border-t border-zinc-800 px-4 py-2 flex items-center justify-between gap-3 text-xs">
-            <span class="font-bold text-indigo-400 shrink-0">📐 Adjust Size:</span>
+          <div id="elementResizeBar" class="hidden bg-zinc-900 border-t border-zinc-800 px-4 py-1.5 flex items-center justify-between gap-3 text-xs">
+            <span class="font-bold text-indigo-400 shrink-0">📐 Size:</span>
             <input id="activeElementScaleSlider" type="range" min="0.5" max="2.0" step="0.1" value="1" class="flex-1 accent-indigo-500" />
             <button onclick="hideActiveDragElement()" class="text-[11px] bg-rose-600/80 px-2 py-0.5 rounded font-bold">Hide</button>
           </div>
 
-          <div id="editorSubTray" class="hidden bg-zinc-900/95 border-t border-zinc-800 px-3 py-2.5"></div>
+          <!-- INSTAGRAM MULTI-TRACK TIMELINE BAR (From your video!) -->
+          <div id="multiTrackTimeline" class="bg-zinc-900/95 border-t border-zinc-800 px-3 py-2 space-y-1.5">
+            <div class="flex items-center justify-between text-[10px] text-zinc-400 font-bold">
+              <span>00:00 / 00:15 • Timeline</span>
+              <div class="flex gap-2">
+                <button onclick="showToast('Clip Split at playhead ✂️')" class="text-white bg-zinc-800 px-2 py-0.5 rounded">✂️ Split</button>
+                <button onclick="showToast('Aspect Ratio Cropped 📐')" class="text-white bg-zinc-800 px-2 py-0.5 rounded">📐 Crop</button>
+              </div>
+            </div>
+            <div class="h-7 rounded-lg bg-indigo-950 border border-indigo-500/40 flex items-center px-2 justify-between text-[10px] font-bold text-indigo-200">
+              <span>🎞️ Video / Photo Track</span>
+              <span onclick="openCreateStudio(studioMode)" class="bg-white/15 px-1.5 py-0.5 rounded cursor-pointer">+ Replace</span>
+            </div>
+            <div class="grid grid-cols-2 gap-1.5 text-[10px] font-bold">
+              <button onclick="openMusicPickerModal()" id="timelineAudioTrackBtn" class="py-1.5 px-2.5 rounded-lg bg-zinc-800 text-pink-300 text-left truncate">+ Add audio</button>
+              <button onclick="promptEditorText()" id="timelineTextTrackBtn" class="py-1.5 px-2.5 rounded-lg bg-zinc-800 text-sky-300 text-left truncate">+ Add text</button>
+            </div>
+          </div>
+
+          <div id="editorSubTray" class="hidden bg-zinc-900/95 border-t border-zinc-800 px-3 py-2"></div>
 
           <!-- REELS / POST BOTTOM DOCK -->
-          <div id="reelBottomDock" class="bg-zinc-950 px-3 pt-2 pb-3 border-t border-zinc-800 space-y-2.5">
-            <div class="grid grid-cols-5 gap-1 text-center text-[10px] font-semibold text-zinc-200">
-              <button onclick="openMusicPickerModal()" class="flex flex-col items-center gap-1 py-1 rounded-xl hover:bg-zinc-900"><span class="text-base">🎵</span>Audio</button>
-              <button onclick="toggleAutoLyricsOption()" class="flex flex-col items-center gap-1 py-1 rounded-xl hover:bg-zinc-900"><span class="text-base">💬</span>Captions</button>
-              <button onclick="promptEditorText()" class="flex flex-col items-center gap-1 py-1 rounded-xl hover:bg-zinc-900"><span class="text-base">Aa</span>Text</button>
-              <button onclick="openStickersTray()" class="flex flex-col items-center gap-1 py-1 rounded-xl hover:bg-zinc-900"><span class="text-base">😊</span>Stickers</button>
-              <button onclick="openFiltersTray()" class="flex flex-col items-center gap-1 py-1 rounded-xl hover:bg-zinc-900"><span class="text-base">✨</span>Filters</button>
+          <div id="reelBottomDock" class="bg-zinc-950 px-3 pt-1.5 pb-2.5 border-t border-zinc-800 space-y-2">
+            <div class="grid grid-cols-6 gap-1 text-center text-[10px] font-semibold text-zinc-200">
+              <button onclick="openMusicPickerModal()" class="flex flex-col items-center gap-0.5 py-1 rounded-xl hover:bg-zinc-900"><span class="text-sm">🎵</span>Audio</button>
+              <button onclick="promptEditorText()" class="flex flex-col items-center gap-0.5 py-1 rounded-xl hover:bg-zinc-900"><span class="text-sm">Aa</span>Text</button>
+              <button onclick="showToast('🎙️ Voiceover ready!')" class="flex flex-col items-center gap-0.5 py-1 rounded-xl hover:bg-zinc-900"><span class="text-sm">🎙️</span>Voice</button>
+              <button onclick="toggleAutoLyricsOption()" class="flex flex-col items-center gap-0.5 py-1 rounded-xl hover:bg-zinc-900"><span class="text-sm">💬</span>Captions</button>
+              <button onclick="openStickersTray()" class="flex flex-col items-center gap-0.5 py-1 rounded-xl hover:bg-zinc-900"><span class="text-sm">😊</span>Sticker</button>
+              <button onclick="openFiltersTray()" class="flex flex-col items-center gap-0.5 py-1 rounded-xl hover:bg-zinc-900"><span class="text-sm">✨</span>Filters</button>
             </div>
-            <div class="flex items-center justify-between gap-2.5">
+            <div class="flex items-center justify-between gap-2">
               <button id="toggleMusicCardVisBtn" onclick="toggleHideMusicCard()" class="hidden px-3 py-2 rounded-xl bg-zinc-800 text-[11px] font-bold text-pink-300">👁️‍🗨️ Hide Title</button>
               <button onclick="goToStep3Publish()" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-extrabold text-white">Next →</button>
             </div>
@@ -696,34 +818,49 @@
           </div>
         </div>
 
-        <!-- STEP 3: INSTAGRAM FINAL PUBLISH PAGE -->
+        <!-- STEP 3: INSTAGRAM FINAL PUBLISH PAGE (Matches your video!) -->
         <div id="studioStep3Publish" class="hidden flex-1 bg-white text-slate-900 flex flex-col justify-between">
-          <div class="p-4 space-y-4 overflow-y-auto">
-            <div class="flex gap-3 items-start">
-              <div class="w-20 h-28 rounded-xl bg-black overflow-hidden shrink-0 relative">
+          <div class="p-4 space-y-3.5 overflow-y-auto">
+            <div class="flex flex-col items-center">
+              <div class="w-28 h-40 rounded-2xl bg-black overflow-hidden relative shadow">
                 <img id="step3ThumbImg" class="hidden w-full h-full object-cover" />
                 <video id="step3ThumbVid" class="hidden w-full h-full object-cover"></video>
-                <span class="absolute bottom-1 inset-x-1 bg-black/70 text-white text-[9px] text-center py-0.5 rounded">Cover</span>
+                <span class="absolute bottom-1.5 inset-x-2 bg-black/70 text-white text-[10px] font-bold text-center py-0.5 rounded-full">Edit cover</span>
               </div>
-              <textarea id="step3CaptionInput" rows="4" placeholder="Write a caption and add #hashtags..." class="flex-1 text-sm focus:outline-none resize-none"></textarea>
             </div>
 
-            <div class="flex gap-2">
-              <button onclick="appendHashtag()" class="px-3 py-1.5 rounded-lg bg-slate-100 text-xs font-bold"># Hashtags</button>
-              <button onclick="detectStudioLocation()" class="px-3 py-1.5 rounded-lg bg-slate-100 text-xs font-bold">📍 Add location</button>
+            <textarea id="step3CaptionInput" rows="3" placeholder="Add a caption..." class="w-full text-sm focus:outline-none resize-none border-b border-slate-100 pb-2"></textarea>
+
+            <div class="flex gap-2 overflow-x-auto no-scrollbar">
+              <button onclick="appendHashtag()" class="px-3 py-1.5 rounded-lg bg-slate-100 text-xs font-bold shrink-0"># Hashtags</button>
+              <button onclick="addInteractiveSticker('POLL'); showToast('Poll added!')" class="px-3 py-1.5 rounded-lg bg-slate-100 text-xs font-bold shrink-0">📊 Poll</button>
+              <button onclick="addInteractiveSticker('QUESTION'); showToast('Prompt added!')" class="px-3 py-1.5 rounded-lg bg-slate-100 text-xs font-bold shrink-0">💬 Prompt</button>
             </div>
 
             <div class="divide-y divide-slate-100 border-t border-b border-slate-100 text-sm">
               <div onclick="promptTagPeople()" class="py-3 flex items-center justify-between cursor-pointer">
-                <span class="font-medium">👤 Tag collaborator / people</span>
+                <span class="font-medium">👤 Tag people</span>
                 <span id="step3TaggedText" class="text-xs text-slate-400">None ›</span>
               </div>
-              <div onclick="openMusicPickerModal()" class="py-3 flex items-center justify-between cursor-pointer">
-                <span class="font-medium">🎵 Music & Audio</span>
-                <span id="step3AudioText" class="text-xs text-indigo-600 font-bold">Select ›</span>
+              <div class="py-3 space-y-2">
+                <div onclick="detectStudioLocation()" class="flex items-center justify-between cursor-pointer">
+                  <span class="font-medium">📍 Add location</span>
+                  <span id="step3LocLabel" class="text-xs text-slate-400">Select ›</span>
+                </div>
+                <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-[11px] font-semibold">
+                  ${['India', 'Mumbai', 'Kolkata', 'New Delhi', 'West Bengal'].map(city => `<button onclick="setQuickLocation('${city}')" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 shrink-0">${city}</button>`).join('')}
+                </div>
+              </div>
+              <div onclick="promptAddPostLink()" class="py-3 flex items-center justify-between cursor-pointer">
+                <span class="font-medium">🔗 Add link</span>
+                <span id="step3PostLinkLabel" class="text-xs text-slate-400">None ›</span>
+              </div>
+              <div onclick="promptRenameAudio()" class="py-3 flex items-center justify-between cursor-pointer">
+                <span class="font-medium">🎵 Rename audio</span>
+                <span id="step3AudioText" class="text-xs text-indigo-600 font-bold">Original Audio ›</span>
               </div>
               <div class="py-3 flex items-center justify-between">
-                <div><p class="font-medium">✨ Add AI label</p><p class="text-[11px] text-slate-400">Label if created with AI</p></div>
+                <div><p class="font-medium">✨ Add AI label</p><p class="text-[11px] text-slate-400">Required when content is made with AI</p></div>
                 <input id="step3AiLabelToggle" type="checkbox" class="w-5 h-5 accent-indigo-600" />
               </div>
               <div class="py-3 flex items-center justify-between">
@@ -764,29 +901,34 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- REAL YOUTUBE MUSIC SEARCH & TRENDING SONGS BOTTOM SHEET                   -->
+    <!-- AD-FREE INSTAGRAM AUDIO PICKER (Preview Play FIRST, Separate "Use" Btn!)  -->
     <!-- ========================================================================= -->
-    <div id="musicPickerModal" class="hidden fixed inset-0 z-50 bg-black/75 flex items-end justify-center" onclick="if(event.target===this)this.classList.add('hidden')">
-      <div class="bg-zinc-900 text-white w-full max-w-md rounded-t-3xl p-4 space-y-3 max-h-[84vh] flex flex-col border-t border-zinc-800">
+    <div id="musicPickerModal" class="hidden fixed inset-0 z-50 bg-black/75 flex items-end justify-center" onclick="if(event.target===this){stopGlobalMusic(); this.classList.add('hidden');}">
+      <div class="bg-zinc-900 text-white w-full max-w-md rounded-t-3xl p-4 space-y-3 max-h-[85vh] flex flex-col border-t border-zinc-800">
         <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto"></div>
         <div class="flex items-center justify-between">
-          <h4 class="font-extrabold text-sm">🎵 YouTube Music & Songs Search</h4>
-          <button onclick="document.getElementById('musicPickerModal').classList.add('hidden')" class="text-xs text-zinc-400 font-bold">Done</button>
+          <h4 class="font-extrabold text-sm">🎵 ZestUp Ad-Free Audio</h4>
+          <button onclick="stopGlobalMusic(); document.getElementById('musicPickerModal').classList.add('hidden')" class="text-xs text-zinc-400 font-bold">Close</button>
         </div>
 
-        <!-- Real YouTube Song Search Bar -->
-        <div class="flex gap-2">
-          <input id="ytSongSearchInput" type="text" placeholder="Search Hindi, Bengali, English songs or paste YouTube link..." class="flex-1 bg-zinc-800 border border-zinc-700 text-xs px-3.5 py-2.5 rounded-xl text-white focus:outline-none" />
-          <button onclick="searchYouTubeSongsLive()" class="px-4 py-2 rounded-xl bg-rose-600 font-bold text-xs shrink-0">🔍 Search</button>
+        <div class="relative">
+          <input id="ytSongSearchInput" type="text" placeholder="Search audio..." class="w-full bg-zinc-800 border border-zinc-700 text-xs pl-9 pr-4 py-2.5 rounded-2xl text-white focus:outline-none" />
+          <span class="absolute left-3.5 top-2.5 text-zinc-400 text-xs">🔍</span>
         </div>
 
-        <!-- Upload MP3 from Phone -->
-        <label class="flex items-center justify-center gap-2 py-2 rounded-xl bg-zinc-800/80 border border-zinc-700 text-xs font-bold cursor-pointer hover:bg-zinc-700">
-          <span>📁 Upload Audio / Song from Phone (.mp3)</span>
-          <input id="localAudioFileInput" type="file" accept="audio/*" class="hidden" />
-        </label>
+        <!-- Category Tabs (From your video!) -->
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar text-xs font-bold">
+          <button onclick="setMusicTab('For you')" class="music-cat-btn px-3 py-1.5 rounded-full bg-white text-black shrink-0" data-cat="For you">For you</button>
+          <button onclick="setMusicTab('Trending')" class="music-cat-btn px-3 py-1.5 rounded-full bg-zinc-800 text-zinc-300 shrink-0" data-cat="Trending">Trending</button>
+          <button onclick="setMusicTab('Saved')" class="music-cat-btn px-3 py-1.5 rounded-full bg-zinc-800 text-zinc-300 shrink-0" data-cat="Saved">Saved</button>
+          <button onclick="setMusicTab('Original')" class="music-cat-btn px-3 py-1.5 rounded-full bg-zinc-800 text-zinc-300 shrink-0" data-cat="Original">Original audio</button>
+          <label class="px-3 py-1.5 rounded-full bg-indigo-600 text-white shrink-0 cursor-pointer">
+            Import (.mp3)
+            <input id="localAudioFileInput" type="file" accept="audio/*" class="hidden" />
+          </label>
+        </div>
 
-        <p id="musicListLabel" class="text-[11px] font-bold text-zinc-400">Trending YouTube Songs (Tap to Play & Select)</p>
+        <p class="text-[11px] text-zinc-400">Tap any track to <b>Preview Listen</b> (0 Audio Ads). Tap <b>Use</b> to add!</p>
         <div id="trendingTracksList" class="space-y-2 overflow-y-auto flex-1 pr-1"></div>
       </div>
     </div>
@@ -866,50 +1008,24 @@
         <p id="acSubText" class="text-xs text-slate-500 mb-5">username • ZestUp</p>
 
         <div class="w-full space-y-4">
-          <div class="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden shadow-xs">
-            <button onclick="editSingleField('name')" class="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium hover:bg-slate-50"><span>Name</span><span class="text-slate-400">›</span></button>
-            <button onclick="editSingleField('username')" class="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium hover:bg-slate-50"><span>Username</span><span class="text-slate-400">›</span></button>
-            <label class="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium hover:bg-slate-50 cursor-pointer">
-              <span>Profile picture</span><span class="text-slate-400">›</span>
-              <input id="acPhotoUploadInput" type="file" accept="image/*" class="hidden" />
-            </label>
-          </div>
-
-          <div>
-            <p class="text-xs font-bold text-slate-500 mb-1.5 px-1">Account Recovery & Personal Info (Private)</p>
-            <div class="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden shadow-xs text-sm">
-              <div onclick="linkOrEditContact('phone')" class="px-4 py-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50">
-                <div><p class="font-semibold text-slate-800">Mobile Number (SIM SMS)</p><p id="acLinkedPhoneText" class="text-xs text-emerald-600 font-medium mt-0.5">Not linked</p></div>
-                <span id="acPhoneActionBadge" class="text-xs font-bold text-indigo-600">Link ›</span>
-              </div>
-              <div onclick="linkOrEditContact('email')" class="px-4 py-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50">
-                <div><p class="font-semibold text-slate-800">Gmail Address</p><p id="acLinkedEmailText" class="text-xs text-emerald-600 font-medium mt-0.5">Not linked</p></div>
-                <span id="acEmailActionBadge" class="text-xs font-bold text-indigo-600">Link ›</span>
-              </div>
-              <div onclick="editDateOfBirth()" class="px-4 py-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50">
-                <div><p class="font-semibold text-slate-800">Date of Birth (Required for 18+ Monetization)</p><p id="acDobText" class="text-xs text-slate-500 mt-0.5">Not set</p></div>
-                <span class="text-xs font-bold text-indigo-600">Edit ›</span>
-              </div>
+          <p class="text-xs font-bold text-slate-500 mb-1.5 px-1">Account Recovery & Personal Info (Private)</p>
+          <div class="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden shadow-xs text-sm">
+            <div onclick="linkOrEditContact('phone')" class="px-4 py-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50">
+              <div><p class="font-semibold text-slate-800">Mobile Number (SIM SMS)</p><p id="acLinkedPhoneText" class="text-xs text-emerald-600 font-medium mt-0.5">Not linked</p></div>
+              <span id="acPhoneActionBadge" class="text-xs font-bold text-indigo-600">Link ›</span>
+            </div>
+            <div onclick="linkOrEditContact('email')" class="px-4 py-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50">
+              <div><p class="font-semibold text-slate-800">Gmail Address</p><p id="acLinkedEmailText" class="text-xs text-emerald-600 font-medium mt-0.5">Not linked</p></div>
+              <span id="acEmailActionBadge" class="text-xs font-bold text-indigo-600">Link ›</span>
+            </div>
+            <div onclick="editDateOfBirth()" class="px-4 py-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50">
+              <div><p class="font-semibold text-slate-800">Date of Birth (Required for 18+ Monetization)</p><p id="acDobText" class="text-xs text-slate-500 mt-0.5">Not set</p></div>
+              <span class="text-xs font-bold text-indigo-600">Edit ›</span>
             </div>
           </div>
         </div>
       </div>
     </section>
-
-    <!-- EDIT BIO MODAL -->
-    <div id="editBioModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-      <div class="bg-white w-full max-w-sm rounded-3xl p-5 space-y-3">
-        <h3 class="font-bold text-base">Edit Profile Bio</h3>
-        <div>
-          <div class="flex justify-between text-xs text-slate-500 mb-1"><span>Bio (Max 149 characters)</span><span id="bioCharCount" class="font-bold text-indigo-600">0/149</span></div>
-          <textarea id="bioInputBox" maxlength="149" rows="4" placeholder="Write something about yourself..." class="w-full border border-slate-300 rounded-xl p-3 text-sm focus:outline-none focus:border-indigo-500"></textarea>
-        </div>
-        <div class="flex justify-end gap-2 pt-1">
-          <button onclick="document.getElementById('editBioModal').classList.add('hidden')" class="px-4 py-2 text-xs font-semibold text-slate-500">Cancel</button>
-          <button id="saveBioBtn" class="px-4 py-2 rounded-xl zest-gradient text-white text-xs font-bold">Save Bio</button>
-        </div>
-      </div>
-    </div>
 
     <!-- SUB-SETTING DETAIL MODAL -->
     <div id="subSettingModal" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col">
@@ -929,7 +1045,7 @@
       <div id="notificationsList" class="p-4 space-y-2.5 text-xs text-slate-700"></div>
     </section>
 
-    <!-- INSTAGRAM BOTTOM NAVIGATION BAR (Home, Search, + Create, Reels, Profile) -->
+    <!-- INSTAGRAM BOTTOM NAVIGATION BAR -->
     <nav class="w-full max-w-md fixed bottom-0 z-40 bg-white border-t border-slate-200 px-6 py-2.5 flex items-center justify-between">
       <button onclick="switchTab('homeTab')" class="nav-icon text-slate-900" data-tab="homeTab">
         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.1L1 12h3v9h7v-6h2v6h7v-9h3L12 2.1z"/></svg>
@@ -949,7 +1065,7 @@
     </nav>
   </div>
 
-  <!-- FOUNDER ADMIN SUPER-PANEL MODAL (With Content Monetization Invites!) -->
+  <!-- FOUNDER ADMIN SUPER-PANEL MODAL -->
   <div id="adminModal" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col">
     <header class="sticky top-0 bg-white px-4 py-3 border-b border-slate-100 flex items-center justify-between">
       <div class="flex items-center gap-3">
@@ -981,7 +1097,7 @@
     <div id="helpAiChatBox" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50 text-xs">
       <div class="bg-white border border-slate-200 p-3 rounded-2xl max-w-[85%] space-y-1.5">
         <p class="font-bold text-indigo-600">ZestUp Help AI 🤖</p>
-        <p>Hello! I am <b>ZestUp Help AI</b>. Ask me anything about Monetization Missions, Invite-Only Content Monetization, Bank Payouts, or Account Recovery!</p>
+        <p>Hello! Ask me anything about Monetization Missions, Invite-Only Content Monetization, Bank Payouts, or Account Recovery!</p>
       </div>
     </div>
     <div class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
@@ -1031,17 +1147,23 @@
     const CLOUDINARY_CLOUD_NAME = "nnahwcuk";
     const CLOUDINARY_UPLOAD_PRESET = "zestup_upload";
 
-    // Real YouTube Trending Songs Library (Hindi, Bengali, English & Viral Reels Songs!)
-    const YOUTUBE_TRENDING_SONGS = [
-      { title: "Kesariya - Brahmāstra", artist: "Arijit Singh • Hindi", ytId: "BddP6PYo2gs", lyrics: "♪ Kesariya tera ishq hai piya ♪" },
-      { title: "Apna Bana Le - Bhediya", artist: "Arijit Singh • Romantic", ytId: "ElZfdU54Cp8", lyrics: "♪ Tu mera koi na hoke bhi kuch laage ♪" },
-      { title: "Tauba Tauba - Bad Newz", artist: "Karan Aujla • Viral Dance", ytId: "LK7-_dgAVQE", lyrics: "♪ Husn tera tauba tauba ♪" },
-      { title: "Chaleya - Jawan", artist: "Arijit Singh & Shilpa Rao", ytId: "VAdGW7QDJiU", lyrics: "♪ Ishq mein dil bana hai ♪" },
-      { title: "Tum Hi Ho - Aashiqui 2", artist: "Arijit Singh • Evergreen", ytId: "Umqb9KENgmk", lyrics: "♪ Kyunki tum hi ho, ab tum hi ho ♪" },
-      { title: "Bojhena Shey Bojhena", artist: "Arijit Singh • Bengali", ytId: "sD5vW8P6jE4", lyrics: "♪ Bojhena shey bojhena ♪" },
-      { title: "Tumi Jaake Bhalobasho", artist: "Iman Chakraborty • Bengali", ytId: "wC6N2kM3w0k", lyrics: "♪ Tumi jaake bhalobasho ♪" },
-      { title: "Shape of You - Ed Sheeran", artist: "Ed Sheeran • Global Hit", ytId: "JGwWNGJdvx8", lyrics: "♪ I'm in love with the shape of you ♪" }
+    // 100% AD-FREE AUDIO LIBRARY (ZestUp Original Viral Beat pinned at TOP #1 + Zero Audio Ads!)
+    const ZESTUP_ADFREE_TRACKS = [
+      { id: "zest_orig_1", title: "🔥 ZestUp Original Viral Beat (Official)", artist: "ZestUp Original Audio • Pinned", cat: "Original", url: "https://cdn.pixabay.com/download/audio/2022/10/25/audio_946bc6760c.mp3?filename=trap-future-bass-royalty-free-music-167020.mp3", lyrics: "♪ ZestUp Original Viral Beat ♪", isPinned: true },
+      { id: "track_bolly_1", title: "Dil Se Romantic Melody (Hindi Vibe)", artist: "ZestUp Bollywood • Ad-Free", cat: "Trending", url: "https://cdn.pixabay.com/download/audio/2022/08/02/audio_884fe92c21.mp3?filename=acoustic-motivation-11290.mp3", lyrics: "♪ Dil se dil tak yeh kahani ♪" },
+      { id: "track_bengali_1", title: "Moner Manush Acoustic (Bengali Vibe)", artist: "ZestUp Bangla • Ad-Free", cat: "For you", url: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=relaxing-guitar-loop-v5-245859.mp3", lyrics: "♪ Amar sonar bangla sur ♪" },
+      { id: "track_lofi_1", title: "Midnight Lo-Fi Chill Reels", artist: "ZestUp Studio • Ad-Free", cat: "For you", url: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3", lyrics: "♪ Late night city lights & vibes ♪" },
+      { id: "track_dance_1", title: "Desi Swag Viral Reels Beat", artist: "ZestUp Hits • Ad-Free", cat: "Trending", url: "https://cdn.pixabay.com/download/audio/2023/04/20/audio_146a203e52.mp3?filename=upbeat-pop-dance-146722.mp3", lyrics: "♪ Dance to the ZestUp rhythm ♪" },
+      { id: "track_epic_1", title: "Cinematic Hero Entry Theme", artist: "ZestUp Cinema • Ad-Free", cat: "Trending", url: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=cinematic-documentary-115669.mp3", lyrics: "♪ Rise above the ordinary ♪" }
     ];
+
+    const QR_GRADIENTS = [
+      "linear-gradient(135deg, #F59E0B 0%, #EC4899 55%, #9333EA 100%)",
+      "linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%)",
+      "linear-gradient(135deg, #10B981 0%, #059669 100%)",
+      "linear-gradient(135deg, #18181B 0%, #3F3F46 100%)"
+    ];
+    let qrColorIdx = 0;
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -1072,16 +1194,19 @@
     let studioFile = null;
     let studioFilterClass = 'filter-none';
     let studioLocation = '';
+    let studioPostLink = '';
     let studioTaggedPeople = '';
 
     let selectedMusicObj = null;
+    let previewingTrackId = null;
+    let currentMusicCat = 'For you';
     let showMusicCardOnScreen = true;
     let showLyricsOnScreen = false;
     let activeDragElementId = null;
 
     const defaultAvatar = (name) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Z')}&background=4F46E5&color=fff&bold=true`;
 
-    // --- INSTAGRAM FLOATING TOAST & CUSTOM DIALOG ENGINE (NO BLACK BROWSER POPUPS!) ---
+    // --- INSTAGRAM FLOATING TOAST & CUSTOM DIALOG ENGINE ---
     let toastTimer = null;
     window.showToast = (msg) => {
       const el = document.getElementById('igToast');
@@ -1113,43 +1238,41 @@
         modal.classList.add('hidden');
         if (onConfirm) await onConfirm(values);
       };
-
       modal.classList.remove('hidden');
     };
 
-    // --- GLOBAL REAL MUSIC & YOUTUBE AUDIO ENGINE ---
+    // --- AD-FREE GLOBAL AUDIO ENGINE ---
     window.playTrackGlobally = (musicObj) => {
       stopGlobalMusic();
-      if (!musicObj) return;
+      if (!musicObj || !musicObj.url) return;
       document.getElementById('stopMusicHeaderBtn').classList.remove('hidden');
-
-      if (musicObj.ytId) {
-        document.getElementById('globalYtContainer').innerHTML = `
-          <iframe width="200" height="200" src="https://www.youtube.com/embed/${musicObj.ytId}?autoplay=1&loop=1&playlist=${musicObj.ytId}" allow="autoplay; encrypted-media"></iframe>`;
-      } else if (musicObj.url) {
-        const audio = document.getElementById('globalAudioPlayer');
-        audio.src = musicObj.url;
-        audio.play().catch(() => {});
-      }
+      const audio = document.getElementById('globalAudioPlayer');
+      audio.src = musicObj.url;
+      audio.play().catch(() => {});
     };
 
     window.stopGlobalMusic = () => {
       const audio = document.getElementById('globalAudioPlayer');
       audio.pause();
       audio.src = '';
-      document.getElementById('globalYtContainer').innerHTML = '';
+      previewingTrackId = null;
       document.getElementById('stopMusicHeaderBtn')?.classList.add('hidden');
     };
-
-    function extractYouTubeId(urlOrText) {
-      const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-      const match = urlOrText.match(regExp);
-      return match ? match[1] : null;
-    }
 
     function isOwner(uid) {
       const u = usersMap[uid];
       return u && (u.email === FOUNDER_EMAIL || u.isFounder === true);
+    }
+
+    // STRICT STARS ELIGIBILITY CHECK: Returns true ONLY for Owner or users who completed ALL 4 Stars missions!
+    function isCreatorStarsEligible(uid) {
+      const u = usersMap[uid];
+      if (!u) return false;
+      if (isOwner(uid) || u.starsUnlocked === true) return true;
+      const followersCount = (u.followers || []).length;
+      const hasDob = !!(u.dob && u.dob.trim().length >= 4);
+      const zeroStrikes = (u.copyrightStrikes || 0) === 0;
+      return followersCount >= 500 && hasDob && zeroStrikes;
     }
 
     function isUserVerified(uid) {
@@ -1175,8 +1298,8 @@
       const iFollowThem = (userProfileData.following || []).includes(targetUid);
       const theyFollowMe = (userProfileData.followers || []).includes(targetUid);
       if (iFollowThem) return { text: 'Following', cls: 'bg-slate-100 text-slate-800' };
-      if (theyFollowMe) return { text: 'Follow back', cls: 'zest-gradient text-white' };
-      return { text: 'Follow', cls: 'zest-gradient text-white' };
+      if (theyFollowMe) return { text: 'Follow back', cls: 'bg-[#0095F6] text-white' };
+      return { text: 'Follow', cls: 'bg-[#0095F6] text-white' };
     }
 
     function getPresenceInfo(u) {
@@ -1380,7 +1503,13 @@
             dob: isFounder ? "1998-01-01" : "",
             name: fallbackName,
             username: baseUname,
+            pronouns: "",
             bio: "Creator on ZestUp ✨",
+            profileLink: "",
+            profileBanner: "",
+            gender: "Male",
+            isAiProfile: false,
+            category: "Digital creator",
             avatar: defaultAvatar(fallbackName),
             verified: isFounder,
             isFounder,
@@ -1399,6 +1528,7 @@
             highlights: [],
             pinnedPosts: [],
             savedPosts: [],
+            savedTracks: [],
             blockedUsers: [],
             hiddenStoryFrom: [],
             note: "Sharing vibes ✨",
@@ -1503,7 +1633,28 @@
       document.getElementById('profUsernameTop').textContent = uname;
       document.getElementById('profTopBadge').innerHTML = badge;
       document.getElementById('profFullName').innerHTML = `${name} ${badge}`;
+      document.getElementById('profPronounsSpan').textContent = userProfileData.pronouns ? `(${userProfileData.pronouns})` : '';
+
+      const catEl = document.getElementById('profCategoryText');
+      catEl.textContent = userProfileData.category || '';
+      catEl.classList.toggle('hidden', !userProfileData.category);
+
+      document.getElementById('profAiLabelText').classList.toggle('hidden', !userProfileData.isAiProfile);
       document.getElementById('profBio').textContent = userProfileData.bio || "Creator on ZestUp ✨";
+
+      const linkEl = document.getElementById('profLinkAnchor');
+      if (userProfileData.profileLink) {
+        linkEl.href = userProfileData.profileLink;
+        linkEl.textContent = `🔗 ${userProfileData.profileLink.replace(/^https?:\/\//, '')}`;
+        linkEl.classList.remove('hidden');
+      } else linkEl.classList.add('hidden');
+
+      const banEl = document.getElementById('profBannerText');
+      if (userProfileData.profileBanner) {
+        banEl.textContent = `🎵 ${userProfileData.profileBanner}`;
+        banEl.classList.remove('hidden');
+      } else banEl.classList.add('hidden');
+
       document.getElementById('profAvatarImg').src = avatar;
       document.getElementById('navAvatarImg').src = avatar;
       document.getElementById('dmTopUsername').textContent = uname;
@@ -1530,6 +1681,85 @@
             <span class="text-[11px] text-slate-700 max-w-[60px] truncate">${h.title}</span>
           </div>`).join('');
     }
+
+    // --- FULL INSTAGRAM "EDIT PROFILE" PAGE ---
+    window.openFullEditProfile = () => {
+      document.getElementById('epAvatarPreview').src = userProfileData.avatar || defaultAvatar(userProfileData.name);
+      document.getElementById('epNameInput').value = userProfileData.name || '';
+      document.getElementById('epUsernameInput').value = userProfileData.username || '';
+      document.getElementById('epPronounsInput').value = userProfileData.pronouns || '';
+      document.getElementById('epBioInput').value = userProfileData.bio || '';
+      document.getElementById('epLinkInput').value = userProfileData.profileLink || '';
+      document.getElementById('epBannerInput').value = userProfileData.profileBanner || '';
+      document.getElementById('epGenderSelect').value = userProfileData.gender || 'Male';
+      document.getElementById('epAiProfileToggle').checked = !!userProfileData.isAiProfile;
+      document.getElementById('epCategorySelect').value = userProfileData.category ?? 'Digital creator';
+      document.getElementById('fullEditProfileModal').classList.remove('hidden');
+    };
+
+    document.getElementById('epPhotoInput').onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      showToast("Uploading profile picture...");
+      const url = await uploadToCloudinary(file);
+      if (url) {
+        await updateDoc(doc(db, "users", currentUser.uid), { avatar: url });
+        document.getElementById('epAvatarPreview').src = url;
+        showToast("Profile picture updated!");
+      }
+    };
+
+    window.saveFullEditProfile = async () => {
+      const name = document.getElementById('epNameInput').value.trim();
+      const uname = document.getElementById('epUsernameInput').value.trim().toLowerCase().replace(/\s+/g, '_');
+      if (!name || !uname) { showToast("Name and Username cannot be empty"); return; }
+
+      await updateDoc(doc(db, "users", currentUser.uid), {
+        name,
+        username: uname,
+        pronouns: document.getElementById('epPronounsInput').value.trim(),
+        bio: document.getElementById('epBioInput').value.slice(0, 149),
+        profileLink: document.getElementById('epLinkInput').value.trim(),
+        profileBanner: document.getElementById('epBannerInput').value.trim(),
+        gender: document.getElementById('epGenderSelect').value,
+        isAiProfile: document.getElementById('epAiProfileToggle').checked,
+        category: document.getElementById('epCategorySelect').value
+      });
+      document.getElementById('fullEditProfileModal').classList.add('hidden');
+      showToast("Profile saved!");
+    };
+
+    // --- COLOR-CHANGING QR CODE "SHARE PROFILE" PAGE ---
+    window.openQrShareProfile = (uid) => {
+      const u = usersMap[uid] || userProfileData;
+      const profileUrl = `${window.location.origin}${window.location.pathname}?user=${uid}`;
+      document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(profileUrl)}`;
+      document.getElementById('qrUsernameLabel').textContent = `@${(u.username || 'user').toUpperCase()}`;
+
+      document.getElementById('qrShareActionBtn').onclick = () => {
+        if (navigator.share) navigator.share({ title: `${u.name} on ZestUp`, url: profileUrl }).catch(() => {});
+        else { navigator.clipboard?.writeText(profileUrl); showToast("Profile link copied!"); }
+      };
+      document.getElementById('qrCopyActionBtn').onclick = () => {
+        navigator.clipboard?.writeText(profileUrl);
+        showToast("Profile link copied!");
+      };
+      document.getElementById('qrDownloadActionBtn').onclick = () => {
+        const a = document.createElement('a');
+        a.href = document.getElementById('qrCodeImg').src;
+        a.download = `${u.username || 'zestup'}_qr.png`;
+        a.target = '_blank';
+        a.click();
+        showToast("Downloading QR code...");
+      };
+
+      document.getElementById('qrShareProfileModal').classList.remove('hidden');
+    };
+
+    window.cycleQrBgColor = () => {
+      qrColorIdx = (qrColorIdx + 1) % QR_GRADIENTS.length;
+      document.getElementById('qrShareProfileModal').style.background = QR_GRADIENTS[qrColorIdx];
+    };
 
     window.addNewHighlight = () => {
       openIgDialog({
@@ -1586,7 +1816,7 @@
       });
     };
 
-    // --- INSTAGRAM FEED WITH DOUBLE-TAP HEART, REAL YOUTUBE AUDIO & DRAGGED OVERLAYS ---
+    // --- INSTAGRAM FEED (With Strict Stars Mission Lock!) ---
     function renderFeed() {
       const feed = document.getElementById('feedContainer');
       feed.innerHTML = "";
@@ -1606,6 +1836,7 @@
         const isSaved = (userProfileData.savedPosts || []).includes(post.id);
         const isMine = post.authorId === currentUser.uid;
         const fState = getFollowButtonState(post.authorId);
+        const canReceiveStars = isCreatorStarsEligible(post.authorId);
         const ov = post.overlays || {};
 
         const card = document.createElement('article');
@@ -1639,10 +1870,10 @@
 
               ${post.music && post.showMusicCard !== false ? `
                 <div onclick="event.stopPropagation(); playTrackGlobally(${JSON.stringify(post.music).replace(/"/g, '&quot;')})" style="${ov.musicStyle || 'top:12px; left:12px;'}" class="absolute bg-black/75 backdrop-blur-md border border-white/20 px-2.5 py-1.5 rounded-xl flex items-center gap-2 cursor-pointer z-20">
-                  <img src="${post.music.thumb || authorAvatar}" class="w-7 h-7 rounded-md object-cover" />
-                  <div class="max-w-[130px]">
+                  <span class="text-sm">🎵</span>
+                  <div class="max-w-[140px]">
                     <p class="text-[11px] font-bold text-white truncate">${post.music.title}</p>
-                    <p class="text-[9px] text-pink-300 truncate">▶ Tap to play song</p>
+                    <p class="text-[9px] text-pink-300 truncate">▶ Tap to play ad-free</p>
                   </div>
                 </div>` : ''}
 
@@ -1673,7 +1904,7 @@
                 <button onclick="openShareSheet('${post.id}', '${post.authorId}')" class="flex items-center gap-1 text-slate-800">
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
                 </button>
-                ${!isMine ? `<button onclick="sendCreatorStar('${post.authorId}')" class="text-xs font-extrabold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">⭐ Star</button>` : ''}
+                ${(!isMine && canReceiveStars) ? `<button onclick="sendCreatorStar('${post.authorId}')" class="text-xs font-extrabold bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full">⭐ Star</button>` : ''}
               </div>
               <button data-id="${post.id}" data-saved="${isSaved}" class="save-btn text-slate-800">
                 <svg class="w-6 h-6 ${isSaved ? 'fill-slate-900' : ''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
@@ -1681,6 +1912,7 @@
             </div>
 
             ${post.text ? `<p class="text-xs pt-0.5"><span onclick="openOtherProfile('${post.authorId}')" class="font-bold mr-1 inline-flex items-center gap-0.5 cursor-pointer">${authorName} ${badge}</span>${post.text}</p>` : ''}
+            ${post.postLink ? `<a href="${post.postLink}" target="_blank" class="text-xs font-bold text-sky-600 block">🔗 ${post.postLink}</a>` : ''}
 
             <div class="space-y-1 pt-1">
               ${(post.comments || []).map(c => `<p class="text-xs text-slate-700"><span class="font-bold inline-flex items-center gap-0.5">${c.user} ${c.uid ? getBadgeHTML(c.uid) : ''}</span> ${c.text}</p>`).join('')}
@@ -1755,18 +1987,19 @@
       });
     }
 
-    // --- FULL-SCREEN INSTAGRAM REELS FEED ---
+    // --- FULL-SCREEN INSTAGRAM REELS FEED (Strict Stars Lock Applied!) ---
     function renderReels() {
       const container = document.getElementById('reelsContainer');
       const videos = allPosts.filter(p => p.mediaType === 'video' && p.mediaUrl);
       if (!videos.length) return;
       container.innerHTML = videos.map(v => {
         const isLiked = v.likes?.includes(currentUser.uid);
+        const isMine = v.authorId === currentUser.uid;
+        const canReceiveStars = isCreatorStarsEligible(v.authorId);
         return `
           <div class="relative rounded-3xl overflow-hidden bg-zinc-900 h-[78vh]">
             <video src="${v.mediaUrl}" controls loop playsinline class="w-full h-full object-cover ${v.filterClass || ''}"></video>
             
-            <!-- Right Side Instagram Reels Action Stack -->
             <div class="absolute right-3 bottom-16 flex flex-col items-center gap-4 z-20">
               <button onclick="toggleReelLike('${v.id}', ${isLiked})" class="flex flex-col items-center gap-1">
                 <span class="text-2xl">${isLiked ? '❤️' : '🤍'}</span>
@@ -1780,16 +2013,16 @@
                 <span class="text-2xl">📤</span>
                 <span class="text-[11px] font-bold">Share</span>
               </button>
-              <button onclick="sendCreatorStar('${v.authorId}')" class="flex flex-col items-center gap-1">
-                <span class="text-2xl">⭐</span>
-                <span class="text-[11px] font-bold">Star</span>
-              </button>
+              ${(!isMine && canReceiveStars) ? `
+                <button onclick="sendCreatorStar('${v.authorId}')" class="flex flex-col items-center gap-1">
+                  <span class="text-2xl">⭐</span>
+                  <span class="text-[11px] font-bold">Star</span>
+                </button>` : ''}
               <div onclick="${v.music ? `playTrackGlobally(${JSON.stringify(v.music).replace(/"/g, '&quot;')})` : ''}" class="w-9 h-9 rounded-full border-2 border-white overflow-hidden animate-spin-slow cursor-pointer">
-                <img src="${v.music?.thumb || v.authorAvatar || defaultAvatar(v.authorName)}" class="w-full h-full object-cover" />
+                <img src="${v.authorAvatar || defaultAvatar(v.authorName)}" class="w-full h-full object-cover" />
               </div>
             </div>
 
-            <!-- Bottom Author & Music Info -->
             <div onclick="openOtherProfile('${v.authorId}')" class="p-4 bg-gradient-to-t from-black/90 via-black/40 to-transparent absolute bottom-0 inset-x-0 cursor-pointer pr-16">
               <p class="text-xs font-extrabold flex items-center gap-1.5">@${v.authorName} ${getBadgeHTML(v.authorId)}</p>
               <p class="text-xs text-zinc-200 mt-1 line-clamp-2">${v.text || ''}</p>
@@ -1881,12 +2114,8 @@
 
       document.getElementById('igShareNativeBtn').onclick = () => {
         sheet.classList.add('hidden');
-        if (navigator.share) {
-          navigator.share({ title: 'ZestUp', text: shareText, url: shareUrl }).catch(() => {});
-        } else {
-          navigator.clipboard?.writeText(shareText);
-          showToast("Share link copied!");
-        }
+        if (navigator.share) navigator.share({ title: 'ZestUp', text: shareText, url: shareUrl }).catch(() => {});
+        else { navigator.clipboard?.writeText(shareText); showToast("Share link copied!"); }
       };
 
       sheet.classList.remove('hidden');
@@ -1936,7 +2165,7 @@
           : "Invite only • Tap to view mission";
 
         let starsMet = 1 + (m.hasDob ? 1 : 0) + (m.followersCount >= 500 ? 2 : 0);
-        document.getElementById('starsMissionSub').textContent = starsMet >= 4 ? "✔ Active (4 of 4 criteria met)" : `${starsMet} of 4 criteria met`;
+        document.getElementById('starsMissionSub').textContent = isCreatorStarsEligible(currentUser.uid) ? "✔ Active (4 of 4 criteria met)" : `${starsMet} of 4 criteria met (Locked)`;
 
         let subsMet = 1 + (m.hasDob ? 1 : 0) + (m.followersCount >= 5000 ? 1 : 0);
         document.getElementById('subsMissionSub').textContent = subsMet >= 3 ? "✔ Active (3 of 3 criteria met)" : `${subsMet} of 3 criteria met`;
@@ -1967,18 +2196,15 @@
             <p class="text-xs font-extrabold text-indigo-900">${isInvited ? '🎉 Active & Unlocked!' : '🔒 Invite-Only Program'}</p>
             <p class="text-xs text-indigo-700">${isInvited ? 'Your reels and posts are eligible to earn money!' : 'Complete the missions below. Only the ZestUp Owner can send invitations to unlock Content Monetization.'}</p>
           </div>
-
           <div class="space-y-3">
             <div class="p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between">
               <div><p class="text-xs font-bold">1. Maintain a healthy professional status</p><p class="text-[11px] text-slate-500">0 Copyright Strikes (${m.strikes}/3 strikes)</p></div>
               <span class="text-sm font-bold ${m.strikes === 0 ? 'text-emerald-600' : 'text-rose-600'}">${m.strikes === 0 ? '✔' : '✕'}</span>
             </div>
-
             <div onclick="submitContentInterestForm()" class="p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between cursor-pointer hover:bg-slate-50">
               <div><p class="text-xs font-bold">2. Submit interest form to ZestUp Owner</p><p class="text-[11px] text-slate-500">${formDone ? 'Form submitted for review ✔' : 'Tap to tell us why you want an invite'}</p></div>
               <span class="text-xs font-bold text-indigo-600">${formDone ? '✔' : 'Submit ›'}</span>
             </div>
-
             <div class="p-3.5 rounded-2xl border border-slate-200 space-y-2">
               <div class="flex justify-between text-xs font-bold"><span>3. Get at least 1,000,000 views</span><span>${m.owner ? '1,000,000+' : m.totalViews.toLocaleString()} / 1M</span></div>
               <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden"><div class="h-full zest-gradient" style="width:${viewsPct}%"></div></div>
@@ -1989,7 +2215,7 @@
         const fOk = m.owner || m.followersCount >= 500;
         const ageOk = m.owner || m.hasDob;
         body.innerHTML = `
-          <p class="text-xs text-slate-600">Fans purchase Stars to send you gifts and real money support.</p>
+          <p class="text-xs text-slate-600">Until all 4 criteria are completed, the ⭐ Star button remains completely hidden on your profile & posts.</p>
           <div class="space-y-3">
             <div class="p-3.5 rounded-2xl border border-slate-200 flex justify-between items-center">
               <div><p class="text-xs font-bold">500 followers</p><p class="text-[11px] text-slate-500">You have ${m.followersCount} followers</p></div>
@@ -2008,36 +2234,28 @@
               <span class="font-bold text-sm ${ageOk ? 'text-emerald-600' : 'text-indigo-600'}">${ageOk ? '✔' : 'Set ›'}</span>
             </div>
           </div>`;
-      } else if (type === 'subscriptions') {
+      } else {
         title.textContent = "Subscriptions criteria";
         const fOk = m.owner || m.followersCount >= 5000;
         const ageOk = m.owner || m.hasDob;
         body.innerHTML = `
           <p class="text-xs text-slate-600">Earn recurring monthly income from your loyal subscribers.</p>
           <div class="space-y-3">
-            <div class="p-3.5 rounded-2xl border border-slate-200 flex justify-between items-center">
-              <p class="text-xs font-bold">Reside in an eligible country (India)</p><span class="text-emerald-600 font-bold">✔</span>
-            </div>
-            <div class="p-3.5 rounded-2xl border border-slate-200 flex justify-between items-center">
-              <p class="text-xs font-bold">At least 18 years old</p><span class="${ageOk ? 'text-emerald-600' : 'text-slate-400'} font-bold">${ageOk ? '✔' : 'Pending'}</span>
-            </div>
+            <div class="p-3.5 rounded-2xl border border-slate-200 flex justify-between items-center"><p class="text-xs font-bold">Reside in an eligible country (India)</p><span class="text-emerald-600 font-bold">✔</span></div>
+            <div class="p-3.5 rounded-2xl border border-slate-200 flex justify-between items-center"><p class="text-xs font-bold">At least 18 years old</p><span class="${ageOk ? 'text-emerald-600' : 'text-slate-400'} font-bold">${ageOk ? '✔' : 'Pending'}</span></div>
             <div class="p-3.5 rounded-2xl border border-slate-200 flex justify-between items-center">
               <div><p class="text-xs font-bold">5,000 followers</p><p class="text-[11px] text-slate-500">You have ${m.followersCount} followers</p></div>
               <span class="font-bold text-sm ${fOk ? 'text-emerald-600' : 'text-slate-400'}">${fOk ? '✔' : `${m.followersCount}/5000`}</span>
             </div>
           </div>`;
-      } else {
-        title.textContent = "Partnership ads";
-        body.innerHTML = `<div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-semibold">✔ Partnership Ads are Ready! Brands can collaborate with your ZestUp profile for sponsored reels and posts.</div>`;
       }
-
       modal.classList.remove('hidden');
     };
 
     window.submitContentInterestForm = () => {
       openIgDialog({
         title: "Request Content Monetization Invite",
-        subtitle: "Tell the ZestUp Owner about your content niche (Reels, Art, Stories, etc.)",
+        subtitle: "Tell the ZestUp Owner about your content niche",
         fields: [{ id: "niche", label: "Why should we invite you?", placeholder: "e.g. I create daily original Reels & videos..." }],
         confirmText: "Submit Form",
         onConfirm: async ({ niche }) => {
@@ -2083,21 +2301,14 @@
       });
       document.getElementById('bankPayoutModal').classList.add('hidden');
       openFbMonetizationHub();
-      showToast("Bank Account & IFSC saved successfully!");
+      showToast("Bank Account & IFSC saved!");
     };
 
     window.requestBankWithdrawal = async () => {
       const bal = userProfileData.earnings || 0;
       const b = userProfileData.bankDetails;
-      if (!b || !b.accountNum) {
-        showToast("Please link your Bank Account & IFSC first!");
-        openBankPayoutModal();
-        return;
-      }
-      if (bal < 100) {
-        showToast(`Minimum withdrawal is ₹100 (Current: ₹${bal})`);
-        return;
-      }
+      if (!b || !b.accountNum) { showToast("Please link your Bank Account & IFSC first!"); openBankPayoutModal(); return; }
+      if (bal < 100) { showToast(`Minimum withdrawal is ₹100 (Current: ₹${bal})`); return; }
       openIgDialog({
         title: `Withdraw ₹${bal} to Bank?`,
         subtitle: `Transfer to ${b.bankName} (A/C: ****${b.accountNum.slice(-4)}, IFSC: ${b.ifsc})`,
@@ -2116,6 +2327,10 @@
     };
 
     window.sendCreatorStar = (creatorUid) => {
+      if (!isCreatorStarsEligible(creatorUid)) {
+        showToast("This creator has not unlocked Stars yet.");
+        return;
+      }
       const u = usersMap[creatorUid] || {};
       openIgDialog({
         title: `Send ⭐ 10 Stars to @${u.username || u.name}?`,
@@ -2131,138 +2346,84 @@
       });
     };
 
-    // --- INSTAGRAM CREATIVE STUDIO + REAL YOUTUBE MUSIC SEARCH + DRAG & RESIZE ---
-    function enableTouchDrag(el) {
-      let startX = 0, startY = 0, origLeft = 0, origTop = 0;
-      el.addEventListener('pointerdown', (e) => {
-        if (e.target.tagName === 'BUTTON') return;
-        selectActiveDragElement(el.id);
-        startX = e.clientX;
-        startY = e.clientY;
-        origLeft = el.offsetLeft;
-        origTop = el.offsetTop;
-        el.setPointerCapture(e.pointerId);
+    // --- AD-FREE AUDIO PICKER (Preview Play FIRST, Separate "Use" Button!) ---
+    window.setMusicTab = (cat) => {
+      currentMusicCat = cat;
+      document.querySelectorAll('.music-cat-btn').forEach(b => {
+        const active = b.dataset.cat === cat;
+        b.className = active ? 'music-cat-btn px-3 py-1.5 rounded-full bg-white text-black shrink-0' : 'music-cat-btn px-3 py-1.5 rounded-full bg-zinc-800 text-zinc-300 shrink-0';
       });
-      el.addEventListener('pointermove', (e) => {
-        if (!el.hasPointerCapture(e.pointerId)) return;
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
-        el.style.left = `${origLeft + dx}px`;
-        el.style.top = `${origTop + dy}px`;
-        el.style.bottom = 'auto';
-        el.style.right = 'auto';
-      });
-    }
-
-    ['dragMusicCard', 'dragLyricsBox', 'dragTextBox', 'dragStickerBox'].forEach(id => {
-      enableTouchDrag(document.getElementById(id));
-    });
-
-    window.selectActiveDragElement = (elId) => {
-      activeDragElementId = elId;
-      const el = document.getElementById(elId);
-      const bar = document.getElementById('elementResizeBar');
-      const slider = document.getElementById('activeElementScaleSlider');
-      bar.classList.remove('hidden');
-      const currentScale = parseFloat(el.dataset.scale || "1");
-      slider.value = currentScale;
-      slider.oninput = (e) => {
-        el.dataset.scale = e.target.value;
-        el.style.transform = `scale(${e.target.value})`;
-      };
+      renderAdFreeAudioList();
     };
-
-    window.hideActiveDragElement = () => {
-      if (!activeDragElementId) return;
-      if (activeDragElementId === 'dragMusicCard') toggleHideMusicCard();
-      else if (activeDragElementId === 'dragLyricsBox') {
-        showLyricsOnScreen = false;
-        document.getElementById('dragLyricsBox').classList.add('hidden');
-      } else {
-        document.getElementById(activeDragElementId).classList.add('hidden');
-      }
-      document.getElementById('elementResizeBar').classList.add('hidden');
-    };
-
-    function renderSongsList(songsArr) {
-      const list = document.getElementById('trendingTracksList');
-      list.innerHTML = songsArr.map((t, idx) => `
-        <div onclick="selectYouTubeSongItem(${idx})" class="p-2.5 rounded-2xl bg-zinc-800 hover:bg-zinc-700 flex items-center justify-between cursor-pointer">
-          <div class="flex items-center gap-3 min-w-0">
-            <img src="https://img.youtube.com/vi/${t.ytId}/default.jpg" class="w-11 h-11 rounded-xl object-cover shrink-0 bg-zinc-700" />
-            <div class="min-w-0">
-              <p class="text-xs font-extrabold text-white truncate">${t.title}</p>
-              <p class="text-[10px] text-zinc-400 truncate">${t.artist}</p>
-            </div>
-          </div>
-          <span class="text-xs font-bold bg-rose-600 px-3 py-1 rounded-full shrink-0 ml-2">▶ Use</span>
-        </div>`).join('');
-      window._currentSongsPool = songsArr;
-    }
 
     window.openMusicPickerModal = () => {
-      document.getElementById('musicListLabel').textContent = "Trending YouTube Songs (Hindi, Bengali & Global)";
-      renderSongsList(YOUTUBE_TRENDING_SONGS);
+      renderAdFreeAudioList();
       document.getElementById('musicPickerModal').classList.remove('hidden');
     };
 
-    window.searchYouTubeSongsLive = async () => {
-      const q = document.getElementById('ytSongSearchInput').value.trim();
-      if (!q) { renderSongsList(YOUTUBE_TRENDING_SONGS); return; }
+    document.getElementById('ytSongSearchInput').oninput = () => renderAdFreeAudioList();
 
-      const directYtId = extractYouTubeId(q);
-      if (directYtId) {
-        applySelectedMusic({
-          title: `YouTube Song (${directYtId})`,
-          artist: "YouTube Audio",
-          ytId: directYtId,
-          thumb: `https://img.youtube.com/vi/${directYtId}/default.jpg`,
-          lyrics: `♪ Playing YouTube Audio ♪`
-        });
-        document.getElementById('musicPickerModal').classList.add('hidden');
-        return;
-      }
+    function renderAdFreeAudioList() {
+      const q = (document.getElementById('ytSongSearchInput')?.value || "").toLowerCase().trim();
+      const savedIds = userProfileData.savedTracks || [];
+      let list = ZESTUP_ADFREE_TRACKS.filter(t => {
+        if (q && !t.title.toLowerCase().includes(q) && !t.artist.toLowerCase().includes(q)) return false;
+        if (currentMusicCat === 'Saved') return savedIds.includes(t.id);
+        if (currentMusicCat === 'Trending') return t.cat === 'Trending' || t.isPinned;
+        if (currentMusicCat === 'Original') return t.cat === 'Original' || t.isPinned;
+        return true;
+      });
 
-      document.getElementById('musicListLabel').textContent = `Searching YouTube for "${q}"...`;
-      // Filter built-in songs + fetch real YouTube results via public Piped/Invidious search API with fallback
-      const localMatches = YOUTUBE_TRENDING_SONGS.filter(s => s.title.toLowerCase().includes(q.toLowerCase()) || s.artist.toLowerCase().includes(q.toLowerCase()));
-      try {
-        const res = await fetch(`https://pipedapi.kavin.rocks/search?q=${encodeURIComponent(q + " song audio")}&filter=music_songs`);
-        const data = await res.json();
-        const apiSongs = (data.items || []).slice(0, 8).map(item => ({
-          title: item.title,
-          artist: item.uploaderName || "YouTube Music",
-          ytId: (item.url || "").replace("/watch?v=", ""),
-          lyrics: `♪ ${item.title} ♪`
-        })).filter(x => x.ytId.length === 11);
+      document.getElementById('trendingTracksList').innerHTML = list.length ? list.map(t => {
+        const isPlaying = previewingTrackId === t.id;
+        const isSaved = savedIds.includes(t.id);
+        return `
+          <div class="p-2.5 rounded-2xl ${t.isPinned ? 'bg-indigo-950/80 border border-indigo-500/40' : 'bg-zinc-800'} flex items-center justify-between gap-2">
+            <div onclick="previewAdFreeTrack('${t.id}')" class="flex items-center gap-3 min-w-0 flex-1 cursor-pointer">
+              <div class="w-10 h-10 rounded-xl ${isPlaying ? 'bg-pink-600 animate-pulse' : 'zest-gradient'} flex items-center justify-center font-bold text-sm shrink-0">
+                ${isPlaying ? '⏸' : '▶'}
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs font-extrabold text-white truncate">${t.title}</p>
+                <p class="text-[10px] text-zinc-400 truncate">${isPlaying ? '🔊 Playing Preview (Ad-Free)...' : t.artist}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <button onclick="toggleSaveAudioTrack('${t.id}')" class="text-sm px-1.5" title="Save Audio">${isSaved ? '🔖' : '📑'}</button>
+              <button onclick="confirmUseAdFreeTrack('${t.id}')" class="text-xs font-extrabold bg-indigo-600 hover:bg-indigo-500 px-3.5 py-1.5 rounded-full text-white">Use</button>
+            </div>
+          </div>`;
+      }).join('') : `<p class="text-center text-xs text-zinc-400 py-8">No saved tracks yet.</p>`;
+    }
 
-        if (apiSongs.length) {
-          document.getElementById('musicListLabel').textContent = `YouTube Search Results for "${q}"`;
-          renderSongsList(apiSongs);
-          return;
-        }
-      } catch {}
-
-      if (localMatches.length) {
-        renderSongsList(localMatches);
+    window.previewAdFreeTrack = (trackId) => {
+      const t = ZESTUP_ADFREE_TRACKS.find(x => x.id === trackId);
+      if (!t) return;
+      if (previewingTrackId === trackId) {
+        stopGlobalMusic();
+        renderAdFreeAudioList();
       } else {
-        // Always provide playable YouTube results matching query
-        renderSongsList(YOUTUBE_TRENDING_SONGS.map(s => ({ ...s, title: `${q} — ${s.title}` })));
+        previewingTrackId = trackId;
+        playTrackGlobally(t);
+        renderAdFreeAudioList();
       }
     };
 
-    window.selectYouTubeSongItem = (idx) => {
-      const t = (window._currentSongsPool || YOUTUBE_TRENDING_SONGS)[idx];
-      if (!t) return;
-      applySelectedMusic({
-        title: t.title,
-        artist: t.artist,
-        ytId: t.ytId,
-        thumb: `https://img.youtube.com/vi/${t.ytId}/default.jpg`,
-        lyrics: t.lyrics || `♪ ${t.title} ♪`
+    window.toggleSaveAudioTrack = async (trackId) => {
+      const saved = (userProfileData.savedTracks || []).includes(trackId);
+      await updateDoc(doc(db, "users", currentUser.uid), {
+        savedTracks: saved ? arrayRemove(trackId) : arrayUnion(trackId)
       });
+      renderAdFreeAudioList();
+      showToast(saved ? "Removed from Saved audio" : "Saved to audio collection!");
+    };
+
+    window.confirmUseAdFreeTrack = (trackId) => {
+      const t = ZESTUP_ADFREE_TRACKS.find(x => x.id === trackId);
+      if (!t) return;
+      applySelectedMusic({ title: t.title, artist: t.artist, url: t.url, lyrics: t.lyrics });
       document.getElementById('musicPickerModal').classList.add('hidden');
-      showToast(`Playing: ${t.title}`);
+      showToast(`Added "${t.title}" to your clip!`);
     };
 
     document.getElementById('localAudioFileInput').onchange = async (e) => {
@@ -2271,10 +2432,8 @@
       const localUrl = URL.createObjectURL(file);
       applySelectedMusic({
         title: file.name.replace(/\.[^/.]+$/, ""),
-        artist: "My Audio",
+        artist: "Original Audio",
         url: localUrl,
-        ytId: null,
-        thumb: defaultAvatar("Audio"),
         lyrics: `♪ ${file.name.replace(/\.[^/.]+$/, "")} ♪`
       });
       document.getElementById('musicPickerModal').classList.add('hidden');
@@ -2290,13 +2449,57 @@
       const card = document.getElementById('dragMusicCard');
       document.getElementById('dragMusicTitle').textContent = musicObj.title;
       document.getElementById('dragMusicArtist').textContent = musicObj.artist;
-      document.getElementById('dragMusicThumb').src = musicObj.thumb;
       card.classList.remove('hidden');
 
       document.getElementById('toggleMusicCardVisBtn')?.classList.remove('hidden');
       document.getElementById('step3AudioText').textContent = musicObj.title + ' ›';
+      document.getElementById('timelineAudioTrackBtn').textContent = '🎵 ' + musicObj.title;
       if (musicObj.lyrics) document.getElementById('dragLyricsText').textContent = musicObj.lyrics;
     }
+
+    // --- TOUCH DRAG & RESIZE STUDIO ---
+    function enableTouchDrag(el) {
+      let startX = 0, startY = 0, origLeft = 0, origTop = 0;
+      el.addEventListener('pointerdown', (e) => {
+        if (e.target.tagName === 'BUTTON') return;
+        selectActiveDragElement(el.id);
+        startX = e.clientX;
+        startY = e.clientY;
+        origLeft = el.offsetLeft;
+        origTop = el.offsetTop;
+        el.setPointerCapture(e.pointerId);
+      });
+      el.addEventListener('pointermove', (e) => {
+        if (!el.hasPointerCapture(e.pointerId)) return;
+        el.style.left = `${origLeft + (e.clientX - startX)}px`;
+        el.style.top = `${origTop + (e.clientY - startY)}px`;
+        el.style.bottom = 'auto';
+        el.style.right = 'auto';
+      });
+    }
+
+    ['dragMusicCard', 'dragLyricsBox', 'dragTextBox', 'dragStickerBox'].forEach(id => enableTouchDrag(document.getElementById(id)));
+
+    window.selectActiveDragElement = (elId) => {
+      activeDragElementId = elId;
+      const el = document.getElementById(elId);
+      const bar = document.getElementById('elementResizeBar');
+      const slider = document.getElementById('activeElementScaleSlider');
+      bar.classList.remove('hidden');
+      slider.value = parseFloat(el.dataset.scale || "1");
+      slider.oninput = (e) => {
+        el.dataset.scale = e.target.value;
+        el.style.transform = `scale(${e.target.value})`;
+      };
+    };
+
+    window.hideActiveDragElement = () => {
+      if (!activeDragElementId) return;
+      if (activeDragElementId === 'dragMusicCard') toggleHideMusicCard();
+      else if (activeDragElementId === 'dragLyricsBox') { showLyricsOnScreen = false; document.getElementById('dragLyricsBox').classList.add('hidden'); }
+      else document.getElementById(activeDragElementId).classList.add('hidden');
+      document.getElementById('elementResizeBar').classList.add('hidden');
+    };
 
     window.toggleHideMusicCard = () => {
       showMusicCardOnScreen = !showMusicCardOnScreen;
@@ -2306,16 +2509,12 @@
     };
 
     window.toggleAutoLyricsOption = () => {
-      if (!selectedMusicObj) {
-        showToast("Select a song in Audio first to add Auto-Lyrics!");
-        return;
-      }
+      if (!selectedMusicObj) { showToast("Select a song in Audio first!"); return; }
       showLyricsOnScreen = !showLyricsOnScreen;
       const box = document.getElementById('dragLyricsBox');
       if (showLyricsOnScreen) {
         openIgDialog({
           title: "Auto-Captions / Lyrics",
-          subtitle: "Customize your lyrics caption or keep it off",
           fields: [{ id: "lyr", label: "Lyrics Text", value: selectedMusicObj.lyrics || `♪ ${selectedMusicObj.title} ♪` }],
           confirmText: "Apply Lyrics",
           onConfirm: ({ lyr }) => {
@@ -2325,9 +2524,7 @@
             selectActiveDragElement('dragLyricsBox');
           }
         });
-      } else {
-        box.classList.add('hidden');
-      }
+      } else box.classList.add('hidden');
     };
 
     window.openCreateStudio = async (mode = 'REEL') => {
@@ -2340,11 +2537,10 @@
         b.classList.toggle('text-zinc-500', b.dataset.mode !== mode);
       });
 
-      ['studioStep1Media', 'studioStep2Editor', 'studioStep3Publish', 'studioLiveMode'].forEach(id => {
-        document.getElementById(id).classList.add('hidden');
-      });
+      ['studioStep1Media', 'studioStep2Editor', 'studioStep3Publish', 'studioLiveMode'].forEach(id => document.getElementById(id).classList.add('hidden'));
       document.getElementById('studioBackBtn').textContent = '✕';
       document.getElementById('studioModeSwitcherBar').classList.remove('hidden');
+      document.getElementById('storyCameraLeftTools').classList.toggle('hidden', mode !== 'STORY');
 
       if (mode === 'LIVE') {
         document.getElementById('studioHeaderTitle').textContent = 'Go Live';
@@ -2381,13 +2577,12 @@
       studioStep = 1;
       studioFilterClass = 'filter-none';
       studioLocation = '';
+      studioPostLink = '';
       studioTaggedPeople = '';
       selectedMusicObj = null;
       showMusicCardOnScreen = true;
       showLyricsOnScreen = false;
-      ['dragMusicCard', 'dragLyricsBox', 'dragTextBox', 'dragStickerBox', 'editorLocationBadge', 'elementResizeBar'].forEach(id => {
-        document.getElementById(id).classList.add('hidden');
-      });
+      ['dragMusicCard', 'dragLyricsBox', 'dragTextBox', 'dragStickerBox', 'editorLocationBadge', 'elementResizeBar'].forEach(id => document.getElementById(id).classList.add('hidden'));
       document.getElementById('dragTextContent').textContent = '';
       document.getElementById('dragStickerContent').innerHTML = '';
     }
@@ -2410,10 +2605,11 @@
       else document.getElementById('editorImgPreview').src = url;
 
       const isStory = (studioMode === 'STORY');
-      document.getElementById('studioHeaderTitle').textContent = isStory ? 'Edit story' : (studioMode === 'REEL' ? 'Edit reel' : 'Edit post');
+      document.getElementById('studioHeaderTitle').textContent = isStory ? 'Edit story' : 'Edit video';
       document.getElementById('storyVerticalTools').classList.toggle('hidden', !isStory);
       document.getElementById('storyBottomDock').classList.toggle('hidden', !isStory);
       document.getElementById('reelBottomDock').classList.toggle('hidden', isStory);
+      document.getElementById('multiTrackTimeline').classList.toggle('hidden', isStory);
     };
 
     window.promptEditorText = () => {
@@ -2421,12 +2617,12 @@
       const content = document.getElementById('dragTextContent');
       openIgDialog({
         title: "Add Text Overlay",
-        subtitle: "Drag text anywhere on screen & adjust size",
         fields: [{ id: "txt", label: "Your Text", value: content.textContent, placeholder: "Type something..." }],
         confirmText: "Done",
         onConfirm: ({ txt }) => {
           content.textContent = txt.trim();
           box.classList.toggle('hidden', !txt.trim());
+          document.getElementById('timelineTextTrackBtn').textContent = txt.trim() ? `Aa ${txt.trim()}` : '+ Add text';
           if (txt.trim()) selectActiveDragElement('dragTextBox');
         }
       });
@@ -2516,8 +2712,17 @@
 
     window.applyStudioFilter = (cls) => {
       studioFilterClass = cls;
-      document.getElementById('editorImgPreview').className = `w-full h-full max-h-[64vh] object-contain pointer-events-none ${cls} ${document.getElementById('editorImgPreview').classList.contains('hidden') ? 'hidden' : ''}`;
-      document.getElementById('editorVidPreview').className = `w-full h-full max-h-[64vh] object-contain pointer-events-none ${cls} ${document.getElementById('editorVidPreview').classList.contains('hidden') ? 'hidden' : ''}`;
+      document.getElementById('editorImgPreview').className = `w-full h-full max-h-[54vh] object-contain pointer-events-none ${cls} ${document.getElementById('editorImgPreview').classList.contains('hidden') ? 'hidden' : ''}`;
+      document.getElementById('editorVidPreview').className = `w-full h-full max-h-[54vh] object-contain pointer-events-none ${cls} ${document.getElementById('editorVidPreview').classList.contains('hidden') ? 'hidden' : ''}`;
+    };
+
+    window.setQuickLocation = (city) => {
+      studioLocation = city;
+      document.getElementById('step3LocLabel').textContent = city + ' ›';
+      const badge = document.getElementById('editorLocationBadge');
+      badge.textContent = `📍 ${city}`;
+      badge.classList.remove('hidden');
+      showToast(`Location set to ${city}`);
     };
 
     window.detectStudioLocation = () => {
@@ -2525,11 +2730,34 @@
         title: "Add Location",
         fields: [{ id: "loc", label: "City or Place", value: studioLocation || "Mumbai, India" }],
         confirmText: "Set Location",
-        onConfirm: ({ loc }) => {
-          studioLocation = loc.trim();
-          const badge = document.getElementById('editorLocationBadge');
-          badge.textContent = `📍 ${studioLocation}`;
-          badge.classList.toggle('hidden', !studioLocation);
+        onConfirm: ({ loc }) => setQuickLocation(loc.trim())
+      });
+    };
+
+    window.promptAddPostLink = () => {
+      openIgDialog({
+        title: "Add Link to Post/Reel",
+        fields: [{ id: "url", label: "URL", value: studioPostLink, placeholder: "https://..." }],
+        confirmText: "Add Link",
+        onConfirm: ({ url }) => {
+          studioPostLink = url.trim();
+          document.getElementById('step3PostLinkLabel').textContent = studioPostLink ? 'Added ›' : 'None ›';
+        }
+      });
+    };
+
+    window.promptRenameAudio = () => {
+      openIgDialog({
+        title: "Rename Audio",
+        fields: [{ id: "aname", label: "Audio Track Name", value: selectedMusicObj?.title || "Original Audio" }],
+        confirmText: "Rename",
+        onConfirm: ({ aname }) => {
+          if (aname && aname.trim()) {
+            if (!selectedMusicObj) selectedMusicObj = { title: aname.trim(), artist: userProfileData.username || "Original Audio" };
+            else selectedMusicObj.title = aname.trim();
+            document.getElementById('step3AudioText').textContent = aname.trim() + ' ›';
+            document.getElementById('dragMusicTitle').textContent = aname.trim();
+          }
         }
       });
     };
@@ -2575,7 +2803,7 @@
       const s = document.getElementById('dragStickerBox');
       return {
         musicStyle: `top:${m.style.top}; left:${m.style.left}; transform:${m.style.transform};`,
-        lyricsStyle: `top:${l.style.top || 'auto'}; bottom:${l.style.bottom || '48px'}; left:${l.style.left}; transform:${l.style.transform};`,
+        lyricsStyle: `top:${l.style.top || 'auto'}; bottom:${l.style.bottom || '30px'}; left:${l.style.left}; transform:${l.style.transform};`,
         textStyle: `top:${t.style.top}; left:${t.style.left}; transform:${t.style.transform};`,
         stickerStyle: `top:${s.style.top}; left:${s.style.left || 'auto'}; right:${s.style.right || 'auto'}; transform:${s.style.transform};`
       };
@@ -2616,6 +2844,7 @@
           stickerHtml: document.getElementById('dragStickerContent').innerHTML,
           overlays: captureOverlayPositions(),
           location: studioLocation,
+          postLink: studioPostLink,
           isAiContent: document.getElementById('step3AiLabelToggle').checked,
           audience: document.getElementById('step3AudienceSelect').value,
           authorId: currentUser.uid,
@@ -2751,7 +2980,81 @@
       document.getElementById('storyViewer').classList.add('hidden');
     };
 
-    // --- ACCOUNTS CENTER, FOLLOW LISTS, OTHER PROFILE, DM, SEARCH, SETTINGS, ADMIN & HELP AI ---
+    // --- FOLLOWERS / FOLLOWING / SUBSCRIPTIONS PAGE (From your video!) ---
+    window.openFollowListModal = (uid, initialTab) => {
+      if (!uid) return;
+      followModalTargetUid = uid;
+      followModalTab = initialTab;
+      const targetUser = usersMap[uid] || {};
+      document.getElementById('followListHeaderTitle').textContent = targetUser.username || targetUser.name || "Connections";
+      document.getElementById('followListSearchInput').value = '';
+      document.getElementById('followListSearchInput').oninput = () => switchFollowListTab(followModalTab);
+      switchFollowListTab(initialTab);
+      document.getElementById('followListModal').classList.remove('hidden');
+    };
+
+    window.switchFollowListTab = (tab) => {
+      followModalTab = tab;
+      document.getElementById('tabListFollowers').className = tab === 'followers' ? 'py-3 border-b-2 border-slate-900 text-slate-900' : 'py-3 text-slate-400';
+      document.getElementById('tabListFollowing').className = tab === 'following' ? 'py-3 border-b-2 border-slate-900 text-slate-900' : 'py-3 text-slate-400';
+      document.getElementById('tabListSubs').className = tab === 'subscriptions' ? 'py-3 border-b-2 border-slate-900 text-slate-900' : 'py-3 text-slate-400';
+
+      const targetUser = usersMap[followModalTargetUid] || {};
+      const q = (document.getElementById('followListSearchInput')?.value || '').toLowerCase().trim();
+      let idList = tab === 'followers' ? (targetUser.followers || []) : (tab === 'following' ? (targetUser.following || []) : []);
+      const container = document.getElementById('followListContainer');
+
+      if (!idList.length) {
+        container.innerHTML = `<p class="text-center text-xs text-slate-400 py-14">No ${tab} yet.</p>`;
+        return;
+      }
+
+      container.innerHTML = idList.map(id => {
+        const u = usersMap[id];
+        if (!u) return '';
+        if (q && !(u.name || '').toLowerCase().includes(q) && !(u.username || '').toLowerCase().includes(q)) return '';
+        const isMe = id === currentUser.uid;
+        const iFollow = (userProfileData.following || []).includes(id);
+        const isOwnList = followModalTargetUid === currentUser.uid;
+
+        let actionHtml = '';
+        if (!isMe) {
+          if (tab === 'followers') {
+            actionHtml = iFollow
+              ? `<button onclick="document.getElementById('followListModal').classList.add('hidden'); openPrivateChat('${id}')" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-slate-100 text-slate-800">Message</button>`
+              : `<button onclick="toggleFollowUser('${id}'); setTimeout(()=>switchFollowListTab('${tab}'), 300)" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-[#0095F6] text-white">Follow back</button>`;
+          } else {
+            actionHtml = iFollow
+              ? `<button onclick="document.getElementById('followListModal').classList.add('hidden'); openPrivateChat('${id}')" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-slate-100 text-slate-800">Message</button>`
+              : `<button onclick="toggleFollowUser('${id}'); setTimeout(()=>switchFollowListTab('${tab}'), 300)" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-[#0095F6] text-white">Follow</button>`;
+          }
+        }
+
+        return `
+          <div class="flex items-center justify-between px-4 py-3">
+            <div onclick="document.getElementById('followListModal').classList.add('hidden'); openOtherProfile('${id}')" class="flex items-center gap-3 cursor-pointer min-w-0">
+              <img src="${u.avatar || defaultAvatar(u.name)}" class="w-11 h-11 rounded-full object-cover shrink-0" />
+              <div class="min-w-0">
+                <p class="text-xs font-bold flex items-center gap-1 truncate">${u.username || u.name} ${getBadgeHTML(id)}</p>
+                <p class="text-[11px] text-slate-500 truncate">${u.name || ''}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              ${actionHtml}
+              ${(isOwnList && tab === 'followers') ? `<button onclick="removeFollower('${id}')" class="text-slate-400 text-xs px-1.5">✕</button>` : ''}
+            </div>
+          </div>`;
+      }).join('');
+    };
+
+    window.removeFollower = async (followerUid) => {
+      await updateDoc(doc(db, "users", currentUser.uid), { followers: arrayRemove(followerUid) });
+      await updateDoc(doc(db, "users", followerUid), { following: arrayRemove(currentUser.uid) });
+      switchFollowListTab('followers');
+      showToast("Follower removed");
+    };
+
+    // --- ACCOUNTS CENTER, OTHER PROFILE, DM, SEARCH, SETTINGS, ADMIN & HELP AI ---
     window.openAccountsCenter = () => {
       document.getElementById('acAvatarImg').src = userProfileData.avatar || defaultAvatar(userProfileData.name);
       document.getElementById('acFullName').textContent = userProfileData.name || "User";
@@ -2845,84 +3148,6 @@
       });
     };
 
-    window.editSingleField = (field) => {
-      openIgDialog({
-        title: `Edit ${field === 'name' ? 'Name' : 'Username'}`,
-        fields: [{ id: "val", label: field === 'name' ? 'Full Name' : 'Username', value: userProfileData[field] || "" }],
-        confirmText: "Save",
-        onConfirm: async ({ val }) => {
-          if (val && val.trim()) {
-            const cleaned = field === 'username' ? val.trim().toLowerCase().replace(/\s+/g, '_') : val.trim();
-            await updateDoc(doc(db, "users", currentUser.uid), { [field]: cleaned });
-            openAccountsCenter();
-            showToast("Profile updated!");
-          }
-        }
-      });
-    };
-
-    document.getElementById('acPhotoUploadInput').onchange = async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      showToast("Uploading profile picture...");
-      const url = await uploadToCloudinary(file);
-      if (url) { await updateDoc(doc(db, "users", currentUser.uid), { avatar: url }); openAccountsCenter(); showToast("Profile picture updated!"); }
-    };
-
-    window.openEditBioModal = () => {
-      const box = document.getElementById('bioInputBox');
-      box.value = (userProfileData.bio || "").slice(0, 149);
-      document.getElementById('bioCharCount').textContent = `${box.value.length}/149`;
-      document.getElementById('editBioModal').classList.remove('hidden');
-    };
-
-    document.getElementById('bioInputBox').oninput = (e) => { document.getElementById('bioCharCount').textContent = `${e.target.value.length}/149`; };
-    document.getElementById('saveBioBtn').onclick = async () => {
-      await updateDoc(doc(db, "users", currentUser.uid), { bio: document.getElementById('bioInputBox').value.slice(0, 149) });
-      document.getElementById('editBioModal').classList.add('hidden');
-      showToast("Bio saved!");
-    };
-
-    window.openFollowListModal = (uid, initialTab) => {
-      if (!uid) return;
-      followModalTargetUid = uid;
-      followModalTab = initialTab;
-      const targetUser = usersMap[uid] || {};
-      document.getElementById('followListHeaderTitle').textContent = targetUser.username || targetUser.name || "Connections";
-      switchFollowListTab(initialTab);
-      document.getElementById('followListModal').classList.remove('hidden');
-    };
-
-    window.switchFollowListTab = (tab) => {
-      followModalTab = tab;
-      document.getElementById('tabListFollowers').className = tab === 'followers' ? 'py-3 border-b-2 border-indigo-600 text-indigo-600' : 'py-3 text-slate-400';
-      document.getElementById('tabListFollowing').className = tab === 'following' ? 'py-3 border-b-2 border-indigo-600 text-indigo-600' : 'py-3 text-slate-400';
-
-      const targetUser = usersMap[followModalTargetUid] || {};
-      const idList = tab === 'followers' ? (targetUser.followers || []) : (targetUser.following || []);
-      const container = document.getElementById('followListContainer');
-
-      if (!idList.length) { container.innerHTML = `<p class="text-center text-xs text-slate-400 py-14">No ${tab} yet.</p>`; return; }
-
-      container.innerHTML = idList.map(id => {
-        const u = usersMap[id];
-        if (!u) return '';
-        const isMe = id === currentUser.uid;
-        const fState = getFollowButtonState(id);
-        return `
-          <div class="flex items-center justify-between px-4 py-3">
-            <div onclick="document.getElementById('followListModal').classList.add('hidden'); openOtherProfile('${id}')" class="flex items-center gap-3 cursor-pointer">
-              <img src="${u.avatar || defaultAvatar(u.name)}" class="w-11 h-11 rounded-full object-cover" />
-              <div>
-                <p class="text-xs font-bold flex items-center gap-1">${u.username || u.name} ${getBadgeHTML(id)}</p>
-                <p class="text-[11px] text-slate-500">${u.name || ''}</p>
-              </div>
-            </div>
-            ${!isMe ? `<button onclick="toggleFollowUser('${id}'); setTimeout(()=>switchFollowListTab('${tab}'), 300)" class="text-xs font-bold px-3.5 py-1.5 rounded-xl ${fState.cls}">${fState.text}</button>` : ''}
-          </div>`;
-      }).join('');
-    };
-
     window.copyProfileLink = (uid) => { navigator.clipboard?.writeText(`${window.location.origin}${window.location.pathname}?user=${uid}`); showToast("Profile URL copied!"); };
 
     window.openOtherProfile = (uid) => {
@@ -2941,7 +3166,20 @@
       document.getElementById('otherProfAvatar').src = u.avatar || defaultAvatar(u.name);
       document.getElementById('otherProfRing').className = getProfileRingClass(uid);
       document.getElementById('otherProfName').innerHTML = `${u.name || 'User'} ${badge}`;
+
+      const catEl = document.getElementById('otherProfCategory');
+      catEl.textContent = u.category || '';
+      catEl.classList.toggle('hidden', !u.category);
+
       document.getElementById('otherProfBio').textContent = u.bio || "";
+
+      const linkEl = document.getElementById('otherProfLink');
+      if (u.profileLink) {
+        linkEl.href = u.profileLink;
+        linkEl.textContent = `🔗 ${u.profileLink.replace(/^https?:\/\//, '')}`;
+        linkEl.classList.remove('hidden');
+      } else linkEl.classList.add('hidden');
+
       document.getElementById('otherStatPosts').textContent = userPosts.length;
       document.getElementById('otherStatFollowers').textContent = (u.followers || []).length;
       document.getElementById('otherStatFollowing').textContent = (u.following || []).length;
@@ -2953,6 +3191,9 @@
       fBtn.onclick = () => toggleFollowUser(uid);
 
       document.getElementById('otherMessageBtn').onclick = () => { closeOtherProfile(); openPrivateChat(uid); };
+
+      // STRICT STARS LOCK: Hide Star button completely unless creator finished all 4 Stars missions!
+      document.getElementById('otherStarBtn').classList.toggle('hidden', !isCreatorStarsEligible(uid));
 
       document.getElementById('otherProfileGrid').innerHTML = userPosts.map(p => p.mediaUrl
         ? (p.mediaType === 'video' ? `<video src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover bg-black ${p.filterClass || ''}"></video>` : `<img src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover ${p.filterClass || ''}" />`)
@@ -3210,7 +3451,6 @@
 
     document.getElementById('searchInput').oninput = () => renderSearchAndExplore();
 
-    // --- SETTINGS ---
     window.openSettings = () => document.getElementById('settingsPage').classList.remove('hidden');
     window.closeSettings = () => document.getElementById('settingsPage').classList.add('hidden');
 
@@ -3268,7 +3508,6 @@
       showToast("User unblocked");
     };
 
-    // --- NOTIFICATIONS, FOUNDER ADMIN (WITH INVITE-ONLY MONETIZATION) & HELP AI ---
     function renderNotifications() {
       const box = document.getElementById('notificationsList');
       if (!box) return;
@@ -3310,6 +3549,7 @@
         const owner = isOwner(u.uid);
         const verified = isUserVerified(u.uid);
         const invited = !!u.contentMonetizationInvited;
+        const starsActive = isCreatorStarsEligible(u.uid);
         return `
           <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5">
             <div class="flex items-center justify-between">
@@ -3317,7 +3557,7 @@
                 <img src="${u.avatar || defaultAvatar(u.name)}" class="w-10 h-10 rounded-full object-cover" />
                 <div class="min-w-0">
                   <p class="text-xs font-bold truncate flex items-center gap-1">${u.name || u.username} ${verified ? BLUE_TICK_SVG : ''}</p>
-                  <p class="text-[10px] text-slate-500">@${u.username} • ${invited ? '✔ Invited Monetization' : 'Not Invited'}</p>
+                  <p class="text-[10px] text-slate-500">@${u.username} • ${invited ? '✔ Invited' : 'No Invite'} • ${starsActive ? '⭐ Stars ON' : '⭐ Locked'}</p>
                   <p class="text-[10px] text-indigo-600 font-semibold">Earnings: ₹${u.earnings || 0} • Strikes: ${u.copyrightStrikes || 0}</p>
                 </div>
               </div>
@@ -3424,7 +3664,7 @@
       let reply = "I understand! You can check your Settings & privacy or tap <b>Message Team</b> at the top right so the ZestUp Owner & Team can help you directly.";
       if (lower.includes("password") || lower.includes("login") || lower.includes("otp")) reply = "🔑 <b>Login & Recovery:</b> Go to <b>Settings → ZestUp Accounts Center</b> and link both your Mobile Number (SIM SMS) and Gmail.";
       else if (lower.includes("blue") || lower.includes("tick")) reply = "☑️ <b>Blue Tick:</b> Keep posting original Reels & Posts—the ZestUp Founder reviews active creators and grants the Blue Tick!";
-      else if (lower.includes("earn") || lower.includes("money") || lower.includes("star") || lower.includes("bank") || lower.includes("invite")) reply = "💰 <b>Monetize & Payouts:</b> Open <b>Profile → Professional dashboard</b> to view your Stars, Content Monetization missions, and add your Bank Account & IFSC Code!";
+      else if (lower.includes("earn") || lower.includes("money") || lower.includes("star") || lower.includes("bank") || lower.includes("invite")) reply = "💰 <b>Monetize & Payouts:</b> Open <b>Profile → Professional dashboard</b> to view your Stars missions (500 followers + 18+ age), Content Monetization invite status, and add your Bank Account & IFSC Code!";
       setTimeout(() => {
         box.innerHTML += `<div class="bg-white border border-slate-200 p-3 rounded-2xl max-w-[85%] space-y-1"><p class="font-bold text-indigo-600">ZestUp Help AI 🤖</p><p>${reply}</p></div>`;
         box.scrollTop = box.scrollHeight;
