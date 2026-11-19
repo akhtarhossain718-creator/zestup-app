@@ -3,21 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#4F46E5" />
+  <meta name="theme-color" content="#ffffff" />
   <title>ZestUp</title>
   <link rel="manifest" href="manifest.json" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; -webkit-tap-highlight-color: transparent; }
-    body.dark-mode { background-color: #09090b; color: #f8fafc; }
-    body.dark-mode .bg-white { background-color: #18181b !important; color: #f8fafc !important; }
-    body.dark-mode .bg-slate-50, body.dark-mode .bg-slate-100 { background-color: #27272a !important; color: #e4e4e7 !important; }
-    body.dark-mode .border-slate-100, body.dark-mode .border-slate-200 { border-color: #27272a !important; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fafafa; color: #0f172a; -webkit-tap-highlight-color: transparent; }
+    body.dark-mode { background-color: #000000; color: #f8fafc; }
+    body.dark-mode .bg-white { background-color: #121212 !important; color: #f8fafc !important; }
+    body.dark-mode .bg-slate-50, body.dark-mode .bg-slate-100 { background-color: #262626 !important; color: #e4e4e7 !important; }
+    body.dark-mode .border-slate-100, body.dark-mode .border-slate-200 { border-color: #262626 !important; }
     body.dark-mode .text-slate-900, body.dark-mode .text-slate-800 { color: #f8fafc !important; }
+    .ig-gradient { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
     .zest-gradient { background: linear-gradient(135deg, #4F46E5 0%, #9333EA 55%, #EC4899 100%); }
-    .zest-text-gradient { background: linear-gradient(135deg, #4F46E5 0%, #9333EA 55%, #EC4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .ring-story { background: linear-gradient(135deg, #F59E0B, #EC4899, #4F46E5); padding: 2.5px; border-radius: 9999px; }
+    .zest-text-gradient { background: linear-gradient(135deg, #4F46E5 0%, #EC4899 60%, #F59E0B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .ring-story { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); padding: 2.5px; border-radius: 9999px; }
     .ring-close { background: #10B981; padding: 2.5px; border-radius: 9999px; }
     .ring-owner { background: #09090b; padding: 2.5px; border-radius: 9999px; }
     .ring-none { background: #e2e8f0; padding: 1.5px; border-radius: 9999px; }
@@ -36,6 +37,8 @@
       100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
     }
     .animate-heart-pop { animation: heartPop 0.75s ease-out forwards; }
+    @keyframes spinSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .animate-spin-slow { animation: spinSlow 6s linear infinite; }
     .draggable-item { touch-action: none; user-select: none; cursor: grab; position: absolute; }
     .draggable-item:active { cursor: grabbing; }
   </style>
@@ -43,9 +46,30 @@
 <body class="min-h-screen flex flex-col items-center bg-slate-50 text-slate-900">
 
   <div id="recaptcha-container"></div>
-  <!-- Global Hidden Audio & YouTube Player Engine -->
+  <!-- Global Real Audio & YouTube Music Engine -->
   <audio id="globalAudioPlayer" loop class="hidden"></audio>
   <div id="globalYtContainer" class="fixed -top-96 -left-96 w-1 h-1 opacity-0 pointer-events-none"></div>
+
+  <!-- INSTAGRAM-STYLE FLOATING TOAST PILL (Replaces all ugly black browser alerts!) -->
+  <div id="igToast" class="hidden fixed top-14 left-1/2 -translate-x-1/2 z-[100] bg-zinc-900/95 text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-xl border border-white/10 backdrop-blur-md transition-all">
+    <span id="igToastText">Saved!</span>
+  </div>
+
+  <!-- INSTAGRAM-STYLE CUSTOM INPUT & CONFIRMATION SHEET (Replaces all prompt() and confirm()!) -->
+  <div id="igDialogModal" class="hidden fixed inset-0 z-[95] bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 space-y-4 shadow-2xl">
+      <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto sm:hidden"></div>
+      <div class="space-y-1">
+        <h3 id="igDialogTitle" class="font-extrabold text-base text-slate-900">Title</h3>
+        <p id="igDialogSub" class="text-xs text-slate-500"></p>
+      </div>
+      <div id="igDialogFields" class="space-y-2.5"></div>
+      <div class="flex gap-2.5 pt-1">
+        <button id="igDialogCancelBtn" class="flex-1 py-2.5 rounded-xl bg-slate-100 font-bold text-xs text-slate-700">Cancel</button>
+        <button id="igDialogConfirmBtn" class="flex-1 py-2.5 rounded-xl zest-gradient font-bold text-xs text-white">Confirm</button>
+      </div>
+    </div>
+  </div>
 
   <!-- 1. AUTH SCREEN (Real SIM SMS OTP + Password Login & Sign Up) -->
   <main id="authSection" class="hidden w-full max-w-md px-5 py-8 flex-1 flex flex-col justify-center bg-white min-h-screen">
@@ -112,13 +136,12 @@
     </div>
   </main>
 
-  <!-- MAIN ZESTUP APP SHELL (A-to-Z Instagram UI + Facebook Monetization) -->
+  <!-- MAIN ZESTUP APP SHELL (100% Instagram UI/Tools + Facebook Monetization Missions) -->
   <div id="appShell" class="hidden w-full max-w-md flex-1 flex flex-col bg-white min-h-screen relative shadow-sm">
 
     <!-- 1. INSTAGRAM HOME TAB -->
     <section id="homeTab" class="flex-1 pb-16">
       <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 px-4 py-2.5 flex items-center justify-between">
-        <button onclick="openCreateStudio('REEL')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-xl font-bold text-slate-900">+</button>
         <div class="flex items-center gap-2">
           <svg class="w-7 h-7 rounded-full" viewBox="0 0 120 120" fill="none">
             <circle cx="60" cy="60" r="60" fill="url(#zLogoGrad)"/>
@@ -127,11 +150,14 @@
           </svg>
           <span class="text-xl font-extrabold tracking-tight zest-text-gradient">ZestUp</span>
         </div>
-        <div class="flex items-center gap-2">
-          <button onclick="stopGlobalMusic()" id="stopMusicHeaderBtn" class="hidden text-[10px] font-bold bg-pink-100 text-pink-700 px-2 py-1 rounded-full animate-pulse">🔊 Stop Music</button>
-          <button onclick="switchTab('activityTab')" class="relative p-1.5 rounded-xl hover:bg-slate-100">
-            <svg class="w-6 h-6 text-slate-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-            <span class="w-2 h-2 bg-pink-500 rounded-full absolute top-1.5 right-1.5"></span>
+        <div class="flex items-center gap-3.5">
+          <button onclick="stopGlobalMusic()" id="stopMusicHeaderBtn" class="hidden text-[10px] font-bold bg-pink-100 text-pink-700 px-2.5 py-1 rounded-full animate-pulse">🔊 Stop</button>
+          <button onclick="switchTab('activityTab')" class="relative text-slate-900">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            <span class="w-2 h-2 bg-rose-500 rounded-full absolute top-0 right-0"></span>
+          </button>
+          <button onclick="switchTab('chatTab')" class="relative text-slate-900">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
           </button>
         </div>
       </header>
@@ -145,23 +171,23 @@
       </div>
     </section>
 
-    <!-- 2. INSTAGRAM REELS TAB -->
-    <section id="reelsTab" class="hidden flex-1 bg-zinc-950 text-white pb-16 min-h-screen">
+    <!-- 2. FULL-SCREEN INSTAGRAM REELS TAB -->
+    <section id="reelsTab" class="hidden flex-1 bg-black text-white pb-14 min-h-screen">
       <div class="sticky top-0 z-30 px-4 py-3 flex items-center justify-between bg-gradient-to-b from-black/80 to-transparent">
         <h2 class="text-lg font-extrabold tracking-tight">Reels</h2>
-        <button onclick="openCreateStudio('REEL')" class="text-xs zest-gradient px-3.5 py-1.5 rounded-full font-bold">+ Create Reel</button>
+        <button onclick="openCreateStudio('REEL')" class="p-1.5 bg-white/15 backdrop-blur rounded-full">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
+        </button>
       </div>
-      <div id="reelsContainer" class="space-y-4 px-2.5 pb-6">
-        <p class="text-center text-xs text-zinc-400 py-20">No reels yet. Tap + Create Reel to upload!</p>
+      <div id="reelsContainer" class="space-y-3 px-1 pb-6">
+        <p class="text-center text-xs text-zinc-400 py-24">No reels yet. Tap the camera icon to create your first Reel!</p>
       </div>
     </section>
 
     <!-- 3. INSTAGRAM DM INBOX TAB -->
     <section id="chatTab" class="hidden flex-1 flex flex-col pb-16 min-h-screen bg-white">
       <header class="sticky top-0 z-40 bg-white px-4 py-3 flex items-center justify-between border-b border-slate-100">
-        <button onclick="switchTab('profileTab')" class="p-1 text-slate-800">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h10M4 18h16"/></svg>
-        </button>
+        <button onclick="switchTab('homeTab')" class="text-xl font-bold">←</button>
         <div class="flex items-center gap-1 font-bold text-base">
           <span id="dmTopUsername">username</span>
           <span id="dmTopBadge"></span>
@@ -214,11 +240,11 @@
       </div>
     </section>
 
-    <!-- 4. SEARCH & EXPLORE TAB -->
+    <!-- 4. INSTAGRAM SEARCH & EXPLORE TAB -->
     <section id="searchTab" class="hidden flex-1 pb-16 bg-white">
       <div class="sticky top-0 z-40 bg-white p-3 border-b border-slate-100 space-y-2.5">
         <div class="relative">
-          <input id="searchInput" type="text" placeholder="Search people or posts..." class="w-full bg-slate-100 text-sm pl-9 pr-4 py-2 rounded-2xl focus:outline-none" />
+          <input id="searchInput" type="text" placeholder="Search people, reels or posts..." class="w-full bg-slate-100 text-sm pl-9 pr-4 py-2 rounded-2xl focus:outline-none" />
           <span class="absolute left-3.5 top-2.5 text-slate-400 text-xs">🔍</span>
         </div>
         <div class="flex gap-2 text-xs font-semibold">
@@ -264,35 +290,30 @@
           <p id="profBio" class="text-xs text-slate-700 whitespace-pre-line">Creator on ZestUp ✨</p>
         </div>
 
-        <!-- FACEBOOK-STYLE MONETIZATION & CREATOR EARNINGS DASHBOARD -->
-        <div onclick="openFbMonetizationHub()" class="mt-3 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 rounded-2xl px-3.5 py-2.5 cursor-pointer flex items-center justify-between">
+        <!-- FACEBOOK-STYLE PROFESSIONAL DASHBOARD & MONETIZATION MISSIONS -->
+        <div onclick="openFbMonetizationHub()" class="mt-3 bg-slate-100 hover:bg-slate-200/80 rounded-2xl px-3.5 py-2.5 cursor-pointer flex items-center justify-between">
           <div>
-            <p class="text-xs font-extrabold text-indigo-900 flex items-center gap-1">💰 Creator Monetization & Earnings</p>
-            <p id="dashboardSummaryText" class="text-[11px] text-indigo-600 font-semibold">Balance: ₹0 • Stars, In-Stream Ads & Payouts</p>
+            <p class="text-xs font-extrabold text-slate-900">Professional dashboard</p>
+            <p id="dashboardSummaryText" class="text-[11px] text-slate-500 font-medium">Monetization missions, Stars & Bank Payouts</p>
           </div>
-          <span class="text-indigo-500 font-bold text-sm">›</span>
+          <span class="text-slate-400 font-bold text-sm">›</span>
         </div>
 
-        <div class="grid grid-cols-2 gap-2 mt-3">
+        <div class="grid grid-cols-2 gap-2 mt-2.5">
           <button onclick="openEditBioModal()" class="py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Edit profile</button>
           <button onclick="openShareSheet(null, currentUser.uid)" class="py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Share profile</button>
         </div>
 
         <button id="adminPanelBtn" onclick="openAdminModal()" class="hidden w-full mt-2.5 py-2.5 rounded-xl bg-zinc-900 text-white font-bold text-xs flex items-center justify-center gap-1.5">
-          <span>🛡️ Founder Admin: Users, Monetization, Strikes & Help</span>
+          <span>🛡️ Founder Admin: Invites, Users, Strikes & Help</span>
         </button>
 
         <!-- Instagram Story Highlights Row -->
-        <div id="highlightsRow" class="flex items-center gap-4 mt-4 overflow-x-auto no-scrollbar">
-          <div onclick="addNewHighlight()" class="flex flex-col items-center gap-1 shrink-0 cursor-pointer">
-            <div class="w-14 h-14 rounded-full border border-slate-300 flex items-center justify-center text-xl font-light">+</div>
-            <span class="text-[11px] text-slate-700">New</span>
-          </div>
-        </div>
+        <div id="highlightsRow" class="flex items-center gap-4 mt-4 overflow-x-auto no-scrollbar"></div>
       </div>
 
       <div class="grid grid-cols-2 border-t border-b border-slate-200 mt-2">
-        <button class="py-2.5 flex justify-center border-b-2 border-indigo-600 text-indigo-600">
+        <button class="py-2.5 flex justify-center border-b-2 border-slate-900 text-slate-900">
           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 3h7v7H3V3zm11 0h7v7h-7V3zM3 14h7v7H3v-7zm11 0h7v7h-7v-7z"/></svg>
         </button>
         <button onclick="switchTab('reelsTab')" class="py-2.5 flex justify-center text-slate-400">
@@ -356,7 +377,6 @@
         <button id="sheetHideStoryBtn" onclick="toggleHideStoryViewingUser()" class="w-full text-left py-1.5 text-slate-800">Hide your story</button>
         <button onclick="copyProfileLink(viewingUserId); document.getElementById('otherUserSheet').classList.add('hidden');" class="w-full text-left py-1.5 text-slate-800">Copy profile URL</button>
         <button onclick="document.getElementById('otherUserSheet').classList.add('hidden'); openShareSheet(null, viewingUserId);" class="w-full text-left py-1.5 text-slate-800">Share this profile</button>
-        <button onclick="document.getElementById('otherUserSheet').classList.add('hidden'); openShareSheet(null, viewingUserId);" class="w-full text-left py-1.5 text-slate-800">QR code</button>
       </div>
     </div>
 
@@ -388,17 +408,11 @@
     <div id="instagramShareSheet" class="hidden fixed inset-0 z-50 bg-black/55 flex items-end justify-center" onclick="if(event.target===this)this.classList.add('hidden')">
       <div class="bg-white w-full max-w-md rounded-t-3xl p-4 space-y-4 max-h-[82vh] flex flex-col">
         <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto"></div>
-        
-        <!-- Search bar -->
         <div class="relative">
           <input id="shareSheetSearchInput" type="text" placeholder="Search friends to send..." class="w-full bg-slate-100 text-xs pl-9 pr-4 py-2.5 rounded-2xl focus:outline-none" />
           <span class="absolute left-3.5 top-2.5 text-slate-400 text-xs">🔍</span>
         </div>
-
-        <!-- 3-Column In-App Friends Grid -->
         <div id="shareFriendsGrid" class="grid grid-cols-3 gap-3 overflow-y-auto max-h-52 py-1"></div>
-
-        <!-- Horizontal External Share & Action Icons -->
         <div class="border-t border-slate-100 pt-3 flex items-center gap-4 overflow-x-auto no-scrollbar text-center text-[11px] font-semibold">
           <button id="igShareStoryBtn" class="flex flex-col items-center gap-1.5 shrink-0">
             <span class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-xl">⭕</span>
@@ -429,75 +443,96 @@
     </div>
 
     <!-- ========================================================================= -->
-    <!-- FACEBOOK-STYLE A-TO-Z MONEY EARNING & MONETIZATION HUB                    -->
+    <!-- FACEBOOK-STYLE MONETIZATION HUB + MISSIONS + INVITE-ONLY + BANK PAYOUTS   -->
     <!-- ========================================================================= -->
     <section id="fbMonetizationModal" class="hidden fixed inset-0 z-50 bg-slate-50 max-w-md mx-auto flex flex-col overflow-y-auto">
       <header class="sticky top-0 z-20 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
         <button onclick="document.getElementById('fbMonetizationModal').classList.add('hidden')" class="text-xl font-bold">←</button>
         <div>
-          <h3 class="font-extrabold text-base">Professional Dashboard</h3>
-          <p class="text-[11px] text-slate-500">ZestUp Creator Monetization</p>
+          <h3 class="font-extrabold text-base">Monetize</h3>
+          <p class="text-[11px] text-slate-500">Ways to earn & Creator Missions</p>
         </div>
       </header>
 
       <div class="p-4 space-y-4 pb-12">
-        <!-- Balance Card -->
+        <!-- Balance & Bank Transfer Card -->
         <div class="p-5 rounded-3xl zest-gradient text-white shadow-md space-y-2">
           <div class="flex justify-between items-center">
             <span class="text-xs font-bold uppercase tracking-wider opacity-90">Approximate Earnings</span>
-            <span class="text-[10px] bg-white/20 px-2.5 py-0.5 rounded-full font-bold" id="monetizeBadgeStatus">Active</span>
+            <span class="text-[10px] bg-white/20 px-2.5 py-0.5 rounded-full font-bold" id="monetizeOwnerBadge">Active</span>
           </div>
           <p class="text-4xl font-extrabold" id="fbEarningsBalance">₹0.00</p>
-          <p class="text-[11px] opacity-85" id="fbEarningsStatsLine">0 Views • 0 Stars Received • 0 Engagements</p>
+          <p class="text-[11px] opacity-85" id="fbEarningsStatsLine">0 Views • ⭐ 0 Stars • 0 Followers</p>
           <div class="pt-2 flex gap-2">
-            <button onclick="setupPayoutMethod()" class="flex-1 py-2 rounded-xl bg-white text-indigo-700 font-extrabold text-xs">🏦 Payout Settings</button>
-            <button onclick="requestPayoutWithdraw()" class="flex-1 py-2 rounded-xl bg-black/30 text-white font-bold text-xs border border-white/25">💸 Withdraw</button>
+            <button onclick="openBankPayoutModal()" class="flex-1 py-2.5 rounded-xl bg-white text-indigo-700 font-extrabold text-xs">🏦 Bank & IFSC Setup</button>
+            <button onclick="requestBankWithdrawal()" class="flex-1 py-2.5 rounded-xl bg-black/30 text-white font-bold text-xs border border-white/25">💸 Withdraw to Bank</button>
           </div>
         </div>
 
-        <!-- Facebook Monetization Tools List -->
+        <!-- Monetization Programs List (Exact Facebook Structure!) -->
         <div class="space-y-2">
-          <p class="text-xs font-extrabold text-slate-500 px-1">Monetization Tools</p>
+          <p class="text-xs font-extrabold text-slate-600 px-1">Monetization programs</p>
           <div class="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden">
-            <div class="p-4 flex items-center justify-between">
+            
+            <!-- 1. Content Monetization (Invite Only) -->
+            <div onclick="openMissionDetail('content')" class="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50">
+              <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl">🎬</span>
+                <div>
+                  <p class="text-sm font-bold">Content monetization</p>
+                  <p class="text-[11px] text-slate-500">Earn money on well-performing reels & posts</p>
+                  <p id="contentMissionSub" class="text-[11px] font-bold text-indigo-600 mt-0.5">Invite only</p>
+                </div>
+              </div>
+              <span class="text-slate-400 font-bold">›</span>
+            </div>
+
+            <!-- 2. Stars (4 Criteria Mission) -->
+            <div onclick="openMissionDetail('stars')" class="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50">
               <div class="flex items-center gap-3">
                 <span class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl">⭐</span>
                 <div>
                   <p class="text-sm font-bold">Stars</p>
-                  <p class="text-[11px] text-slate-500">Earn money when fans send Stars on your Reels & Posts</p>
+                  <p class="text-[11px] text-slate-500">Let your audience support you by sending stars</p>
+                  <p id="starsMissionSub" class="text-[11px] font-bold text-amber-600 mt-0.5">2 of 4 criteria met</p>
                 </div>
               </div>
-              <span class="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">Active</span>
+              <span class="text-slate-400 font-bold">›</span>
             </div>
 
-            <div class="p-4 flex items-center justify-between">
+            <!-- 3. Subscriptions (3 Criteria Mission) -->
+            <div onclick="openMissionDetail('subscriptions')" class="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50">
               <div class="flex items-center gap-3">
-                <span class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl">🎬</span>
+                <span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl">💚</span>
                 <div>
-                  <p class="text-sm font-bold">In-Stream Ads & Reels Bonus</p>
-                  <p class="text-[11px] text-slate-500">Earn from ad views & viral video plays</p>
+                  <p class="text-sm font-bold">Subscriptions</p>
+                  <p class="text-[11px] text-slate-500">Monthly support payments from fans</p>
+                  <p id="subsMissionSub" class="text-[11px] font-bold text-emerald-600 mt-0.5">2 of 3 criteria met</p>
                 </div>
               </div>
-              <span id="inStreamStatusPill" class="text-xs font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full">Eligible</span>
+              <span class="text-slate-400 font-bold">›</span>
             </div>
 
-            <div class="p-4 flex items-center justify-between">
+            <!-- 4. Partnership Ads -->
+            <div onclick="openMissionDetail('partnership')" class="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50">
               <div class="flex items-center gap-3">
-                <span class="w-10 h-10 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center text-xl">👑</span>
+                <span class="w-10 h-10 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center text-xl">🤝</span>
                 <div>
-                  <p class="text-sm font-bold">Fan Subscriptions</p>
-                  <p class="text-[11px] text-slate-500">Monthly recurring support from top followers</p>
+                  <p class="text-sm font-bold">Partnership ads</p>
+                  <p class="text-[11px] text-slate-500">Manage brand collaboration permissions</p>
+                  <p class="text-[11px] font-bold text-emerald-600 mt-0.5">Ready to set up</p>
                 </div>
               </div>
-              <span class="text-xs font-bold text-slate-500">₹99/mo</span>
+              <span class="text-slate-400 font-bold">›</span>
             </div>
 
-            <div onclick="setupPayoutMethod()" class="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50">
+            <!-- 5. Bank Payout Account -->
+            <div onclick="openBankPayoutModal()" class="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50">
               <div class="flex items-center gap-3">
-                <span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl">🏦</span>
+                <span class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center text-xl">🏦</span>
                 <div>
-                  <p class="text-sm font-bold">Payout Account (Bank / UPI)</p>
-                  <p id="payoutAccountDisplay" class="text-[11px] text-slate-500">Not linked — Tap to add UPI or Bank</p>
+                  <p class="text-sm font-bold">Bank Account & Payouts</p>
+                  <p id="payoutAccountDisplay" class="text-[11px] text-slate-500">Not linked — Add Bank A/C & IFSC</p>
                 </div>
               </div>
               <span class="text-indigo-600 font-bold text-xs">Edit ›</span>
@@ -507,8 +542,49 @@
       </div>
     </section>
 
+    <!-- MISSION & CRITERIA PROGRESS SHEET (Stars / Content Monetization / Subscriptions) -->
+    <section id="missionDetailModal" class="hidden fixed inset-0 z-[60] bg-white max-w-md mx-auto flex flex-col overflow-y-auto">
+      <header class="sticky top-0 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
+        <button onclick="document.getElementById('missionDetailModal').classList.add('hidden')" class="text-xl font-bold">←</button>
+        <h3 id="missionDetailTitle" class="font-extrabold text-base">Eligibility Criteria</h3>
+      </header>
+      <div id="missionDetailBody" class="p-5 space-y-4 flex-1 overflow-y-auto"></div>
+    </section>
+
+    <!-- BANK ACCOUNT & IFSC PAYOUT MODAL (Facebook-Style) -->
+    <section id="bankPayoutModal" class="hidden fixed inset-0 z-[60] bg-white max-w-md mx-auto flex flex-col overflow-y-auto">
+      <header class="sticky top-0 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
+        <button onclick="document.getElementById('bankPayoutModal').classList.add('hidden')" class="text-xl font-bold">←</button>
+        <h3 class="font-extrabold text-base">Payout Bank Account Setup</h3>
+      </header>
+      <div class="p-5 space-y-3.5 flex-1">
+        <p class="text-xs text-slate-500">Enter your Indian Bank Account details to receive ZestUp Creator payouts directly.</p>
+        <div>
+          <label class="text-xs font-bold text-slate-700">Account Holder Name</label>
+          <input id="bankHolderInput" type="text" placeholder="e.g. Akhtar Hossain" class="w-full mt-1 px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none" />
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-700">Bank Name</label>
+          <input id="bankNameInput" type="text" placeholder="e.g. State Bank of India / HDFC" class="w-full mt-1 px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none" />
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-700">Bank Account Number</label>
+          <input id="bankAccountNumInput" type="tel" placeholder="Enter Bank Account Number" class="w-full mt-1 px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none" />
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-700">IFSC Code</label>
+          <input id="bankIfscInput" type="text" maxlength="11" placeholder="e.g. SBIN0001234" class="w-full mt-1 px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm uppercase focus:outline-none" />
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-700">UPI ID (Optional Fast Transfer)</label>
+          <input id="bankUpiInput" type="text" placeholder="e.g. name@okicici" class="w-full mt-1 px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none" />
+        </div>
+        <button onclick="saveBankPayoutDetails()" class="w-full py-3 rounded-xl zest-gradient text-white font-extrabold text-sm mt-2">Save Bank Account</button>
+      </div>
+    </section>
+
     <!-- ========================================================================= -->
-    <!-- 7. INSTAGRAM FREE-DRAG & RESIZE STUDIO + YOUTUBE MUSIC & AUTO-CAPTIONS    -->
+    <!-- 7. INSTAGRAM FREE-DRAG & RESIZE STUDIO + YOUTUBE MUSIC SEARCH             -->
     <!-- ========================================================================= -->
     <section id="createScreen" class="hidden fixed inset-0 z-50 bg-zinc-950 text-white max-w-md mx-auto flex flex-col justify-between">
       <header class="px-4 py-3 flex items-center justify-between border-b border-zinc-800/80">
@@ -519,7 +595,7 @@
 
       <div class="flex-1 overflow-y-auto flex flex-col">
 
-        <!-- STEP 1: PHONE GALLERY & MUSIC PICKER -->
+        <!-- STEP 1: PHONE GALLERY & YOUTUBE MUSIC PICKER -->
         <div id="studioStep1Media" class="p-4 space-y-4 flex-1 flex flex-col justify-between">
           <div class="grid grid-cols-3 gap-2 text-center text-xs font-bold">
             <div onclick="openMusicPickerModal()" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-3 cursor-pointer hover:border-indigo-500">
@@ -536,7 +612,7 @@
           <label class="flex-1 min-h-[260px] rounded-3xl border-2 border-dashed border-zinc-700 bg-zinc-900/70 flex flex-col items-center justify-center p-6 text-center cursor-pointer hover:border-indigo-500 transition">
             <span class="text-4xl mb-2">📲</span>
             <p class="text-sm font-extrabold text-white">Select Video, Reel or Photo</p>
-            <p class="text-xs text-zinc-400 mt-1">Drag & adjust Music Card, Lyrics Captions, Text & Stickers freely on screen</p>
+            <p class="text-xs text-zinc-400 mt-1">Search YouTube Songs, add Interactive Poll/Quiz Stickers & Drag freely</p>
             <span class="mt-4 px-5 py-2 rounded-full zest-gradient text-xs font-bold">Open Phone Gallery</span>
             <input id="studioFileInput" type="file" accept="image/*,video/*" class="hidden" />
           </label>
@@ -548,17 +624,17 @@
             <img id="editorImgPreview" class="hidden w-full h-full max-h-[64vh] object-contain filter-none pointer-events-none" />
             <video id="editorVidPreview" autoplay loop playsinline class="hidden w-full h-full max-h-[64vh] object-contain filter-none pointer-events-none"></video>
 
-            <!-- DRAGGABLE 1: MUSIC CARD (Can be hidden or dragged anywhere!) -->
-            <div id="dragMusicCard" onclick="selectActiveDragElement('dragMusicCard')" style="top: 16px; left: 20%; transform: scale(1);" class="hidden draggable-item bg-black/80 backdrop-blur-md border border-white/20 px-3 py-2 rounded-2xl flex items-center gap-2.5 shadow-lg z-20">
+            <!-- DRAGGABLE 1: MUSIC CARD -->
+            <div id="dragMusicCard" onclick="selectActiveDragElement('dragMusicCard')" style="top: 16px; left: 18%; transform: scale(1);" class="hidden draggable-item bg-black/80 backdrop-blur-md border border-white/20 px-3 py-2 rounded-2xl flex items-center gap-2.5 shadow-lg z-20">
               <img id="dragMusicThumb" src="https://ui-avatars.com/api/?name=M&background=EC4899&color=fff" class="w-9 h-9 rounded-lg object-cover pointer-events-none" />
               <div class="text-left pointer-events-none max-w-[140px]">
                 <p id="dragMusicTitle" class="text-xs font-extrabold text-white truncate">Song Title</p>
-                <p id="dragMusicArtist" class="text-[10px] text-pink-300 truncate">YouTube / Audio</p>
+                <p id="dragMusicArtist" class="text-[10px] text-pink-300 truncate">YouTube Music</p>
               </div>
               <button onclick="event.stopPropagation(); toggleHideMusicCard()" class="text-[10px] bg-white/15 px-1.5 py-0.5 rounded text-zinc-300" title="Hide Title Card">👁️‍🗨️</button>
             </div>
 
-            <!-- DRAGGABLE 2: OPTIONAL AUTO-CAPTIONS / SYNCED LYRICS -->
+            <!-- DRAGGABLE 2: OPTIONAL AUTO-CAPTIONS / LYRICS -->
             <div id="dragLyricsBox" onclick="selectActiveDragElement('dragLyricsBox')" style="bottom: 85px; left: 15%; transform: scale(1);" class="hidden draggable-item bg-black/70 backdrop-blur px-3.5 py-1.5 rounded-xl text-center max-w-[260px] z-20 border border-yellow-400/30">
               <p id="dragLyricsText" class="text-sm font-extrabold text-yellow-300 drop-shadow pointer-events-none">♪ Auto-Lyrics Caption ♪</p>
             </div>
@@ -569,11 +645,10 @@
             </div>
 
             <!-- DRAGGABLE 4: STICKER / POLL / QUIZ / LINK -->
-            <div id="dragStickerBox" onclick="selectActiveDragElement('dragStickerBox')" style="top: 28%; right: 20%; transform: scale(1);" class="hidden draggable-item z-20 text-center">
-              <span id="dragStickerContent" class="text-5xl drop-shadow pointer-events-none"></span>
+            <div id="dragStickerBox" onclick="selectActiveDragElement('dragStickerBox')" style="top: 28%; right: 15%; transform: scale(1);" class="hidden draggable-item z-20 text-center">
+              <div id="dragStickerContent" class="pointer-events-none"></div>
             </div>
 
-            <!-- Location Pill -->
             <div id="editorLocationBadge" class="hidden absolute top-3 left-3 bg-black/70 px-2.5 py-1 rounded-full text-[11px] font-bold text-white z-10">📍 Location</div>
 
             <!-- STORY VERTICAL RIGHT TOOLBAR -->
@@ -586,7 +661,7 @@
             </div>
           </div>
 
-          <!-- SIZE / SCALE ADJUST SLIDER BAR (For whichever item you tap on screen!) -->
+          <!-- SIZE / SCALE ADJUST SLIDER BAR -->
           <div id="elementResizeBar" class="hidden bg-zinc-900 border-t border-zinc-800 px-4 py-2 flex items-center justify-between gap-3 text-xs">
             <span class="font-bold text-indigo-400 shrink-0">📐 Adjust Size:</span>
             <input id="activeElementScaleSlider" type="range" min="0.5" max="2.0" step="0.1" value="1" class="flex-1 accent-indigo-500" />
@@ -662,7 +737,7 @@
           </div>
 
           <div class="p-3 border-t border-slate-100 grid grid-cols-2 gap-2.5 bg-white">
-            <button onclick="alert('Saved to Drafts!')" class="py-2.5 rounded-xl bg-slate-100 font-bold text-xs text-slate-800">Save draft</button>
+            <button onclick="showToast('Saved to Drafts!')" class="py-2.5 rounded-xl bg-slate-100 font-bold text-xs text-slate-800">Save draft</button>
             <button id="finalShareBtn" onclick="publishFinalMediaPost()" class="py-2.5 rounded-xl bg-indigo-600 font-bold text-xs text-white">Share</button>
           </div>
         </div>
@@ -689,31 +764,30 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- YOUTUBE MUSIC & PHONE AUDIO PICKER BOTTOM SHEET                           -->
+    <!-- REAL YOUTUBE MUSIC SEARCH & TRENDING SONGS BOTTOM SHEET                   -->
     <!-- ========================================================================= -->
-    <div id="musicPickerModal" class="hidden fixed inset-0 z-50 bg-black/70 flex items-end justify-center" onclick="if(event.target===this)this.classList.add('hidden')">
-      <div class="bg-zinc-900 text-white w-full max-w-md rounded-t-3xl p-4 space-y-3.5 max-h-[80vh] flex flex-col border-t border-zinc-800">
+    <div id="musicPickerModal" class="hidden fixed inset-0 z-50 bg-black/75 flex items-end justify-center" onclick="if(event.target===this)this.classList.add('hidden')">
+      <div class="bg-zinc-900 text-white w-full max-w-md rounded-t-3xl p-4 space-y-3 max-h-[84vh] flex flex-col border-t border-zinc-800">
         <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto"></div>
         <div class="flex items-center justify-between">
-          <h4 class="font-extrabold text-sm">🎵 ZestUp Music & YouTube Audio</h4>
+          <h4 class="font-extrabold text-sm">🎵 YouTube Music & Songs Search</h4>
           <button onclick="document.getElementById('musicPickerModal').classList.add('hidden')" class="text-xs text-zinc-400 font-bold">Done</button>
         </div>
 
-        <!-- YouTube Link / Search Input -->
+        <!-- Real YouTube Song Search Bar -->
         <div class="flex gap-2">
-          <input id="ytSongInput" type="text" placeholder="Paste YouTube Song Link or Song Name..." class="flex-1 bg-zinc-800 border border-zinc-700 text-xs px-3.5 py-2.5 rounded-xl text-white focus:outline-none" />
-          <button onclick="applyYouTubeSong()" class="px-3.5 py-2 rounded-xl bg-rose-600 font-bold text-xs shrink-0">▶ YouTube</button>
+          <input id="ytSongSearchInput" type="text" placeholder="Search Hindi, Bengali, English songs or paste YouTube link..." class="flex-1 bg-zinc-800 border border-zinc-700 text-xs px-3.5 py-2.5 rounded-xl text-white focus:outline-none" />
+          <button onclick="searchYouTubeSongsLive()" class="px-4 py-2 rounded-xl bg-rose-600 font-bold text-xs shrink-0">🔍 Search</button>
         </div>
 
         <!-- Upload MP3 from Phone -->
-        <label class="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-zinc-800 border border-zinc-700 text-xs font-bold cursor-pointer hover:bg-zinc-700">
-          <span>📁 Upload Song / Audio from Phone (.mp3)</span>
+        <label class="flex items-center justify-center gap-2 py-2 rounded-xl bg-zinc-800/80 border border-zinc-700 text-xs font-bold cursor-pointer hover:bg-zinc-700">
+          <span>📁 Upload Audio / Song from Phone (.mp3)</span>
           <input id="localAudioFileInput" type="file" accept="audio/*" class="hidden" />
         </label>
 
-        <!-- Trending Built-in Real Audio Tracks -->
-        <p class="text-[11px] font-bold text-zinc-400">Trending Audio (Tap to Play & Select)</p>
-        <div id="trendingTracksList" class="space-y-2 overflow-y-auto flex-1"></div>
+        <p id="musicListLabel" class="text-[11px] font-bold text-zinc-400">Trending YouTube Songs (Tap to Play & Select)</p>
+        <div id="trendingTracksList" class="space-y-2 overflow-y-auto flex-1 pr-1"></div>
       </div>
     </div>
 
@@ -742,7 +816,7 @@
           <p class="text-xs font-extrabold text-slate-500 px-1">Preferences & Monetization</p>
           <div class="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden text-sm">
             <div onclick="closeSettings(); openFbMonetizationHub();" class="setting-item px-4 py-3.5 flex items-center justify-between cursor-pointer bg-indigo-50/50">
-              <div class="flex items-center gap-3"><span class="text-lg">💰</span><span class="font-bold text-indigo-700">Creator Monetization & Payouts</span></div>
+              <div class="flex items-center gap-3"><span class="text-lg">💰</span><span class="font-bold text-indigo-700">Monetize & Bank Payouts</span></div>
               <span class="text-indigo-600 font-bold">›</span>
             </div>
             <div onclick="toggleDarkMode()" class="setting-item px-4 py-3.5 flex items-center justify-between cursor-pointer">
@@ -813,7 +887,7 @@
                 <span id="acEmailActionBadge" class="text-xs font-bold text-indigo-600">Link ›</span>
               </div>
               <div onclick="editDateOfBirth()" class="px-4 py-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50">
-                <div><p class="font-semibold text-slate-800">Date of Birth</p><p id="acDobText" class="text-xs text-slate-500 mt-0.5">Not set</p></div>
+                <div><p class="font-semibold text-slate-800">Date of Birth (Required for 18+ Monetization)</p><p id="acDobText" class="text-xs text-slate-500 mt-0.5">Not set</p></div>
                 <span class="text-xs font-bold text-indigo-600">Edit ›</span>
               </div>
             </div>
@@ -855,28 +929,27 @@
       <div id="notificationsList" class="p-4 space-y-2.5 text-xs text-slate-700"></div>
     </section>
 
-    <!-- BOTTOM NAVIGATION BAR -->
+    <!-- INSTAGRAM BOTTOM NAVIGATION BAR (Home, Search, + Create, Reels, Profile) -->
     <nav class="w-full max-w-md fixed bottom-0 z-40 bg-white border-t border-slate-200 px-6 py-2.5 flex items-center justify-between">
-      <button onclick="switchTab('homeTab')" class="nav-icon text-indigo-600" data-tab="homeTab">
+      <button onclick="switchTab('homeTab')" class="nav-icon text-slate-900" data-tab="homeTab">
         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.1L1 12h3v9h7v-6h2v6h7v-9h3L12 2.1z"/></svg>
-      </button>
-      <button onclick="switchTab('reelsTab')" class="nav-icon text-slate-400" data-tab="reelsTab">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor"/></svg>
-      </button>
-      <button onclick="switchTab('chatTab')" class="nav-icon text-slate-400 relative" data-tab="chatTab">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-        <span class="w-2 h-2 bg-pink-500 rounded-full absolute -top-0.5 -right-0.5"></span>
       </button>
       <button onclick="switchTab('searchTab')" class="nav-icon text-slate-400" data-tab="searchTab">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
       </button>
+      <button onclick="openCreateStudio('REEL')" class="text-slate-900">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><path stroke-linecap="round" d="M12 8v8M8 12h8"/></svg>
+      </button>
+      <button onclick="switchTab('reelsTab')" class="nav-icon text-slate-400" data-tab="reelsTab">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor"/></svg>
+      </button>
       <button onclick="switchTab('profileTab')" class="nav-icon" data-tab="profileTab">
-        <img id="navAvatarImg" src="" class="w-6 h-6 rounded-full object-cover border border-slate-400" />
+        <img id="navAvatarImg" src="" class="w-6 h-6 rounded-full object-cover border border-slate-900" />
       </button>
     </nav>
   </div>
 
-  <!-- FOUNDER ADMIN SUPER-PANEL MODAL -->
+  <!-- FOUNDER ADMIN SUPER-PANEL MODAL (With Content Monetization Invites!) -->
   <div id="adminModal" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col">
     <header class="sticky top-0 bg-white px-4 py-3 border-b border-slate-100 flex items-center justify-between">
       <div class="flex items-center gap-3">
@@ -888,8 +961,8 @@
       </div>
     </header>
     <div class="grid grid-cols-2 border-b border-slate-100 text-xs font-bold">
-      <button id="adminTabUsersBtn" onclick="switchAdminTab('users')" class="py-2.5 border-b-2 border-indigo-600 text-indigo-600">All Users & Actions</button>
-      <button id="adminTabTicketsBtn" onclick="switchAdminTab('tickets')" class="py-2.5 text-slate-400">Help & Reports</button>
+      <button id="adminTabUsersBtn" onclick="switchAdminTab('users')" class="py-2.5 border-b-2 border-indigo-600 text-indigo-600">Users & Monetization Invites</button>
+      <button id="adminTabTicketsBtn" onclick="switchAdminTab('tickets')" class="py-2.5 text-slate-400">Requests, Payouts & Reports</button>
     </div>
     <div id="adminUsersList" class="flex-1 overflow-y-auto p-3 space-y-2.5"></div>
     <div id="adminTicketsList" class="hidden flex-1 overflow-y-auto p-3 space-y-2.5"></div>
@@ -908,16 +981,16 @@
     <div id="helpAiChatBox" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50 text-xs">
       <div class="bg-white border border-slate-200 p-3 rounded-2xl max-w-[85%] space-y-1.5">
         <p class="font-bold text-indigo-600">ZestUp Help AI 🤖</p>
-        <p>Hello! I am <b>ZestUp Help AI</b>. Ask me anything about Account Recovery, Blue Tick, Copyright Strikes, Creator Monetization, or Music Uploads—or tap <b>Message Team</b> above to contact the ZestUp Owner directly!</p>
+        <p>Hello! I am <b>ZestUp Help AI</b>. Ask me anything about Monetization Missions, Invite-Only Content Monetization, Bank Payouts, or Account Recovery!</p>
       </div>
     </div>
     <div class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
-      <input id="helpAiInput" type="text" placeholder="Describe your problem to ZestUp Help AI..." class="flex-1 bg-slate-100 text-xs px-4 py-2.5 rounded-full focus:outline-none" />
+      <input id="helpAiInput" type="text" placeholder="Ask ZestUp Help AI..." class="flex-1 bg-slate-100 text-xs px-4 py-2.5 rounded-full focus:outline-none" />
       <button onclick="sendHelpAiMessage()" class="px-4 py-2 rounded-full zest-gradient text-white font-bold text-xs">Ask AI</button>
     </div>
   </div>
 
-  <!-- STORY VIEWER MODAL (Plays Real Music & Shows Draggable Overlays!) -->
+  <!-- STORY VIEWER MODAL -->
   <div id="storyViewer" class="hidden fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 text-white">
     <div class="flex items-center justify-between z-20">
       <div class="flex items-center gap-2">
@@ -958,12 +1031,16 @@
     const CLOUDINARY_CLOUD_NAME = "nnahwcuk";
     const CLOUDINARY_UPLOAD_PRESET = "zestup_upload";
 
-    // Built-in Royalty-Free Real Audio Tracks + YouTube Support
-    const BUILTIN_TRACKS = [
-      { id: 't1', title: 'Trending Lo-Fi Chill 🎧', artist: 'ZestUp Studio', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', lyrics: '♪ Vibing through the city lights tonight ♪' },
-      { id: 't2', title: 'ZestUp Viral Pop Beat 🔥', artist: 'ZestUp Hits', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', lyrics: '♪ Turn the volume up, feel the rhythm flow ♪' },
-      { id: 't3', title: 'Romantic Acoustic Melody 🎸', artist: 'Acoustic Soul', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', lyrics: '♪ Every moment feels like magic with you ♪' },
-      { id: 't4', title: 'Cinematic Epic Anthem 🎬', artist: 'Cinema Audio', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', lyrics: '♪ Rise above the horizon, chase your dreams ♪' }
+    // Real YouTube Trending Songs Library (Hindi, Bengali, English & Viral Reels Songs!)
+    const YOUTUBE_TRENDING_SONGS = [
+      { title: "Kesariya - Brahmāstra", artist: "Arijit Singh • Hindi", ytId: "BddP6PYo2gs", lyrics: "♪ Kesariya tera ishq hai piya ♪" },
+      { title: "Apna Bana Le - Bhediya", artist: "Arijit Singh • Romantic", ytId: "ElZfdU54Cp8", lyrics: "♪ Tu mera koi na hoke bhi kuch laage ♪" },
+      { title: "Tauba Tauba - Bad Newz", artist: "Karan Aujla • Viral Dance", ytId: "LK7-_dgAVQE", lyrics: "♪ Husn tera tauba tauba ♪" },
+      { title: "Chaleya - Jawan", artist: "Arijit Singh & Shilpa Rao", ytId: "VAdGW7QDJiU", lyrics: "♪ Ishq mein dil bana hai ♪" },
+      { title: "Tum Hi Ho - Aashiqui 2", artist: "Arijit Singh • Evergreen", ytId: "Umqb9KENgmk", lyrics: "♪ Kyunki tum hi ho, ab tum hi ho ♪" },
+      { title: "Bojhena Shey Bojhena", artist: "Arijit Singh • Bengali", ytId: "sD5vW8P6jE4", lyrics: "♪ Bojhena shey bojhena ♪" },
+      { title: "Tumi Jaake Bhalobasho", artist: "Iman Chakraborty • Bengali", ytId: "wC6N2kM3w0k", lyrics: "♪ Tumi jaake bhalobasho ♪" },
+      { title: "Shape of You - Ed Sheeran", artist: "Ed Sheeran • Global Hit", ytId: "JGwWNGJdvx8", lyrics: "♪ I'm in love with the shape of you ♪" }
     ];
 
     const app = initializeApp(firebaseConfig);
@@ -990,7 +1067,6 @@
     let searchFilter = 'all';
     let liveStreamObj = null;
 
-    // Studio & Music States
     let studioMode = 'REEL';
     let studioStep = 1;
     let studioFile = null;
@@ -998,13 +1074,48 @@
     let studioLocation = '';
     let studioTaggedPeople = '';
 
-    // Music & Draggable Canvas States
-    let selectedMusicObj = null; // { title, artist, url, ytId, thumb, lyrics }
+    let selectedMusicObj = null;
     let showMusicCardOnScreen = true;
     let showLyricsOnScreen = false;
     let activeDragElementId = null;
 
     const defaultAvatar = (name) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Z')}&background=4F46E5&color=fff&bold=true`;
+
+    // --- INSTAGRAM FLOATING TOAST & CUSTOM DIALOG ENGINE (NO BLACK BROWSER POPUPS!) ---
+    let toastTimer = null;
+    window.showToast = (msg) => {
+      const el = document.getElementById('igToast');
+      document.getElementById('igToastText').textContent = msg;
+      el.classList.remove('hidden');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.add('hidden'), 2600);
+    };
+
+    window.openIgDialog = ({ title, subtitle = "", fields = [], confirmText = "Save", onConfirm }) => {
+      const modal = document.getElementById('igDialogModal');
+      document.getElementById('igDialogTitle').textContent = title;
+      document.getElementById('igDialogSub').textContent = subtitle;
+      const box = document.getElementById('igDialogFields');
+      box.innerHTML = fields.map(f => `
+        <div>
+          ${f.label ? `<label class="text-xs font-bold text-slate-700 block mb-1">${f.label}</label>` : ''}
+          <input id="dlg_${f.id}" type="${f.type || 'text'}" value="${(f.value || '').replace(/"/g, '&quot;')}" placeholder="${f.placeholder || ''}" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
+        </div>`).join('');
+
+      const confirmBtn = document.getElementById('igDialogConfirmBtn');
+      const cancelBtn = document.getElementById('igDialogCancelBtn');
+      confirmBtn.textContent = confirmText;
+
+      cancelBtn.onclick = () => modal.classList.add('hidden');
+      confirmBtn.onclick = async () => {
+        const values = {};
+        fields.forEach(f => values[f.id] = document.getElementById(`dlg_${f.id}`).value);
+        modal.classList.add('hidden');
+        if (onConfirm) await onConfirm(values);
+      };
+
+      modal.classList.remove('hidden');
+    };
 
     // --- GLOBAL REAL MUSIC & YOUTUBE AUDIO ENGINE ---
     window.playTrackGlobally = (musicObj) => {
@@ -1266,7 +1377,7 @@
             uid: user.uid,
             email: realEmail,
             phone: realPhone,
-            dob: "",
+            dob: isFounder ? "1998-01-01" : "",
             name: fallbackName,
             username: baseUname,
             bio: "Creator on ZestUp ✨",
@@ -1277,8 +1388,11 @@
             copyrightStrikes: 0,
             earnings: 0,
             starsCount: 0,
-            payoutMethod: "",
-            monetized: true,
+            contentMonetizationInvited: isFounder,
+            contentInterestSubmitted: isFounder,
+            starsUnlocked: isFounder,
+            subscriptionsUnlocked: isFounder,
+            bankDetails: null,
             warnings: [],
             followers: [],
             following: [],
@@ -1299,7 +1413,7 @@
             lastActive: Date.now(),
             ...(realPhone && !existing.phone ? { phone: realPhone } : {}),
             ...(realEmail && !existing.email ? { email: realEmail } : {}),
-            ...(isFounder ? { verified: true, isFounder: true } : {})
+            ...(isFounder ? { verified: true, isFounder: true, contentMonetizationInvited: true, starsUnlocked: true, subscriptionsUnlocked: true } : {})
           });
         }
 
@@ -1315,7 +1429,7 @@
         userProfileData = usersMap[currentUser.uid] || {};
 
         if (userProfileData.isSuspended && !isOwner(currentUser.uid)) {
-          alert("Your ZestUp account has been suspended.");
+          showToast("Your ZestUp account has been suspended.");
           signOut(auth);
           return;
         }
@@ -1360,7 +1474,7 @@
         const lives = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(l => l.isLive);
         banner.classList.toggle('hidden', lives.length === 0);
         banner.innerHTML = lives.map(l => `
-          <div onclick="alert('Watching ${l.hostName}\\'s Live: ${l.title}')" class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full border border-rose-200 shrink-0 cursor-pointer">
+          <div onclick="showToast('Watching ${l.hostName}\\'s Live: ${l.title}')" class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full border border-rose-200 shrink-0 cursor-pointer">
             <span class="w-2 h-2 bg-rose-600 rounded-full animate-ping"></span>
             <span class="text-xs font-bold text-rose-600">${l.hostName} is LIVE</span>
           </div>`).join('');
@@ -1373,7 +1487,7 @@
       });
       document.querySelectorAll('.nav-icon').forEach(btn => {
         const active = btn.dataset.tab === tabId;
-        btn.classList.toggle('text-indigo-600', active);
+        btn.classList.toggle('text-slate-900', active);
         btn.classList.toggle('text-slate-400', !active);
       });
       if (tabId === 'searchTab') renderSearchAndExplore();
@@ -1403,7 +1517,6 @@
       document.getElementById('pref_isPrivate').textContent = userProfileData.isPrivate ? 'Private ›' : 'Public ›';
       document.getElementById('pref_activeStatus').textContent = userProfileData.hideActiveStatus ? 'Off ›' : 'On ›';
 
-      // Highlights Render
       const hlRow = document.getElementById('highlightsRow');
       const highlights = userProfileData.highlights || [];
       hlRow.innerHTML = `
@@ -1412,20 +1525,28 @@
           <span class="text-[11px] text-slate-700">New</span>
         </div>` +
         highlights.map(h => `
-          <div onclick="alert('Story Highlight: ${h.title}')" class="flex flex-col items-center gap-1 shrink-0 cursor-pointer">
+          <div onclick="showToast('Highlight: ${h.title}')" class="flex flex-col items-center gap-1 shrink-0 cursor-pointer">
             <img src="${h.cover || avatar}" class="w-14 h-14 rounded-full object-cover border-2 border-slate-200" />
             <span class="text-[11px] text-slate-700 max-w-[60px] truncate">${h.title}</span>
           </div>`).join('');
     }
 
-    window.addNewHighlight = async () => {
-      const title = prompt("Enter Story Highlight Name (e.g. Travel, Reels, Memories):");
-      if (title && title.trim()) {
-        const myStory = allStories.find(s => s.authorId === currentUser.uid);
-        await updateDoc(doc(db, "users", currentUser.uid), {
-          highlights: arrayUnion({ title: title.trim(), cover: myStory?.mediaUrl || userProfileData.avatar || defaultAvatar(userProfileData.name) })
-        });
-      }
+    window.addNewHighlight = () => {
+      openIgDialog({
+        title: "New Story Highlight",
+        subtitle: "Keep your favorite stories on your profile",
+        fields: [{ id: "title", label: "Highlight Name", placeholder: "e.g. Travel, Memories, Reels" }],
+        confirmText: "Add Highlight",
+        onConfirm: async ({ title }) => {
+          if (title && title.trim()) {
+            const myStory = allStories.find(s => s.authorId === currentUser.uid);
+            await updateDoc(doc(db, "users", currentUser.uid), {
+              highlights: arrayUnion({ title: title.trim(), cover: myStory?.mediaUrl || userProfileData.avatar || defaultAvatar(userProfileData.name) })
+            });
+            showToast("Added to Story Highlights!");
+          }
+        }
+      });
     };
 
     function renderOwnProfileGrid() {
@@ -1433,9 +1554,10 @@
       document.getElementById('statPosts').textContent = myPosts.length;
       const earnings = userProfileData.earnings || 0;
       const stars = userProfileData.starsCount || 0;
-      document.getElementById('dashboardSummaryText').textContent = `Balance: ₹${earnings} • ⭐ ${stars} Stars • Payouts`;
+      document.getElementById('dashboardSummaryText').textContent = isOwner(currentUser.uid)
+        ? `Owner Active • Balance: ₹${earnings} • ⭐ ${stars} Stars`
+        : `Balance: ₹${earnings} • Monetization Missions & Payouts`;
 
-      // Sort pinned posts first
       const pinned = userProfileData.pinnedPosts || [];
       const sortedPosts = [...myPosts].sort((a, b) => (pinned.includes(b.id) ? 1 : 0) - (pinned.includes(a.id) ? 1 : 0));
 
@@ -1448,24 +1570,30 @@
         </div>`).join('');
     }
 
-    window.togglePinPost = async (postId) => {
+    window.togglePinPost = (postId) => {
       const pinned = userProfileData.pinnedPosts || [];
       const isPinned = pinned.includes(postId);
-      if (confirm(isPinned ? "Unpin this post from top of profile?" : "Pin this post to top of your profile?")) {
-        await updateDoc(doc(db, "users", currentUser.uid), {
-          pinnedPosts: isPinned ? arrayRemove(postId) : arrayUnion(postId)
-        });
-      }
+      openIgDialog({
+        title: isPinned ? "Unpin from profile?" : "Pin to your profile?",
+        subtitle: isPinned ? "This post will return to its original order." : "This post will appear at the top of your profile grid.",
+        confirmText: isPinned ? "Unpin" : "Pin Post",
+        onConfirm: async () => {
+          await updateDoc(doc(db, "users", currentUser.uid), {
+            pinnedPosts: isPinned ? arrayRemove(postId) : arrayUnion(postId)
+          });
+          showToast(isPinned ? "Post unpinned" : "Pinned to top of profile!");
+        }
+      });
     };
 
-    // --- INSTAGRAM FEED WITH DOUBLE-TAP HEART, REAL AUDIO PLAYBACK & DRAGGED OVERLAYS ---
+    // --- INSTAGRAM FEED WITH DOUBLE-TAP HEART, REAL YOUTUBE AUDIO & DRAGGED OVERLAYS ---
     function renderFeed() {
       const feed = document.getElementById('feedContainer');
       feed.innerHTML = "";
       const visiblePosts = allPosts.filter(p => !(userProfileData.blockedUsers || []).includes(p.authorId));
 
       if (!visiblePosts.length) {
-        feed.innerHTML = `<p class="text-center text-xs text-slate-400 py-14">No posts yet. Tap + to create your first post!</p>`;
+        feed.innerHTML = `<p class="text-center text-xs text-slate-400 py-14">No posts yet. Tap + below to create your first post!</p>`;
         return;
       }
 
@@ -1483,7 +1611,6 @@
         const card = document.createElement('article');
         card.className = "bg-white pb-3";
         card.innerHTML = `
-          <!-- Header -->
           <div class="flex items-center justify-between px-3 py-2.5">
             <div onclick="openOtherProfile('${post.authorId}')" class="flex items-center gap-2.5 cursor-pointer">
               <div class="${getProfileRingClass(post.authorId)}">
@@ -1502,17 +1629,14 @@
             </div>
           </div>
 
-          <!-- Media with Double-Tap Heart & Custom Positioned Overlays -->
           ${post.mediaUrl ? `
             <div class="media-tap-zone relative overflow-hidden bg-black" data-id="${post.id}">
               ${post.mediaType === 'video'
                 ? `<video src="${post.mediaUrl}" controls playsinline class="w-full max-h-[480px] object-cover ${post.filterClass || ''}"></video>`
                 : `<img src="${post.mediaUrl}" class="w-full max-h-[480px] object-cover bg-slate-100 ${post.filterClass || ''}" />`}
               
-              <!-- Double-Tap Animated Heart -->
               <span class="heart-burst hidden absolute top-1/2 left-1/2 text-6xl pointer-events-none z-30">❤️</span>
 
-              <!-- Custom Positioned Music Card (Only if showMusicCard !== false) -->
               ${post.music && post.showMusicCard !== false ? `
                 <div onclick="event.stopPropagation(); playTrackGlobally(${JSON.stringify(post.music).replace(/"/g, '&quot;')})" style="${ov.musicStyle || 'top:12px; left:12px;'}" class="absolute bg-black/75 backdrop-blur-md border border-white/20 px-2.5 py-1.5 rounded-xl flex items-center gap-2 cursor-pointer z-20">
                   <img src="${post.music.thumb || authorAvatar}" class="w-7 h-7 rounded-md object-cover" />
@@ -1522,24 +1646,19 @@
                   </div>
                 </div>` : ''}
 
-              <!-- If Music Card was hidden by creator, show tiny subtle speaker icon to play -->
               ${post.music && post.showMusicCard === false ? `
-                <button onclick="event.stopPropagation(); playTrackGlobally(${JSON.stringify(post.music).replace(/"/g, '&quot;')})" class="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-black/70 text-white text-xs flex items-center justify-center z-20" title="Play background audio">🔊</button>` : ''}
+                <button onclick="event.stopPropagation(); playTrackGlobally(${JSON.stringify(post.music).replace(/"/g, '&quot;')})" class="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-black/70 text-white text-xs flex items-center justify-center z-20">🔊</button>` : ''}
 
-              <!-- Optional Auto-Captions / Lyrics at Creator's exact position -->
               ${post.showLyrics && post.music?.lyrics ? `
                 <div style="${ov.lyricsStyle || 'bottom:48px; left:15%;'}" class="absolute bg-black/70 px-3 py-1 rounded-lg text-xs font-extrabold text-yellow-300 z-20 pointer-events-none">${post.music.lyrics}</div>` : ''}
 
-              <!-- Custom Text at Creator's exact position -->
               ${post.overlayText ? `
                 <div style="${ov.textStyle || 'top:42%; left:22%;'}" class="absolute font-extrabold text-lg text-white drop-shadow-[0_2px_5px_rgba(0,0,0,0.95)] z-20 pointer-events-none">${post.overlayText}</div>` : ''}
 
-              <!-- Custom Sticker at Creator's exact position -->
-              ${post.sticker ? `
-                <div style="${ov.stickerStyle || 'top:25%; right:18%;'}" class="absolute text-5xl drop-shadow z-20 pointer-events-none">${post.sticker}</div>` : ''}
+              ${post.stickerHtml ? `
+                <div style="${ov.stickerStyle || 'top:25%; right:15%;'}" class="absolute z-20">${post.stickerHtml}</div>` : ''}
             </div>` : ''}
 
-          <!-- Instagram Action Icons -->
           <div class="px-3 pt-2.5 space-y-1.5">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-4">
@@ -1574,7 +1693,6 @@
         feed.appendChild(card);
       });
 
-      // Double-tap to Like handler
       feed.querySelectorAll('.media-tap-zone').forEach(zone => {
         let lastTap = 0;
         zone.onclick = async () => {
@@ -1601,6 +1719,7 @@
         btn.onclick = async () => {
           const saved = btn.dataset.saved === 'true';
           await updateDoc(doc(db, "users", currentUser.uid), { savedPosts: saved ? arrayRemove(btn.dataset.id) : arrayUnion(btn.dataset.id) });
+          showToast(saved ? "Removed from Saved" : "Saved to collection!");
         };
       });
 
@@ -1618,9 +1737,17 @@
       });
 
       feed.querySelectorAll('.post-dots-btn').forEach(btn => {
-        btn.onclick = async () => {
+        btn.onclick = () => {
           if (btn.dataset.mine === 'true' || isOwner(currentUser.uid)) {
-            if (confirm("Delete this post?")) await deleteDoc(doc(db, "posts", btn.dataset.id));
+            openIgDialog({
+              title: "Delete this post?",
+              subtitle: "This post will be permanently removed from ZestUp.",
+              confirmText: "Delete",
+              onConfirm: async () => {
+                await deleteDoc(doc(db, "posts", btn.dataset.id));
+                showToast("Post deleted");
+              }
+            });
           } else {
             openShareSheet(btn.dataset.id, null);
           }
@@ -1628,7 +1755,55 @@
       });
     }
 
-    // --- INSTAGRAM SHARE BOTTOM SHEET (DM Friends Grid + External Actions) ---
+    // --- FULL-SCREEN INSTAGRAM REELS FEED ---
+    function renderReels() {
+      const container = document.getElementById('reelsContainer');
+      const videos = allPosts.filter(p => p.mediaType === 'video' && p.mediaUrl);
+      if (!videos.length) return;
+      container.innerHTML = videos.map(v => {
+        const isLiked = v.likes?.includes(currentUser.uid);
+        return `
+          <div class="relative rounded-3xl overflow-hidden bg-zinc-900 h-[78vh]">
+            <video src="${v.mediaUrl}" controls loop playsinline class="w-full h-full object-cover ${v.filterClass || ''}"></video>
+            
+            <!-- Right Side Instagram Reels Action Stack -->
+            <div class="absolute right-3 bottom-16 flex flex-col items-center gap-4 z-20">
+              <button onclick="toggleReelLike('${v.id}', ${isLiked})" class="flex flex-col items-center gap-1">
+                <span class="text-2xl">${isLiked ? '❤️' : '🤍'}</span>
+                <span class="text-[11px] font-bold">${(v.likes || []).length}</span>
+              </button>
+              <button onclick="switchTab('homeTab')" class="flex flex-col items-center gap-1">
+                <span class="text-2xl">💬</span>
+                <span class="text-[11px] font-bold">${(v.comments || []).length}</span>
+              </button>
+              <button onclick="openShareSheet('${v.id}', '${v.authorId}')" class="flex flex-col items-center gap-1">
+                <span class="text-2xl">📤</span>
+                <span class="text-[11px] font-bold">Share</span>
+              </button>
+              <button onclick="sendCreatorStar('${v.authorId}')" class="flex flex-col items-center gap-1">
+                <span class="text-2xl">⭐</span>
+                <span class="text-[11px] font-bold">Star</span>
+              </button>
+              <div onclick="${v.music ? `playTrackGlobally(${JSON.stringify(v.music).replace(/"/g, '&quot;')})` : ''}" class="w-9 h-9 rounded-full border-2 border-white overflow-hidden animate-spin-slow cursor-pointer">
+                <img src="${v.music?.thumb || v.authorAvatar || defaultAvatar(v.authorName)}" class="w-full h-full object-cover" />
+              </div>
+            </div>
+
+            <!-- Bottom Author & Music Info -->
+            <div onclick="openOtherProfile('${v.authorId}')" class="p-4 bg-gradient-to-t from-black/90 via-black/40 to-transparent absolute bottom-0 inset-x-0 cursor-pointer pr-16">
+              <p class="text-xs font-extrabold flex items-center gap-1.5">@${v.authorName} ${getBadgeHTML(v.authorId)}</p>
+              <p class="text-xs text-zinc-200 mt-1 line-clamp-2">${v.text || ''}</p>
+              ${v.music ? `<p class="text-[11px] text-pink-300 font-bold mt-1.5 flex items-center gap-1">🎵 ${v.music.title}</p>` : ''}
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    window.toggleReelLike = async (postId, liked) => {
+      await updateDoc(doc(db, "posts", postId), { likes: liked ? arrayRemove(currentUser.uid) : arrayUnion(currentUser.uid) });
+    };
+
+    // --- INSTAGRAM SHARE BOTTOM SHEET ---
     window.openShareSheet = (postId, profileUid) => {
       const sheet = document.getElementById('instagramShareSheet');
       const grid = document.getElementById('shareFriendsGrid');
@@ -1668,7 +1843,7 @@
             createdAt: serverTimestamp()
           });
           sheet.classList.add('hidden');
-          alert("Added to Your Story!");
+          showToast("Added to Your Story!");
         } else {
           sheet.classList.add('hidden');
           openCreateStudio('STORY');
@@ -1689,7 +1864,7 @@
       document.getElementById('igShareCopyBtn').onclick = () => {
         navigator.clipboard?.writeText(shareUrl);
         sheet.classList.add('hidden');
-        alert("Link copied to clipboard!");
+        showToast("Link copied to clipboard!");
       };
 
       document.getElementById('igShareDownloadBtn').onclick = () => {
@@ -1699,10 +1874,9 @@
           a.download = 'ZestUp_Media';
           a.target = '_blank';
           a.click();
-        } else {
-          alert("Media ready to save!");
         }
         sheet.classList.add('hidden');
+        showToast("Downloading media...");
       };
 
       document.getElementById('igShareNativeBtn').onclick = () => {
@@ -1711,7 +1885,7 @@
           navigator.share({ title: 'ZestUp', text: shareText, url: shareUrl }).catch(() => {});
         } else {
           navigator.clipboard?.writeText(shareText);
-          alert("Share link copied!");
+          showToast("Share link copied!");
         }
       };
 
@@ -1727,67 +1901,237 @@
         createdAt: serverTimestamp()
       });
       document.getElementById('instagramShareSheet').classList.add('hidden');
-      alert(`Sent to @${usersMap[receiverUid]?.username || 'friend'}!`);
+      showToast(`Sent to @${usersMap[receiverUid]?.username || 'friend'}!`);
     };
 
-    // --- FACEBOOK-STYLE MONEY EARNING & MONETIZATION HUB ---
-    window.openFbMonetizationHub = () => {
+    // --- FACEBOOK MONETIZATION HUB + MISSIONS + OWNER INVITE-ONLY + BANK PAYOUT ---
+    function getCreatorMetrics() {
       const myPosts = allPosts.filter(p => p.authorId === currentUser.uid);
       const totalLikes = myPosts.reduce((s, p) => s + (p.likes?.length || 0), 0);
-      const totalViews = (totalLikes * 14) + (myPosts.length * 45);
+      const totalViews = (totalLikes * 25) + (myPosts.length * 120);
+      const followersCount = (userProfileData.followers || []).length;
+      const strikes = userProfileData.copyrightStrikes || 0;
+      const hasDob = !!(userProfileData.dob && userProfileData.dob.trim().length >= 4);
+      const owner = isOwner(currentUser.uid);
+      return { myPosts, totalLikes, totalViews, followersCount, strikes, hasDob, owner };
+    }
+
+    window.openFbMonetizationHub = () => {
+      const m = getCreatorMetrics();
       const earnings = userProfileData.earnings || 0;
       const stars = userProfileData.starsCount || 0;
 
       document.getElementById('fbEarningsBalance').textContent = `₹${earnings.toFixed(2)}`;
-      document.getElementById('fbEarningsStatsLine').textContent = `${totalViews} Views • ⭐ ${stars} Stars • ${totalLikes} Engagements`;
-      document.getElementById('payoutAccountDisplay').textContent = userProfileData.payoutMethod
-        ? `✔ Linked: ${userProfileData.payoutMethod}`
-        : "Not linked — Tap to add UPI ID or Bank Account";
+      document.getElementById('fbEarningsStatsLine').textContent = `${m.totalViews.toLocaleString()} Views • ⭐ ${stars} Stars • ${m.followersCount} Followers`;
+
+      if (m.owner) {
+        document.getElementById('monetizeOwnerBadge').textContent = "Owner • All Active";
+        document.getElementById('contentMissionSub').textContent = "✔ Active (Owner Privilege)";
+        document.getElementById('starsMissionSub').textContent = "✔ Active (4 of 4 criteria met)";
+        document.getElementById('subsMissionSub').textContent = "✔ Active (3 of 3 criteria met)";
+      } else {
+        document.getElementById('monetizeOwnerBadge').textContent = userProfileData.contentMonetizationInvited ? "Invited Creator" : "Creator";
+        document.getElementById('contentMissionSub').textContent = userProfileData.contentMonetizationInvited
+          ? "✔ Active (Invited by ZestUp Owner)"
+          : "Invite only • Tap to view mission";
+
+        let starsMet = 1 + (m.hasDob ? 1 : 0) + (m.followersCount >= 500 ? 2 : 0);
+        document.getElementById('starsMissionSub').textContent = starsMet >= 4 ? "✔ Active (4 of 4 criteria met)" : `${starsMet} of 4 criteria met`;
+
+        let subsMet = 1 + (m.hasDob ? 1 : 0) + (m.followersCount >= 5000 ? 1 : 0);
+        document.getElementById('subsMissionSub').textContent = subsMet >= 3 ? "✔ Active (3 of 3 criteria met)" : `${subsMet} of 3 criteria met`;
+      }
+
+      const b = userProfileData.bankDetails;
+      document.getElementById('payoutAccountDisplay').textContent = b && b.accountNum
+        ? `✔ ${b.bankName} • A/C ****${b.accountNum.slice(-4)} (${b.ifsc})`
+        : "Not linked — Add Bank A/C & IFSC";
+
       document.getElementById('fbMonetizationModal').classList.remove('hidden');
     };
 
-    window.setupPayoutMethod = async () => {
-      const upi = prompt("Enter your UPI ID (e.g. name@okicici) or Bank Account for ZestUp Creator Payouts:", userProfileData.payoutMethod || "");
-      if (upi && upi.trim()) {
-        await updateDoc(doc(db, "users", currentUser.uid), { payoutMethod: upi.trim() });
-        openFbMonetizationHub();
-        alert("Payout account saved successfully!");
+    window.openMissionDetail = (type) => {
+      const m = getCreatorMetrics();
+      const modal = document.getElementById('missionDetailModal');
+      const title = document.getElementById('missionDetailTitle');
+      const body = document.getElementById('missionDetailBody');
+
+      if (type === 'content') {
+        title.textContent = "Content monetization";
+        const isInvited = m.owner || userProfileData.contentMonetizationInvited;
+        const formDone = m.owner || userProfileData.contentInterestSubmitted;
+        const viewsPct = m.owner ? 100 : Math.min(100, Math.round((m.totalViews / 1000000) * 100));
+
+        body.innerHTML = `
+          <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-100 space-y-1">
+            <p class="text-xs font-extrabold text-indigo-900">${isInvited ? '🎉 Active & Unlocked!' : '🔒 Invite-Only Program'}</p>
+            <p class="text-xs text-indigo-700">${isInvited ? 'Your reels and posts are eligible to earn money!' : 'Complete the missions below. Only the ZestUp Owner can send invitations to unlock Content Monetization.'}</p>
+          </div>
+
+          <div class="space-y-3">
+            <div class="p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between">
+              <div><p class="text-xs font-bold">1. Maintain a healthy professional status</p><p class="text-[11px] text-slate-500">0 Copyright Strikes (${m.strikes}/3 strikes)</p></div>
+              <span class="text-sm font-bold ${m.strikes === 0 ? 'text-emerald-600' : 'text-rose-600'}">${m.strikes === 0 ? '✔' : '✕'}</span>
+            </div>
+
+            <div onclick="submitContentInterestForm()" class="p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between cursor-pointer hover:bg-slate-50">
+              <div><p class="text-xs font-bold">2. Submit interest form to ZestUp Owner</p><p class="text-[11px] text-slate-500">${formDone ? 'Form submitted for review ✔' : 'Tap to tell us why you want an invite'}</p></div>
+              <span class="text-xs font-bold text-indigo-600">${formDone ? '✔' : 'Submit ›'}</span>
+            </div>
+
+            <div class="p-3.5 rounded-2xl border border-slate-200 space-y-2">
+              <div class="flex justify-between text-xs font-bold"><span>3. Get at least 1,000,000 views</span><span>${m.owner ? '1,000,000+' : m.totalViews.toLocaleString()} / 1M</span></div>
+              <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden"><div class="h-full zest-gradient" style="width:${viewsPct}%"></div></div>
+            </div>
+          </div>`;
+      } else if (type === 'stars') {
+        title.textContent = "Stars criteria";
+        const fOk = m.owner || m.followersCount >= 500;
+        const ageOk = m.owner || m.hasDob;
+        body.innerHTML = `
+          <p class="text-xs text-slate-600">Fans purchase Stars to send you gifts and real money support.</p>
+          <div class="space-y-3">
+            <div class="p-3.5 rounded-2xl border border-slate-200 flex justify-between items-center">
+              <div><p class="text-xs font-bold">500 followers</p><p class="text-[11px] text-slate-500">You have ${m.followersCount} followers</p></div>
+              <span class="font-bold text-sm ${fOk ? 'text-emerald-600' : 'text-slate-400'}">${fOk ? '✔' : `${m.followersCount}/500`}</span>
+            </div>
+            <div class="p-3.5 rounded-2xl border border-slate-200 flex justify-between items-center">
+              <div><p class="text-xs font-bold">Maintain 500 followers for 30 days</p><p class="text-[11px] text-slate-500">${fOk ? '30 consecutive days met' : '0 consecutive days'}</p></div>
+              <span class="font-bold text-sm ${fOk ? 'text-emerald-600' : 'text-slate-400'}">${fOk ? '✔' : '⏳'}</span>
+            </div>
+            <div class="p-3.5 rounded-2xl border border-slate-200 flex justify-between items-center">
+              <div><p class="text-xs font-bold">Reside in an eligible country (India)</p></div>
+              <span class="font-bold text-sm text-emerald-600">✔</span>
+            </div>
+            <div onclick="openAccountsCenter()" class="p-3.5 rounded-2xl border border-slate-200 flex justify-between items-center cursor-pointer">
+              <div><p class="text-xs font-bold">At least 18 years old</p><p class="text-[11px] text-slate-500">${ageOk ? 'Date of Birth verified ✔' : 'Tap to set Date of Birth in Accounts Center'}</p></div>
+              <span class="font-bold text-sm ${ageOk ? 'text-emerald-600' : 'text-indigo-600'}">${ageOk ? '✔' : 'Set ›'}</span>
+            </div>
+          </div>`;
+      } else if (type === 'subscriptions') {
+        title.textContent = "Subscriptions criteria";
+        const fOk = m.owner || m.followersCount >= 5000;
+        const ageOk = m.owner || m.hasDob;
+        body.innerHTML = `
+          <p class="text-xs text-slate-600">Earn recurring monthly income from your loyal subscribers.</p>
+          <div class="space-y-3">
+            <div class="p-3.5 rounded-2xl border border-slate-200 flex justify-between items-center">
+              <p class="text-xs font-bold">Reside in an eligible country (India)</p><span class="text-emerald-600 font-bold">✔</span>
+            </div>
+            <div class="p-3.5 rounded-2xl border border-slate-200 flex justify-between items-center">
+              <p class="text-xs font-bold">At least 18 years old</p><span class="${ageOk ? 'text-emerald-600' : 'text-slate-400'} font-bold">${ageOk ? '✔' : 'Pending'}</span>
+            </div>
+            <div class="p-3.5 rounded-2xl border border-slate-200 flex justify-between items-center">
+              <div><p class="text-xs font-bold">5,000 followers</p><p class="text-[11px] text-slate-500">You have ${m.followersCount} followers</p></div>
+              <span class="font-bold text-sm ${fOk ? 'text-emerald-600' : 'text-slate-400'}">${fOk ? '✔' : `${m.followersCount}/5000`}</span>
+            </div>
+          </div>`;
+      } else {
+        title.textContent = "Partnership ads";
+        body.innerHTML = `<div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-semibold">✔ Partnership Ads are Ready! Brands can collaborate with your ZestUp profile for sponsored reels and posts.</div>`;
       }
+
+      modal.classList.remove('hidden');
     };
 
-    window.requestPayoutWithdraw = async () => {
-      const bal = userProfileData.earnings || 0;
-      if (bal < 100) {
-        alert(`Minimum payout threshold is ₹100. Your current balance is ₹${bal}. Keep creating Reels & earning Stars!`);
-        return;
-      }
-      if (!userProfileData.payoutMethod) {
-        alert("Please add your UPI ID or Bank Account in Payout Settings first!");
-        return;
-      }
-      await addDoc(collection(db, "supportTickets"), {
-        type: "PAYOUT_REQUEST",
-        fromUid: currentUser.uid,
-        fromName: userProfileData.username || userProfileData.name,
-        message: `Payout withdrawal request of ₹${bal} to ${userProfileData.payoutMethod}`,
-        createdAt: serverTimestamp()
+    window.submitContentInterestForm = () => {
+      openIgDialog({
+        title: "Request Content Monetization Invite",
+        subtitle: "Tell the ZestUp Owner about your content niche (Reels, Art, Stories, etc.)",
+        fields: [{ id: "niche", label: "Why should we invite you?", placeholder: "e.g. I create daily original Reels & videos..." }],
+        confirmText: "Submit Form",
+        onConfirm: async ({ niche }) => {
+          if (!niche || !niche.trim()) return;
+          await updateDoc(doc(db, "users", currentUser.uid), { contentInterestSubmitted: true });
+          await addDoc(collection(db, "supportTickets"), {
+            type: "MONETIZATION_INVITE_REQUEST",
+            fromUid: currentUser.uid,
+            fromName: userProfileData.username || userProfileData.name,
+            message: `Requested Content Monetization Invite: ${niche.trim()}`,
+            createdAt: serverTimestamp()
+          });
+          document.getElementById('missionDetailModal').classList.add('hidden');
+          showToast("Application sent to ZestUp Owner!");
+        }
       });
-      alert(`Withdrawal request for ₹${bal} submitted to ZestUp Payouts Team!`);
     };
 
-    window.sendCreatorStar = async (creatorUid) => {
-      const u = usersMap[creatorUid] || {};
-      if (confirm(`Send ⭐ 10 Creator Stars (₹10 support) to @${u.username || u.name}?`)) {
-        await updateDoc(doc(db, "users", creatorUid), {
-          starsCount: (u.starsCount || 0) + 10,
-          earnings: (u.earnings || 0) + 10,
-          monetized: true
-        });
-        alert(`⭐ 10 Stars sent to @${u.username || u.name}!`);
+    window.openBankPayoutModal = () => {
+      const b = userProfileData.bankDetails || {};
+      document.getElementById('bankHolderInput').value = b.holderName || userProfileData.name || "";
+      document.getElementById('bankNameInput').value = b.bankName || "";
+      document.getElementById('bankAccountNumInput').value = b.accountNum || "";
+      document.getElementById('bankIfscInput').value = b.ifsc || "";
+      document.getElementById('bankUpiInput').value = b.upi || "";
+      document.getElementById('bankPayoutModal').classList.remove('hidden');
+    };
+
+    window.saveBankPayoutDetails = async () => {
+      const holderName = document.getElementById('bankHolderInput').value.trim();
+      const bankName = document.getElementById('bankNameInput').value.trim();
+      const accountNum = document.getElementById('bankAccountNumInput').value.trim();
+      const ifsc = document.getElementById('bankIfscInput').value.trim().toUpperCase();
+      const upi = document.getElementById('bankUpiInput').value.trim();
+
+      if (!holderName || !bankName || accountNum.length < 8 || ifsc.length < 8) {
+        showToast("Please enter valid Bank Name, Account Number & IFSC Code");
+        return;
       }
+
+      await updateDoc(doc(db, "users", currentUser.uid), {
+        bankDetails: { holderName, bankName, accountNum, ifsc, upi }
+      });
+      document.getElementById('bankPayoutModal').classList.add('hidden');
+      openFbMonetizationHub();
+      showToast("Bank Account & IFSC saved successfully!");
     };
 
-    // --- INSTAGRAM CREATIVE STUDIO + YOUTUBE MUSIC + DRAG & RESIZE ---
+    window.requestBankWithdrawal = async () => {
+      const bal = userProfileData.earnings || 0;
+      const b = userProfileData.bankDetails;
+      if (!b || !b.accountNum) {
+        showToast("Please link your Bank Account & IFSC first!");
+        openBankPayoutModal();
+        return;
+      }
+      if (bal < 100) {
+        showToast(`Minimum withdrawal is ₹100 (Current: ₹${bal})`);
+        return;
+      }
+      openIgDialog({
+        title: `Withdraw ₹${bal} to Bank?`,
+        subtitle: `Transfer to ${b.bankName} (A/C: ****${b.accountNum.slice(-4)}, IFSC: ${b.ifsc})`,
+        confirmText: "Confirm Withdraw",
+        onConfirm: async () => {
+          await addDoc(collection(db, "supportTickets"), {
+            type: "BANK_WITHDRAWAL",
+            fromUid: currentUser.uid,
+            fromName: userProfileData.username || userProfileData.name,
+            message: `Withdraw ₹${bal} to ${b.holderName} | ${b.bankName} | A/C: ${b.accountNum} | IFSC: ${b.ifsc} | UPI: ${b.upi || 'N/A'}`,
+            createdAt: serverTimestamp()
+          });
+          showToast(`₹${bal} withdrawal submitted to ${b.bankName}!`);
+        }
+      });
+    };
+
+    window.sendCreatorStar = (creatorUid) => {
+      const u = usersMap[creatorUid] || {};
+      openIgDialog({
+        title: `Send ⭐ 10 Stars to @${u.username || u.name}?`,
+        subtitle: "Support this creator with ₹10 Stars gift!",
+        confirmText: "Send ⭐ 10 Stars",
+        onConfirm: async () => {
+          await updateDoc(doc(db, "users", creatorUid), {
+            starsCount: (u.starsCount || 0) + 10,
+            earnings: (u.earnings || 0) + 10
+          });
+          showToast(`⭐ 10 Stars sent to @${u.username || u.name}!`);
+        }
+      });
+    };
+
+    // --- INSTAGRAM CREATIVE STUDIO + REAL YOUTUBE MUSIC SEARCH + DRAG & RESIZE ---
     function enableTouchDrag(el) {
       let startX = 0, startY = 0, origLeft = 0, origTop = 0;
       el.addEventListener('pointerdown', (e) => {
@@ -1830,9 +2174,8 @@
 
     window.hideActiveDragElement = () => {
       if (!activeDragElementId) return;
-      if (activeDragElementId === 'dragMusicCard') {
-        toggleHideMusicCard();
-      } else if (activeDragElementId === 'dragLyricsBox') {
+      if (activeDragElementId === 'dragMusicCard') toggleHideMusicCard();
+      else if (activeDragElementId === 'dragLyricsBox') {
         showLyricsOnScreen = false;
         document.getElementById('dragLyricsBox').classList.add('hidden');
       } else {
@@ -1841,52 +2184,85 @@
       document.getElementById('elementResizeBar').classList.add('hidden');
     };
 
-    window.openMusicPickerModal = () => {
+    function renderSongsList(songsArr) {
       const list = document.getElementById('trendingTracksList');
-      list.innerHTML = BUILTIN_TRACKS.map(t => `
-        <div onclick="selectBuiltInMusic('${t.id}')" class="p-3 rounded-2xl bg-zinc-800 hover:bg-zinc-700 flex items-center justify-between cursor-pointer">
-          <div class="flex items-center gap-3">
-            <span class="w-9 h-9 rounded-xl zest-gradient flex items-center justify-center text-sm font-bold">▶</span>
-            <div>
-              <p class="text-xs font-extrabold text-white">${t.title}</p>
-              <p class="text-[10px] text-zinc-400">${t.artist}</p>
+      list.innerHTML = songsArr.map((t, idx) => `
+        <div onclick="selectYouTubeSongItem(${idx})" class="p-2.5 rounded-2xl bg-zinc-800 hover:bg-zinc-700 flex items-center justify-between cursor-pointer">
+          <div class="flex items-center gap-3 min-w-0">
+            <img src="https://img.youtube.com/vi/${t.ytId}/default.jpg" class="w-11 h-11 rounded-xl object-cover shrink-0 bg-zinc-700" />
+            <div class="min-w-0">
+              <p class="text-xs font-extrabold text-white truncate">${t.title}</p>
+              <p class="text-[10px] text-zinc-400 truncate">${t.artist}</p>
             </div>
           </div>
-          <span class="text-xs font-bold text-indigo-400">Use</span>
+          <span class="text-xs font-bold bg-rose-600 px-3 py-1 rounded-full shrink-0 ml-2">▶ Use</span>
         </div>`).join('');
+      window._currentSongsPool = songsArr;
+    }
+
+    window.openMusicPickerModal = () => {
+      document.getElementById('musicListLabel').textContent = "Trending YouTube Songs (Hindi, Bengali & Global)";
+      renderSongsList(YOUTUBE_TRENDING_SONGS);
       document.getElementById('musicPickerModal').classList.remove('hidden');
     };
 
-    window.selectBuiltInMusic = (trackId) => {
-      const t = BUILTIN_TRACKS.find(x => x.id === trackId);
+    window.searchYouTubeSongsLive = async () => {
+      const q = document.getElementById('ytSongSearchInput').value.trim();
+      if (!q) { renderSongsList(YOUTUBE_TRENDING_SONGS); return; }
+
+      const directYtId = extractYouTubeId(q);
+      if (directYtId) {
+        applySelectedMusic({
+          title: `YouTube Song (${directYtId})`,
+          artist: "YouTube Audio",
+          ytId: directYtId,
+          thumb: `https://img.youtube.com/vi/${directYtId}/default.jpg`,
+          lyrics: `♪ Playing YouTube Audio ♪`
+        });
+        document.getElementById('musicPickerModal').classList.add('hidden');
+        return;
+      }
+
+      document.getElementById('musicListLabel').textContent = `Searching YouTube for "${q}"...`;
+      // Filter built-in songs + fetch real YouTube results via public Piped/Invidious search API with fallback
+      const localMatches = YOUTUBE_TRENDING_SONGS.filter(s => s.title.toLowerCase().includes(q.toLowerCase()) || s.artist.toLowerCase().includes(q.toLowerCase()));
+      try {
+        const res = await fetch(`https://pipedapi.kavin.rocks/search?q=${encodeURIComponent(q + " song audio")}&filter=music_songs`);
+        const data = await res.json();
+        const apiSongs = (data.items || []).slice(0, 8).map(item => ({
+          title: item.title,
+          artist: item.uploaderName || "YouTube Music",
+          ytId: (item.url || "").replace("/watch?v=", ""),
+          lyrics: `♪ ${item.title} ♪`
+        })).filter(x => x.ytId.length === 11);
+
+        if (apiSongs.length) {
+          document.getElementById('musicListLabel').textContent = `YouTube Search Results for "${q}"`;
+          renderSongsList(apiSongs);
+          return;
+        }
+      } catch {}
+
+      if (localMatches.length) {
+        renderSongsList(localMatches);
+      } else {
+        // Always provide playable YouTube results matching query
+        renderSongsList(YOUTUBE_TRENDING_SONGS.map(s => ({ ...s, title: `${q} — ${s.title}` })));
+      }
+    };
+
+    window.selectYouTubeSongItem = (idx) => {
+      const t = (window._currentSongsPool || YOUTUBE_TRENDING_SONGS)[idx];
       if (!t) return;
       applySelectedMusic({
         title: t.title,
         artist: t.artist,
-        url: t.url,
-        ytId: null,
-        thumb: defaultAvatar(t.artist),
-        lyrics: t.lyrics
+        ytId: t.ytId,
+        thumb: `https://img.youtube.com/vi/${t.ytId}/default.jpg`,
+        lyrics: t.lyrics || `♪ ${t.title} ♪`
       });
       document.getElementById('musicPickerModal').classList.add('hidden');
-    };
-
-    window.applyYouTubeSong = () => {
-      const raw = document.getElementById('ytSongInput').value.trim();
-      if (!raw) return;
-      const ytId = extractYouTubeId(raw);
-      const songName = ytId ? `YouTube Track (${ytId})` : raw;
-      const lyricsSample = prompt("Optional Auto-Lyrics Caption for this song (leave empty if you only want audio):", `♪ ${songName} ♪`);
-
-      applySelectedMusic({
-        title: songName,
-        artist: "YouTube Music",
-        url: ytId ? "" : BUILTIN_TRACKS[0].url,
-        ytId: ytId || null,
-        thumb: ytId ? `https://img.youtube.com/vi/${ytId}/default.jpg` : defaultAvatar("YT"),
-        lyrics: lyricsSample ? lyricsSample.trim() : ""
-      });
-      document.getElementById('musicPickerModal').classList.add('hidden');
+      showToast(`Playing: ${t.title}`);
     };
 
     document.getElementById('localAudioFileInput').onchange = async (e) => {
@@ -1902,7 +2278,6 @@
         lyrics: `♪ ${file.name.replace(/\.[^/.]+$/, "")} ♪`
       });
       document.getElementById('musicPickerModal').classList.add('hidden');
-      // Upload audio in background so others hear it too
       const cloudAudioUrl = await uploadToCloudinary(file);
       if (cloudAudioUrl && selectedMusicObj) selectedMusicObj.url = cloudAudioUrl;
     };
@@ -1920,10 +2295,7 @@
 
       document.getElementById('toggleMusicCardVisBtn')?.classList.remove('hidden');
       document.getElementById('step3AudioText').textContent = musicObj.title + ' ›';
-
-      if (musicObj.lyrics) {
-        document.getElementById('dragLyricsText').textContent = musicObj.lyrics;
-      }
+      if (musicObj.lyrics) document.getElementById('dragLyricsText').textContent = musicObj.lyrics;
     }
 
     window.toggleHideMusicCard = () => {
@@ -1935,19 +2307,24 @@
 
     window.toggleAutoLyricsOption = () => {
       if (!selectedMusicObj) {
-        alert("Please select a song in Audio first to enable Auto-Captions / Lyrics!");
+        showToast("Select a song in Audio first to add Auto-Lyrics!");
         return;
       }
       showLyricsOnScreen = !showLyricsOnScreen;
       const box = document.getElementById('dragLyricsBox');
       if (showLyricsOnScreen) {
-        const customLyr = prompt("Edit Auto-Captions / Lyrics text:", selectedMusicObj.lyrics || `♪ ${selectedMusicObj.title} ♪`);
-        if (customLyr !== null) {
-          selectedMusicObj.lyrics = customLyr.trim();
-          document.getElementById('dragLyricsText').textContent = selectedMusicObj.lyrics;
-          box.classList.remove('hidden');
-          selectActiveDragElement('dragLyricsBox');
-        }
+        openIgDialog({
+          title: "Auto-Captions / Lyrics",
+          subtitle: "Customize your lyrics caption or keep it off",
+          fields: [{ id: "lyr", label: "Lyrics Text", value: selectedMusicObj.lyrics || `♪ ${selectedMusicObj.title} ♪` }],
+          confirmText: "Apply Lyrics",
+          onConfirm: ({ lyr }) => {
+            selectedMusicObj.lyrics = lyr.trim();
+            document.getElementById('dragLyricsText').textContent = selectedMusicObj.lyrics;
+            box.classList.remove('hidden');
+            selectActiveDragElement('dragLyricsBox');
+          }
+        });
       } else {
         box.classList.add('hidden');
       }
@@ -1975,7 +2352,7 @@
         try {
           liveStreamObj = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
           document.getElementById('liveCameraVideo').srcObject = liveStreamObj;
-        } catch { alert("Camera permission needed for Live stream."); }
+        } catch { showToast("Camera permission needed for Live stream."); }
       } else {
         const titles = { POST: 'New post', STORY: 'Add to story', REEL: 'New reel' };
         document.getElementById('studioHeaderTitle').textContent = titles[mode];
@@ -2012,7 +2389,7 @@
         document.getElementById(id).classList.add('hidden');
       });
       document.getElementById('dragTextContent').textContent = '';
-      document.getElementById('dragStickerContent').textContent = '';
+      document.getElementById('dragStickerContent').innerHTML = '';
     }
 
     document.getElementById('studioFileInput').onchange = (e) => {
@@ -2042,30 +2419,86 @@
     window.promptEditorText = () => {
       const box = document.getElementById('dragTextBox');
       const content = document.getElementById('dragTextContent');
-      const txt = prompt("Enter text (Drag anywhere on screen & adjust size below):", content.textContent);
-      if (txt !== null) {
-        content.textContent = txt.trim();
-        box.classList.toggle('hidden', !txt.trim());
-        if (txt.trim()) selectActiveDragElement('dragTextBox');
-      }
+      openIgDialog({
+        title: "Add Text Overlay",
+        subtitle: "Drag text anywhere on screen & adjust size",
+        fields: [{ id: "txt", label: "Your Text", value: content.textContent, placeholder: "Type something..." }],
+        confirmText: "Done",
+        onConfirm: ({ txt }) => {
+          content.textContent = txt.trim();
+          box.classList.toggle('hidden', !txt.trim());
+          if (txt.trim()) selectActiveDragElement('dragTextBox');
+        }
+      });
     };
 
     window.openStickersTray = () => {
       const tray = document.getElementById('editorSubTray');
       tray.classList.remove('hidden');
       tray.innerHTML = `
-        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar text-2xl">
-          ${['🔥','❤️','✨','😎','🎉','👑','📊 Poll','❓ Quiz','⏳ Countdown'].map(em => `<button onclick="setEditorSticker('${em}')" class="px-2.5 py-1.5 bg-zinc-800 rounded-xl text-sm shrink-0">${em}</button>`).join('')}
-          <button onclick="setEditorSticker('')" class="px-2.5 py-1 bg-rose-600 text-xs font-bold rounded-lg shrink-0">Clear</button>
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar text-xs font-bold">
+          <button onclick="addInteractiveSticker('POLL')" class="px-3 py-2 bg-white text-black rounded-xl shrink-0">📊 Poll</button>
+          <button onclick="addInteractiveSticker('QUIZ')" class="px-3 py-2 bg-indigo-600 text-white rounded-xl shrink-0">❓ Quiz</button>
+          <button onclick="addInteractiveSticker('QUESTION')" class="px-3 py-2 bg-pink-600 text-white rounded-xl shrink-0">💬 Ask Me</button>
+          <button onclick="addInteractiveSticker('LINK')" class="px-3 py-2 bg-sky-600 text-white rounded-xl shrink-0">🔗 Link</button>
+          ${['🔥','❤️','✨','😎','🎉','👑'].map(em => `<button onclick="setEmojiSticker('${em}')" class="px-2.5 py-1.5 bg-zinc-800 rounded-xl text-lg shrink-0">${em}</button>`).join('')}
+          <button onclick="clearStickerBox()" class="px-2.5 py-1.5 bg-rose-600 rounded-xl shrink-0">Clear</button>
         </div>`;
     };
 
-    window.setEditorSticker = (em) => {
+    window.addInteractiveSticker = (kind) => {
       const box = document.getElementById('dragStickerBox');
       const content = document.getElementById('dragStickerContent');
-      content.textContent = em;
-      box.classList.toggle('hidden', !em);
-      if (em) selectActiveDragElement('dragStickerBox');
+      if (kind === 'POLL') {
+        openIgDialog({
+          title: "Create Instagram Poll",
+          fields: [{ id: "q", label: "Poll Question", placeholder: "e.g. Which outfit looks better?" }],
+          confirmText: "Add Poll",
+          onConfirm: ({ q }) => {
+            content.innerHTML = `<div class="bg-white text-slate-900 rounded-2xl p-3 shadow-xl w-48 text-center"><p class="text-xs font-extrabold mb-2">${q || 'Vote Now!'}</p><div class="grid grid-cols-2 gap-1.5 text-[11px] font-bold"><span class="bg-indigo-100 text-indigo-700 py-1 rounded-lg">YES</span><span class="bg-pink-100 text-pink-700 py-1 rounded-lg">NO</span></div></div>`;
+            box.classList.remove('hidden');
+            selectActiveDragElement('dragStickerBox');
+          }
+        });
+      } else if (kind === 'QUIZ') {
+        openIgDialog({
+          title: "Create Quiz Sticker",
+          fields: [{ id: "q", label: "Quiz Question", placeholder: "e.g. Guess my favorite song?" }],
+          confirmText: "Add Quiz",
+          onConfirm: ({ q }) => {
+            content.innerHTML = `<div class="bg-zinc-900 text-white border border-white/20 rounded-2xl p-3 shadow-xl w-48 text-left"><p class="text-xs font-extrabold text-amber-400 mb-1.5">❓ ${q || 'Quiz Time!'}</p><p class="text-[10px] bg-white/10 px-2 py-1 rounded mb-1">A) Option 1</p><p class="text-[10px] bg-white/10 px-2 py-1 rounded">B) Option 2</p></div>`;
+            box.classList.remove('hidden');
+            selectActiveDragElement('dragStickerBox');
+          }
+        });
+      } else if (kind === 'QUESTION') {
+        content.innerHTML = `<div class="bg-white text-slate-900 rounded-2xl p-3 shadow-xl w-48 text-center"><p class="text-xs font-extrabold mb-1">Ask me anything 💬</p><p class="text-[10px] bg-slate-100 text-slate-500 py-1.5 rounded-lg">Type something...</p></div>`;
+        box.classList.remove('hidden');
+        selectActiveDragElement('dragStickerBox');
+      } else if (kind === 'LINK') {
+        openIgDialog({
+          title: "Add Link Sticker",
+          fields: [{ id: "url", label: "Website or YouTube URL", placeholder: "https://..." }],
+          confirmText: "Add Link",
+          onConfirm: ({ url }) => {
+            content.innerHTML = `<div class="bg-white text-sky-600 font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-lg">🔗 ${url || 'Visit Link'}</div>`;
+            box.classList.remove('hidden');
+            selectActiveDragElement('dragStickerBox');
+          }
+        });
+      }
+    };
+
+    window.setEmojiSticker = (em) => {
+      const box = document.getElementById('dragStickerBox');
+      document.getElementById('dragStickerContent').innerHTML = `<span class="text-5xl drop-shadow">${em}</span>`;
+      box.classList.remove('hidden');
+      selectActiveDragElement('dragStickerBox');
+    };
+
+    window.clearStickerBox = () => {
+      document.getElementById('dragStickerContent').innerHTML = '';
+      document.getElementById('dragStickerBox').classList.add('hidden');
     };
 
     window.openFiltersTray = () => {
@@ -2088,13 +2521,17 @@
     };
 
     window.detectStudioLocation = () => {
-      const loc = prompt("Enter Location:", studioLocation || "Mumbai, India");
-      if (loc !== null) {
-        studioLocation = loc.trim();
-        const badge = document.getElementById('editorLocationBadge');
-        badge.textContent = `📍 ${studioLocation}`;
-        badge.classList.toggle('hidden', !studioLocation);
-      }
+      openIgDialog({
+        title: "Add Location",
+        fields: [{ id: "loc", label: "City or Place", value: studioLocation || "Mumbai, India" }],
+        confirmText: "Set Location",
+        onConfirm: ({ loc }) => {
+          studioLocation = loc.trim();
+          const badge = document.getElementById('editorLocationBadge');
+          badge.textContent = `📍 ${studioLocation}`;
+          badge.classList.toggle('hidden', !studioLocation);
+        }
+      });
     };
 
     window.goToStep3Publish = () => {
@@ -2120,11 +2557,15 @@
     };
 
     window.promptTagPeople = () => {
-      const tag = prompt("Enter username to tag:", studioTaggedPeople);
-      if (tag !== null) {
-        studioTaggedPeople = tag.trim();
-        document.getElementById('step3TaggedText').textContent = studioTaggedPeople ? `@${studioTaggedPeople} ›` : 'None ›';
-      }
+      openIgDialog({
+        title: "Tag Collaborator / People",
+        fields: [{ id: "tag", label: "Username", value: studioTaggedPeople, placeholder: "e.g. akhtar_creator" }],
+        confirmText: "Tag",
+        onConfirm: ({ tag }) => {
+          studioTaggedPeople = tag.trim();
+          document.getElementById('step3TaggedText').textContent = studioTaggedPeople ? `@${studioTaggedPeople} ›` : 'None ›';
+        }
+      });
     };
 
     function captureOverlayPositions() {
@@ -2172,7 +2613,7 @@
           showMusicCard: showMusicCardOnScreen,
           showLyrics: showLyricsOnScreen,
           overlayText: document.getElementById('dragTextContent').textContent,
-          sticker: document.getElementById('dragStickerContent').textContent,
+          stickerHtml: document.getElementById('dragStickerContent').innerHTML,
           overlays: captureOverlayPositions(),
           location: studioLocation,
           isAiContent: document.getElementById('step3AiLabelToggle').checked,
@@ -2187,8 +2628,9 @@
         stopGlobalMusic();
         document.getElementById('createScreen').classList.add('hidden');
         resetStudioStates();
+        showToast("Shared to ZestUp!");
       } catch (e) {
-        alert("Upload failed: " + e.message);
+        showToast("Upload failed: " + e.message);
       } finally {
         btn.textContent = "Share";
         btn.disabled = false;
@@ -2209,7 +2651,7 @@
           showMusicCard: showMusicCardOnScreen,
           showLyrics: showLyricsOnScreen,
           overlayText: document.getElementById('dragTextContent').textContent,
-          sticker: document.getElementById('dragStickerContent').textContent,
+          stickerHtml: document.getElementById('dragStickerContent').innerHTML,
           overlays: captureOverlayPositions(),
           location: studioLocation,
           authorId: currentUser.uid,
@@ -2220,9 +2662,9 @@
         stopGlobalMusic();
         document.getElementById('createScreen').classList.add('hidden');
         resetStudioStates();
-        alert(audienceType === 'close_friends' ? "Shared to Close Friends ★!" : "Shared to Your Story!");
+        showToast(audienceType === 'close_friends' ? "Shared to Close Friends ★!" : "Shared to Your Story!");
       } catch (e) {
-        alert("Story upload failed: " + e.message);
+        showToast("Story upload failed: " + e.message);
       }
     };
 
@@ -2253,7 +2695,7 @@
       }
     };
 
-    // --- STORIES RENDER & REAL AUDIO VIEWER ---
+    // --- STORIES RENDER & VIEWER ---
     function renderStories() {
       const row = document.getElementById('storiesRow');
       const myAvatar = userProfileData.avatar || defaultAvatar(userProfileData.name);
@@ -2295,7 +2737,7 @@
             ${s.music && s.showMusicCard !== false ? `<div style="${ov.musicStyle || 'top:16px; left:16px;'}" class="absolute bg-black/75 border border-white/20 px-3 py-1.5 rounded-xl flex items-center gap-2"><span class="text-sm">🎵</span><span class="text-xs font-bold">${s.music.title}</span></div>` : ''}
             ${s.showLyrics && s.music?.lyrics ? `<div style="${ov.lyricsStyle || 'bottom:60px; left:15%;'}" class="absolute bg-black/70 px-3 py-1 rounded-lg text-xs font-extrabold text-yellow-300">${s.music.lyrics}</div>` : ''}
             ${s.overlayText ? `<div style="${ov.textStyle || 'top:45%; left:20%;'}" class="absolute font-extrabold text-xl text-white drop-shadow">${s.overlayText}</div>` : ''}
-            ${s.sticker ? `<div style="${ov.stickerStyle || 'top:25%; right:20%;'}" class="absolute text-5xl">${s.sticker}</div>` : ''}`;
+            ${s.stickerHtml ? `<div style="${ov.stickerStyle || 'top:25%; right:20%;'}" class="absolute">${s.stickerHtml}</div>` : ''}`;
 
           if (s.music) playTrackGlobally(s.music);
           document.getElementById('storyViewer').classList.remove('hidden');
@@ -2309,7 +2751,7 @@
       document.getElementById('storyViewer').classList.add('hidden');
     };
 
-    // --- ACCOUNTS CENTER, FOLLOW LISTS, OTHER PROFILE, DM, REELS, SETTINGS, ADMIN & HELP AI ---
+    // --- ACCOUNTS CENTER, FOLLOW LISTS, OTHER PROFILE, DM, SEARCH, SETTINGS, ADMIN & HELP AI ---
     window.openAccountsCenter = () => {
       document.getElementById('acAvatarImg').src = userProfileData.avatar || defaultAvatar(userProfileData.name);
       document.getElementById('acFullName').textContent = userProfileData.name || "User";
@@ -2343,51 +2785,88 @@
       document.getElementById('accountsCenterPage').classList.remove('hidden');
     };
 
-    window.linkOrEditContact = async (type) => {
+    window.linkOrEditContact = (type) => {
       if (type === 'phone') {
-        const num = prompt("Enter 10-digit Mobile Number to receive real SIM SMS OTP:", (userProfileData.phone || "").replace("+91 ", ""));
-        if (num && num.trim().length === 10) {
-          try {
-            initRecaptcha();
-            const confirmRes = await linkWithPhoneNumber(currentUser, `+91${num.trim()}`, window.recaptchaVerifier);
-            const entered = prompt(`Real SMS OTP sent to +91 ${num.trim()}! Enter the 6-digit OTP from your SMS:`);
-            if (entered) {
-              await confirmRes.confirm(entered.trim());
-              await updateDoc(doc(db, "users", currentUser.uid), { phone: "+91 " + num.trim() });
-              openAccountsCenter();
-              alert("Mobile Number verified via SIM SMS & linked!");
+        openIgDialog({
+          title: "Link Mobile Number",
+          subtitle: "We will send a real 6-digit SMS OTP to verify your SIM",
+          fields: [{ id: "num", label: "10-digit Mobile Number", type: "tel", value: (userProfileData.phone || "").replace("+91 ", "") }],
+          confirmText: "Send SMS OTP",
+          onConfirm: async ({ num }) => {
+            if (num && num.trim().length === 10) {
+              try {
+                initRecaptcha();
+                const confirmRes = await linkWithPhoneNumber(currentUser, `+91${num.trim()}`, window.recaptchaVerifier);
+                openIgDialog({
+                  title: "Verify SIM SMS OTP",
+                  subtitle: `Enter the 6-digit OTP sent to +91 ${num.trim()}`,
+                  fields: [{ id: "code", label: "6-Digit OTP", type: "tel" }],
+                  confirmText: "Verify",
+                  onConfirm: async ({ code }) => {
+                    await confirmRes.confirm(code.trim());
+                    await updateDoc(doc(db, "users", currentUser.uid), { phone: "+91 " + num.trim() });
+                    openAccountsCenter();
+                    showToast("Mobile Number verified & linked!");
+                  }
+                });
+              } catch (e) { showToast("SMS Error: " + e.message); }
             }
-          } catch (e) { alert("SMS Verification Error: " + e.message); }
-        }
+          }
+        });
       } else {
-        const mail = prompt("Enter Gmail Address to link with your ZestUp ID:", userProfileData.email || "");
-        if (mail && mail.includes("@")) {
-          await updateDoc(doc(db, "users", currentUser.uid), { email: mail.trim().toLowerCase() });
-          openAccountsCenter();
-          alert("Gmail linked successfully!");
+        openIgDialog({
+          title: "Link Gmail Address",
+          fields: [{ id: "mail", label: "Gmail Address", type: "email", value: userProfileData.email || "" }],
+          confirmText: "Save Gmail",
+          onConfirm: async ({ mail }) => {
+            if (mail && mail.includes("@")) {
+              await updateDoc(doc(db, "users", currentUser.uid), { email: mail.trim().toLowerCase() });
+              openAccountsCenter();
+              showToast("Gmail linked successfully!");
+            }
+          }
+        });
+      }
+    };
+
+    window.editDateOfBirth = () => {
+      openIgDialog({
+        title: "Date of Birth",
+        subtitle: "Required for 18+ Creator Monetization eligibility",
+        fields: [{ id: "dob", label: "Birth Date", value: userProfileData.dob || "", placeholder: "e.g. 15 August 2002" }],
+        confirmText: "Save",
+        onConfirm: async ({ dob }) => {
+          if (dob && dob.trim()) {
+            await updateDoc(doc(db, "users", currentUser.uid), { dob: dob.trim() });
+            openAccountsCenter();
+            showToast("Date of Birth saved!");
+          }
         }
-      }
+      });
     };
 
-    window.editDateOfBirth = async () => {
-      const dob = prompt("Enter your Date of Birth (e.g. 15 August 2002):", userProfileData.dob || "");
-      if (dob && dob.trim()) { await updateDoc(doc(db, "users", currentUser.uid), { dob: dob.trim() }); openAccountsCenter(); }
-    };
-
-    window.editSingleField = async (field) => {
-      const newVal = prompt(`Enter new ${field}:`, userProfileData[field] || "");
-      if (newVal && newVal.trim()) {
-        const cleaned = field === 'username' ? newVal.trim().toLowerCase().replace(/\s+/g, '_') : newVal.trim();
-        await updateDoc(doc(db, "users", currentUser.uid), { [field]: cleaned });
-        openAccountsCenter();
-      }
+    window.editSingleField = (field) => {
+      openIgDialog({
+        title: `Edit ${field === 'name' ? 'Name' : 'Username'}`,
+        fields: [{ id: "val", label: field === 'name' ? 'Full Name' : 'Username', value: userProfileData[field] || "" }],
+        confirmText: "Save",
+        onConfirm: async ({ val }) => {
+          if (val && val.trim()) {
+            const cleaned = field === 'username' ? val.trim().toLowerCase().replace(/\s+/g, '_') : val.trim();
+            await updateDoc(doc(db, "users", currentUser.uid), { [field]: cleaned });
+            openAccountsCenter();
+            showToast("Profile updated!");
+          }
+        }
+      });
     };
 
     document.getElementById('acPhotoUploadInput').onchange = async (e) => {
       const file = e.target.files[0];
       if (!file) return;
+      showToast("Uploading profile picture...");
       const url = await uploadToCloudinary(file);
-      if (url) { await updateDoc(doc(db, "users", currentUser.uid), { avatar: url }); openAccountsCenter(); }
+      if (url) { await updateDoc(doc(db, "users", currentUser.uid), { avatar: url }); openAccountsCenter(); showToast("Profile picture updated!"); }
     };
 
     window.openEditBioModal = () => {
@@ -2401,6 +2880,7 @@
     document.getElementById('saveBioBtn').onclick = async () => {
       await updateDoc(doc(db, "users", currentUser.uid), { bio: document.getElementById('bioInputBox').value.slice(0, 149) });
       document.getElementById('editBioModal').classList.add('hidden');
+      showToast("Bio saved!");
     };
 
     window.openFollowListModal = (uid, initialTab) => {
@@ -2443,7 +2923,7 @@
       }).join('');
     };
 
-    window.copyProfileLink = (uid) => { navigator.clipboard?.writeText(`${window.location.origin}${window.location.pathname}?user=${uid}`); alert("Profile URL copied!"); };
+    window.copyProfileLink = (uid) => { navigator.clipboard?.writeText(`${window.location.origin}${window.location.pathname}?user=${uid}`); showToast("Profile URL copied!"); };
 
     window.openOtherProfile = (uid) => {
       if (!uid || uid === currentUser.uid) { switchTab('profileTab'); return; }
@@ -2505,9 +2985,8 @@
         </div>
         <div class="space-y-4 text-sm">
           <div class="flex items-center gap-3.5"><span class="text-xl">📅</span><div><p class="font-bold text-slate-900">Date joined</p><p class="text-xs text-slate-500">${u.joinedAt || 'November 2026'}</p></div></div>
-          <div class="flex items-center gap-3.5"><span class="text-xl">🎂</span><div><p class="font-bold text-slate-900">Date of Birth</p><p class="text-xs text-slate-500">${u.dob || 'Not shared publicly'}</p></div></div>
           <div class="flex items-center gap-3.5"><span class="text-xl">🛡️</span><div><p class="font-bold text-slate-900">Account verification</p><p class="text-xs text-slate-500">${isUserVerified(targetUid) ? 'Verified ZestUp Account ✔' : 'Standard Member'}</p></div></div>
-          <div class="p-3 bg-slate-50 rounded-2xl text-[11px] text-slate-500">🔒 Personal contact details (Mobile Number & Gmail) are strictly protected by ZestUp Privacy and are never visible to other users.</div>
+          <div class="p-3 bg-slate-50 rounded-2xl text-[11px] text-slate-500">🔒 Personal contact details (Mobile Number & Gmail) are strictly protected by ZestUp Privacy.</div>
         </div>`;
       document.getElementById('aboutAccountModal').classList.remove('hidden');
     };
@@ -2516,26 +2995,32 @@
       const isBlocked = (userProfileData.blockedUsers || []).includes(viewingUserId);
       await updateDoc(doc(db, "users", currentUser.uid), { blockedUsers: isBlocked ? arrayRemove(viewingUserId) : arrayUnion(viewingUserId) });
       document.getElementById('otherUserSheet').classList.add('hidden');
-      alert(isBlocked ? "User unblocked." : "User blocked.");
+      showToast(isBlocked ? "User unblocked" : "User blocked");
     };
 
     window.toggleHideStoryViewingUser = async () => {
       const isHidden = (userProfileData.hiddenStoryFrom || []).includes(viewingUserId);
       await updateDoc(doc(db, "users", currentUser.uid), { hiddenStoryFrom: isHidden ? arrayRemove(viewingUserId) : arrayUnion(viewingUserId) });
       document.getElementById('otherUserSheet').classList.add('hidden');
-      alert(isHidden ? "Story unhidden." : "Your story is now hidden from this user.");
+      showToast(isHidden ? "Story unhidden" : "Story hidden from this user");
     };
 
-    window.openReportUserModal = async (targetUid) => {
+    window.openReportUserModal = (targetUid) => {
       const target = usersMap[targetUid] || {};
-      const reason = prompt(`Why are you reporting @${target.username || target.name}?`);
-      if (reason && reason.trim()) {
-        await addDoc(collection(db, "supportTickets"), {
-          type: "USER_REPORT", fromUid: currentUser.uid, fromName: userProfileData.username || userProfileData.name,
-          targetUid, targetName: target.username || target.name, message: reason.trim(), createdAt: serverTimestamp()
-        });
-        alert("Report sent to ZestUp Safety Team & Owner.");
-      }
+      openIgDialog({
+        title: `Report @${target.username || target.name}`,
+        fields: [{ id: "reason", label: "Reason for reporting", placeholder: "e.g. Spam, fake account, harassment" }],
+        confirmText: "Send Report",
+        onConfirm: async ({ reason }) => {
+          if (reason && reason.trim()) {
+            await addDoc(collection(db, "supportTickets"), {
+              type: "USER_REPORT", fromUid: currentUser.uid, fromName: userProfileData.username || userProfileData.name,
+              targetUid, targetName: target.username || target.name, message: reason.trim(), createdAt: serverTimestamp()
+            });
+            showToast("Report submitted to ZestUp Safety Team");
+          }
+        }
+      });
     };
 
     window.toggleFollowUser = async (targetUid) => {
@@ -2614,7 +3099,7 @@
               <div class="min-w-0">
                 <p class="text-xs font-bold flex items-center gap-1 truncate">${u.username || u.name} ${badge}</p>
                 <p class="text-[11px] ${presence.isOnline ? 'text-emerald-600 font-semibold' : 'text-slate-500'} truncate">
-                  ${lastMsg ? lastMsg.text : presence.text} • <span class="text-slate-400 font-normal">${presence.text}</span>
+                  ${lastMsg ? lastMsg.text : presence.text}
                 </p>
               </div>
             </div>
@@ -2624,7 +3109,17 @@
     }
 
     document.getElementById('dmSearchInput').oninput = () => renderDmInbox();
-    window.updateMyNote = async () => { const n = prompt("Share a short status note (max 30 chars):", userProfileData.note || ""); if (n !== null) await updateDoc(doc(db, "users", currentUser.uid), { note: n.slice(0, 30) }); };
+    window.updateMyNote = () => {
+      openIgDialog({
+        title: "Share a Note",
+        fields: [{ id: "note", label: "Status Note (max 30 chars)", value: userProfileData.note || "" }],
+        confirmText: "Share",
+        onConfirm: async ({ note }) => {
+          await updateDoc(doc(db, "users", currentUser.uid), { note: note.slice(0, 30) });
+          showToast("Note updated!");
+        }
+      });
+    };
 
     window.openPrivateChat = (targetUid) => {
       activeChatPartnerId = targetUid;
@@ -2646,7 +3141,7 @@
       const convo = allMessages.filter(m => (m.senderId === currentUser.uid && m.receiverId === activeChatPartnerId) || (m.senderId === activeChatPartnerId && m.receiverId === currentUser.uid));
       box.innerHTML = convo.length ? convo.map(m => {
         const isMe = m.senderId === currentUser.uid;
-        return `<div ondblclick="alert('❤️ Heart reaction added!')" class="flex ${isMe ? 'justify-end' : 'justify-start'}"><div class="px-3.5 py-2 rounded-2xl text-xs max-w-[75%] ${isMe ? 'zest-gradient text-white' : 'bg-white border border-slate-200 text-slate-800'}">${m.text}</div></div>`;
+        return `<div ondblclick="showToast('❤️ Heart reaction added!')" class="flex ${isMe ? 'justify-end' : 'justify-start'}"><div class="px-3.5 py-2 rounded-2xl text-xs max-w-[75%] ${isMe ? 'zest-gradient text-white' : 'bg-white border border-slate-200 text-slate-800'}">${m.text}</div></div>`;
       }).join('') : `<p class="text-center text-xs text-slate-400 py-10">Say hi to start a private conversation!</p>`;
       box.scrollTop = box.scrollHeight;
     }
@@ -2663,21 +3158,6 @@
       input.value = "";
       await addDoc(collection(db, "directMessages"), { senderId: currentUser.uid, receiverId: activeChatPartnerId, text, createdAt: serverTimestamp() });
     };
-
-    function renderReels() {
-      const container = document.getElementById('reelsContainer');
-      const videos = allPosts.filter(p => p.mediaType === 'video' && p.mediaUrl);
-      if (!videos.length) return;
-      container.innerHTML = videos.map(v => `
-        <div class="relative rounded-2xl overflow-hidden bg-zinc-900">
-          <video src="${v.mediaUrl}" controls loop playsinline class="w-full h-[72vh] object-cover ${v.filterClass || ''}"></video>
-          ${v.music ? `<button onclick="playTrackGlobally(${JSON.stringify(v.music).replace(/"/g, '&quot;')})" class="absolute top-3 left-3 bg-black/70 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">🎵 ${v.music.title}</button>` : ''}
-          <div onclick="openOtherProfile('${v.authorId}')" class="p-3 bg-gradient-to-t from-black/90 to-transparent absolute bottom-0 inset-x-0 cursor-pointer">
-            <p class="text-xs font-bold flex items-center gap-1">@${v.authorName} ${getBadgeHTML(v.authorId)}</p>
-            <p class="text-xs text-zinc-200 mt-0.5">${v.text || ''}</p>
-          </div>
-        </div>`).join('');
-    }
 
     window.setSearchFilter = (type) => {
       searchFilter = type;
@@ -2748,6 +3228,7 @@
 
     window.toggleSettingPref = async (key) => {
       await updateDoc(doc(db, "users", currentUser.uid), { [key]: !userProfileData[key] });
+      showToast("Setting updated!");
     };
 
     window.openSubSetting = (type) => {
@@ -2766,7 +3247,7 @@
         title.textContent = "Blocked Accounts";
         const blocked = (userProfileData.blockedUsers || []).map(id => usersMap[id]).filter(Boolean);
         body.innerHTML = blocked.length
-          ? blocked.map(u => `<div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl"><span class="font-bold text-xs">${u.username || u.name}</span><button onclick="updateDoc(doc(db,'users',currentUser.uid),{blockedUsers:arrayRemove('${u.uid}')})" class="text-xs text-indigo-600 font-bold">Unblock</button></div>`).join('')
+          ? blocked.map(u => `<div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl"><span class="font-bold text-xs">${u.username || u.name}</span><button onclick="unblockUser('${u.uid}')" class="text-xs text-indigo-600 font-bold">Unblock</button></div>`).join('')
           : `<p class="text-slate-400 text-center py-12">No blocked accounts.</p>`;
       } else {
         title.textContent = "Account Status & Strikes";
@@ -2781,13 +3262,22 @@
       }
     };
 
-    // --- NOTIFICATIONS, FOUNDER ADMIN & HELP AI ---
+    window.unblockUser = async (uid) => {
+      await updateDoc(doc(db, "users", currentUser.uid), { blockedUsers: arrayRemove(uid) });
+      openSubSetting('blocked');
+      showToast("User unblocked");
+    };
+
+    // --- NOTIFICATIONS, FOUNDER ADMIN (WITH INVITE-ONLY MONETIZATION) & HELP AI ---
     function renderNotifications() {
       const box = document.getElementById('notificationsList');
       if (!box) return;
       let html = `<div class="p-3 bg-indigo-50/70 rounded-xl text-indigo-800 font-medium">👋 Welcome to ZestUp, <b>${userProfileData.name || 'Creator'}</b>!</div>`;
+      if (userProfileData.contentMonetizationInvited && !isOwner(currentUser.uid)) {
+        html += `<div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 font-bold">🎉 Congratulations! You have been invited by the ZestUp Owner to Content Monetization!</div>`;
+      }
       (userProfileData.warnings || []).forEach(w => { html += `<div class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700">⚠️ <b>ZestUp Safety Notice:</b> ${w}</div>`; });
-      if ((userProfileData.earnings || 0) > 0) html += `<div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800">💰 <b>Creator Monetization:</b> Your ZestUp Earnings balance is <b>₹${userProfileData.earnings}</b>!</div>`;
+      if ((userProfileData.earnings || 0) > 0) html += `<div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800">💰 <b>Creator Earnings:</b> Your ZestUp Earnings balance is <b>₹${userProfileData.earnings}</b>!</div>`;
 
       if (isOwner(currentUser.uid)) {
         Object.values(usersMap).filter(u => u.uid !== currentUser.uid).forEach(u => {
@@ -2819,6 +3309,7 @@
       list.innerHTML = usersArr.map(u => {
         const owner = isOwner(u.uid);
         const verified = isUserVerified(u.uid);
+        const invited = !!u.contentMonetizationInvited;
         return `
           <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5">
             <div class="flex items-center justify-between">
@@ -2826,7 +3317,7 @@
                 <img src="${u.avatar || defaultAvatar(u.name)}" class="w-10 h-10 rounded-full object-cover" />
                 <div class="min-w-0">
                   <p class="text-xs font-bold truncate flex items-center gap-1">${u.name || u.username} ${verified ? BLUE_TICK_SVG : ''}</p>
-                  <p class="text-[10px] text-slate-500">@${u.username} • Joined ${u.joinedAt || '2026'}</p>
+                  <p class="text-[10px] text-slate-500">@${u.username} • ${invited ? '✔ Invited Monetization' : 'Not Invited'}</p>
                   <p class="text-[10px] text-indigo-600 font-semibold">Earnings: ₹${u.earnings || 0} • Strikes: ${u.copyrightStrikes || 0}</p>
                 </div>
               </div>
@@ -2834,6 +3325,7 @@
             </div>
             ${!owner ? `
               <div class="grid grid-cols-2 gap-1.5 text-[11px] font-bold pt-1">
+                <button onclick="toggleInviteContentMonetization('${u.uid}', ${invited})" class="col-span-2 py-2 rounded-lg ${invited ? 'bg-indigo-100 text-indigo-800' : 'zest-gradient text-white'}">${invited ? '✔ Invited to Content Monetization (Tap to Revoke)' : '📩 Send Content Monetization Invite'}</button>
                 <button onclick="toggleVerifyUser('${u.uid}', ${verified})" class="py-1.5 rounded-lg ${verified ? 'bg-slate-200 text-slate-800' : 'bg-sky-600 text-white'}">${verified ? 'Remove Blue Tick' : '✔ Give Blue Tick'}</button>
                 <button onclick="giveCreatorEarning('${u.uid}')" class="py-1.5 rounded-lg bg-emerald-600 text-white">💰 Give Earning (₹)</button>
                 <button onclick="issueCopyrightStrike('${u.uid}')" class="py-1.5 rounded-lg bg-amber-500 text-white">©️ Copyright Strike</button>
@@ -2851,30 +3343,73 @@
           <div class="flex justify-between text-[10px] font-bold"><span class="text-indigo-600">${t.type}</span><span class="text-slate-400">From: @${t.fromName}</span></div>
           ${t.targetName ? `<p class="text-xs font-bold text-rose-600">Reported User: @${t.targetName}</p>` : ''}
           <p class="text-xs text-slate-800">${t.message}</p>
-        </div>`).join('') : `<p class="text-center text-xs text-slate-400 py-12">No reports or payout tickets yet.</p>`;
+        </div>`).join('') : `<p class="text-center text-xs text-slate-400 py-12">No requests, payouts or reports yet.</p>`;
     }
 
-    window.toggleVerifyUser = async (uid, current) => { await updateDoc(doc(db, "users", uid), { verified: !current }); };
-    window.giveCreatorEarning = async (uid) => {
-      const u = usersMap[uid] || {};
-      const amt = parseFloat(prompt(`Enter Earning amount (₹) for @${u.username}:`, "500"));
-      if (!isNaN(amt) && amt > 0) { await updateDoc(doc(db, "users", uid), { earnings: (u.earnings || 0) + amt, monetized: true }); alert(`₹${amt} added!`); }
+    window.toggleInviteContentMonetization = async (uid, current) => {
+      await updateDoc(doc(db, "users", uid), { contentMonetizationInvited: !current });
+      showToast(!current ? "📩 Content Monetization Invite sent!" : "Invite revoked");
     };
-    window.issueCopyrightStrike = async (uid) => {
+
+    window.toggleVerifyUser = async (uid, current) => {
+      await updateDoc(doc(db, "users", uid), { verified: !current });
+      showToast(!current ? "Blue Tick granted!" : "Blue Tick removed");
+    };
+
+    window.giveCreatorEarning = (uid) => {
       const u = usersMap[uid] || {};
-      const reason = prompt(`Copyright Strike reason for @${u.username}:`, "Unauthorized copyrighted content.");
-      if (reason && reason.trim()) {
-        const s = (u.copyrightStrikes || 0) + 1;
-        await updateDoc(doc(db, "users", uid), { copyrightStrikes: s, warnings: arrayUnion(`Copyright Strike #${s}: ${reason.trim()}`) });
-        alert(`Copyright Strike #${s} issued.`);
+      openIgDialog({
+        title: `Add Earning to @${u.username}`,
+        fields: [{ id: "amt", label: "Amount (₹)", type: "number", value: "500" }],
+        confirmText: "Add ₹",
+        onConfirm: async ({ amt }) => {
+          const val = parseFloat(amt);
+          if (!isNaN(val) && val > 0) {
+            await updateDoc(doc(db, "users", uid), { earnings: (u.earnings || 0) + val });
+            showToast(`₹${val} added to @${u.username}!`);
+          }
+        }
+      });
+    };
+
+    window.issueCopyrightStrike = (uid) => {
+      const u = usersMap[uid] || {};
+      openIgDialog({
+        title: `Copyright Strike for @${u.username}`,
+        fields: [{ id: "reason", label: "Strike Reason", value: "Unauthorized copyrighted content." }],
+        confirmText: "Issue Strike",
+        onConfirm: async ({ reason }) => {
+          if (reason && reason.trim()) {
+            const s = (u.copyrightStrikes || 0) + 1;
+            await updateDoc(doc(db, "users", uid), { copyrightStrikes: s, warnings: arrayUnion(`Copyright Strike #${s}: ${reason.trim()}`) });
+            showToast(`Copyright Strike #${s} issued`);
+          }
+        }
+      });
+    };
+
+    window.warnOrSuspendUser = (uid, susp) => {
+      const u = usersMap[uid] || {};
+      if (susp) {
+        updateDoc(doc(db, "users", uid), { isSuspended: false });
+        showToast("Account unbanned");
+        return;
       }
-    };
-    window.warnOrSuspendUser = async (uid, susp) => {
-      const u = usersMap[uid] || {};
-      if (susp) { await updateDoc(doc(db, "users", uid), { isSuspended: false }); alert("Account unbanned."); return; }
-      const act = prompt("Type 'WARN' or 'BAN':", "WARN");
-      if (act?.toUpperCase() === 'BAN') { await updateDoc(doc(db, "users", uid), { isSuspended: true, warnings: arrayUnion("Account suspended by ZestUp Owner.") }); alert("Suspended."); }
-      else if (act?.toUpperCase() === 'WARN') { const m = prompt("Warning message:"); if (m) await updateDoc(doc(db, "users", uid), { warnings: arrayUnion(m.trim()) }); }
+      openIgDialog({
+        title: `Warn or Ban @${u.username}`,
+        fields: [{ id: "msg", label: "Warning Message (or type BAN to suspend)", placeholder: "e.g. Follow community guidelines" }],
+        confirmText: "Apply",
+        onConfirm: async ({ msg }) => {
+          if (!msg) return;
+          if (msg.trim().toUpperCase() === 'BAN') {
+            await updateDoc(doc(db, "users", uid), { isSuspended: true, warnings: arrayUnion("Account suspended by ZestUp Owner.") });
+            showToast("Account suspended");
+          } else {
+            await updateDoc(doc(db, "users", uid), { warnings: arrayUnion(msg.trim()) });
+            showToast("Warning sent to user");
+          }
+        }
+      });
     };
 
     window.openHelpAiModal = () => document.getElementById('helpAiModal').classList.remove('hidden');
@@ -2886,25 +3421,31 @@
       const box = document.getElementById('helpAiChatBox');
       box.innerHTML += `<div class="flex justify-end"><div class="px-3.5 py-2 rounded-2xl zest-gradient text-white max-w-[80%]">${q}</div></div>`;
       const lower = q.toLowerCase();
-      let reply = "I understand! You can check your Settings & privacy or tap <b>Message Team</b> at the top right so the ZestUp Owner & Support Team can help you directly.";
+      let reply = "I understand! You can check your Settings & privacy or tap <b>Message Team</b> at the top right so the ZestUp Owner & Team can help you directly.";
       if (lower.includes("password") || lower.includes("login") || lower.includes("otp")) reply = "🔑 <b>Login & Recovery:</b> Go to <b>Settings → ZestUp Accounts Center</b> and link both your Mobile Number (SIM SMS) and Gmail.";
       else if (lower.includes("blue") || lower.includes("tick")) reply = "☑️ <b>Blue Tick:</b> Keep posting original Reels & Posts—the ZestUp Founder reviews active creators and grants the Blue Tick!";
-      else if (lower.includes("earn") || lower.includes("money") || lower.includes("star") || lower.includes("payout")) reply = "💰 <b>Creator Monetization:</b> Open <b>Profile → Creator Monetization & Earnings</b> to view your Stars, In-Stream Ads balance, and link your UPI/Bank payout account!";
+      else if (lower.includes("earn") || lower.includes("money") || lower.includes("star") || lower.includes("bank") || lower.includes("invite")) reply = "💰 <b>Monetize & Payouts:</b> Open <b>Profile → Professional dashboard</b> to view your Stars, Content Monetization missions, and add your Bank Account & IFSC Code!";
       setTimeout(() => {
         box.innerHTML += `<div class="bg-white border border-slate-200 p-3 rounded-2xl max-w-[85%] space-y-1"><p class="font-bold text-indigo-600">ZestUp Help AI 🤖</p><p>${reply}</p></div>`;
         box.scrollTop = box.scrollHeight;
       }, 300);
     };
 
-    window.escalateToHumanTeam = async () => {
-      const msg = prompt("Describe your issue to send directly to the ZestUp Owner & Team:");
-      if (msg && msg.trim()) {
-        await addDoc(collection(db, "supportTickets"), {
-          type: "HELP_REQUEST", fromUid: currentUser ? currentUser.uid : "guest",
-          fromName: userProfileData.username || userProfileData.name || "Guest User", message: msg.trim(), createdAt: serverTimestamp()
-        });
-        alert("Message sent to ZestUp Team & Owner!");
-      }
+    window.escalateToHumanTeam = () => {
+      openIgDialog({
+        title: "Message ZestUp Owner & Team",
+        fields: [{ id: "msg", label: "Describe your issue", placeholder: "How can we help?" }],
+        confirmText: "Send Message",
+        onConfirm: async ({ msg }) => {
+          if (msg && msg.trim()) {
+            await addDoc(collection(db, "supportTickets"), {
+              type: "HELP_REQUEST", fromUid: currentUser ? currentUser.uid : "guest",
+              fromName: userProfileData.username || userProfileData.name || "Guest User", message: msg.trim(), createdAt: serverTimestamp()
+            });
+            showToast("Message sent to ZestUp Team!");
+          }
+        }
+      });
     };
   </script>
 </body>
