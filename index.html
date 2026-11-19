@@ -9,16 +9,16 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; color: #0f172a; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; -webkit-tap-highlight-color: transparent; }
     body.dark-mode { background-color: #09090b; color: #f8fafc; }
     body.dark-mode .bg-white { background-color: #18181b !important; color: #f8fafc !important; }
     body.dark-mode .bg-slate-50, body.dark-mode .bg-slate-100 { background-color: #27272a !important; color: #e4e4e7 !important; }
     body.dark-mode .border-slate-100, body.dark-mode .border-slate-200 { border-color: #27272a !important; }
     body.dark-mode .text-slate-900, body.dark-mode .text-slate-800 { color: #f8fafc !important; }
-    body.dark-mode .text-slate-700, body.dark-mode .text-slate-600 { color: #d4d4d8 !important; }
     .zest-gradient { background: linear-gradient(135deg, #4F46E5 0%, #9333EA 55%, #EC4899 100%); }
     .zest-text-gradient { background: linear-gradient(135deg, #4F46E5 0%, #9333EA 55%, #EC4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .ring-story { background: linear-gradient(135deg, #4F46E5, #EC4899, #F59E0B); padding: 2.5px; border-radius: 9999px; }
+    .ring-story { background: linear-gradient(135deg, #F59E0B, #EC4899, #4F46E5); padding: 2.5px; border-radius: 9999px; }
+    .ring-close { background: #10B981; padding: 2.5px; border-radius: 9999px; }
     .ring-owner { background: #09090b; padding: 2.5px; border-radius: 9999px; }
     .ring-none { background: #e2e8f0; padding: 1.5px; border-radius: 9999px; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -30,18 +30,22 @@
     .filter-vintage { filter: sepia(0.6) contrast(0.95) brightness(0.95); }
     .filter-bw { filter: grayscale(1) contrast(1.2); }
     .filter-glow { filter: brightness(1.12) contrast(1.08) drop-shadow(0 0 8px rgba(236,72,153,0.4)); }
-    .txt-bg-none { background: #ffffff; color: #0f172a; }
-    .txt-bg-indigo { background: linear-gradient(135deg, #4F46E5, #9333EA); color: #ffffff; }
-    .txt-bg-sunset { background: linear-gradient(135deg, #F59E0B, #EC4899); color: #ffffff; }
-    .txt-bg-ocean { background: linear-gradient(135deg, #0284C7, #10B981); color: #ffffff; }
-    .txt-bg-dark { background: linear-gradient(135deg, #18181b, #3f3f46); color: #ffffff; }
-    .txt-bg-rose { background: linear-gradient(135deg, #E11D48, #FB7185); color: #ffffff; }
+    @keyframes heartPop {
+      0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+      50% { transform: translate(-50%, -50%) scale(1.25); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+    }
+    .animate-heart-pop { animation: heartPop 0.75s ease-out forwards; }
+    .draggable-item { touch-action: none; user-select: none; cursor: grab; position: absolute; }
+    .draggable-item:active { cursor: grabbing; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center bg-slate-100 text-slate-900">
+<body class="min-h-screen flex flex-col items-center bg-slate-50 text-slate-900">
 
-  <!-- Invisible reCAPTCHA for Real SIM SMS OTP -->
   <div id="recaptcha-container"></div>
+  <!-- Global Hidden Audio & YouTube Player Engine -->
+  <audio id="globalAudioPlayer" loop class="hidden"></audio>
+  <div id="globalYtContainer" class="fixed -top-96 -left-96 w-1 h-1 opacity-0 pointer-events-none"></div>
 
   <!-- 1. AUTH SCREEN (Real SIM SMS OTP + Password Login & Sign Up) -->
   <main id="authSection" class="hidden w-full max-w-md px-5 py-8 flex-1 flex flex-col justify-center bg-white min-h-screen">
@@ -76,16 +80,13 @@
 
       <div class="space-y-2.5">
         <input id="authFullName" type="text" placeholder="Full Name" class="hidden w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
-
         <div id="phoneInputBox" class="flex gap-2">
           <span class="px-3 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-sm font-semibold text-slate-700">+91</span>
           <input id="phoneInput" type="tel" maxlength="10" placeholder="10-digit Mobile Number" class="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
         </div>
-
         <div id="gmailInputBox" class="hidden">
           <input id="emailInput" type="email" placeholder="Enter your Gmail (e.g. name@gmail.com)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
         </div>
-
         <div id="loginMethodRow" class="flex items-center justify-between text-[11px] px-1">
           <span class="text-slate-500">Login via:</span>
           <div class="flex gap-3 font-bold">
@@ -93,18 +94,14 @@
             <button id="loginViaPassBtn" onclick="setLoginSubType('password')" class="text-slate-400">Password</button>
           </div>
         </div>
-
         <div id="passwordFieldBox" class="hidden">
           <input id="passwordInput" type="password" placeholder="Enter Password" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
         </div>
-
         <div id="otpBox" class="hidden space-y-2 pt-1">
           <p id="otpHintText" class="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl text-center">📩 Real SMS OTP sent to your SIM!</p>
           <input id="otpCodeInput" type="tel" maxlength="6" placeholder="Enter 6-digit SMS OTP" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-indigo-300 text-center tracking-[0.4em] font-bold text-base focus:outline-none" />
         </div>
-
         <p id="authError" class="text-xs text-rose-500 font-medium hidden"></p>
-
         <button id="primaryAuthBtn" class="w-full py-2.5 rounded-xl zest-gradient font-bold text-white text-sm shadow-sm">Send SMS OTP to SIM</button>
         <button id="verifyOtpAuthBtn" class="hidden w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-bold text-white text-sm shadow-sm">Verify SIM OTP & Continue</button>
       </div>
@@ -115,10 +112,10 @@
     </div>
   </main>
 
-  <!-- MAIN ZESTUP APP SHELL -->
-  <div id="appShell" class="hidden w-full max-w-md flex-1 flex flex-col bg-slate-100 min-h-screen relative shadow-sm">
+  <!-- MAIN ZESTUP APP SHELL (A-to-Z Instagram UI + Facebook Monetization) -->
+  <div id="appShell" class="hidden w-full max-w-md flex-1 flex flex-col bg-white min-h-screen relative shadow-sm">
 
-    <!-- 1. HOME TAB -->
+    <!-- 1. INSTAGRAM HOME TAB -->
     <section id="homeTab" class="flex-1 pb-16">
       <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 px-4 py-2.5 flex items-center justify-between">
         <button onclick="openCreateStudio('REEL')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-xl font-bold text-slate-900">+</button>
@@ -130,32 +127,28 @@
           </svg>
           <span class="text-xl font-extrabold tracking-tight zest-text-gradient">ZestUp</span>
         </div>
-        <button onclick="switchTab('activityTab')" class="relative p-1.5 rounded-xl hover:bg-slate-100">
-          <svg class="w-6 h-6 text-slate-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-          <span class="w-2 h-2 bg-pink-500 rounded-full absolute top-1.5 right-1.5"></span>
-        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="stopGlobalMusic()" id="stopMusicHeaderBtn" class="hidden text-[10px] font-bold bg-pink-100 text-pink-700 px-2 py-1 rounded-full animate-pulse">🔊 Stop Music</button>
+          <button onclick="switchTab('activityTab')" class="relative p-1.5 rounded-xl hover:bg-slate-100">
+            <svg class="w-6 h-6 text-slate-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            <span class="w-2 h-2 bg-pink-500 rounded-full absolute top-1.5 right-1.5"></span>
+          </button>
+        </div>
       </header>
 
-      <!-- Facebook-style Quick Status Composer Bar -->
-      <div class="bg-white px-3.5 py-2.5 border-b border-slate-100 flex items-center gap-2.5">
-        <img id="homeComposerAvatar" onclick="switchTab('profileTab')" class="w-9 h-9 rounded-full object-cover cursor-pointer" />
-        <button onclick="openCreateStudio('TEXT')" class="flex-1 text-left px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-xs text-slate-500 font-medium">What's on your mind?</button>
-        <button onclick="openCreateStudio('POST')" class="p-2 rounded-xl bg-emerald-50 text-emerald-600 text-base" title="Photo/Video">🖼️</button>
-      </div>
-
       <div id="liveBannerRow" class="hidden px-3 py-2 bg-rose-50 border-b border-rose-100 flex items-center gap-3 overflow-x-auto no-scrollbar"></div>
-      <div id="storiesRow" class="bg-white flex items-center gap-3.5 px-3 py-3 overflow-x-auto no-scrollbar border-b border-slate-200/70"></div>
+      <div id="storiesRow" class="bg-white flex items-center gap-3.5 px-3 py-3 overflow-x-auto no-scrollbar border-b border-slate-100"></div>
 
-      <!-- CLEAN FACEBOOK-STYLE FEED CARDS -->
-      <div id="feedContainer" class="space-y-2.5 pt-2">
+      <!-- INSTAGRAM FEED -->
+      <div id="feedContainer" class="divide-y divide-slate-100">
         <p class="text-center text-xs text-slate-400 py-12">Loading ZestUp feed...</p>
       </div>
     </section>
 
-    <!-- 2. REELS TAB -->
+    <!-- 2. INSTAGRAM REELS TAB -->
     <section id="reelsTab" class="hidden flex-1 bg-zinc-950 text-white pb-16 min-h-screen">
       <div class="sticky top-0 z-30 px-4 py-3 flex items-center justify-between bg-gradient-to-b from-black/80 to-transparent">
-        <h2 class="text-lg font-extrabold tracking-tight">ZestUp Reels</h2>
+        <h2 class="text-lg font-extrabold tracking-tight">Reels</h2>
         <button onclick="openCreateStudio('REEL')" class="text-xs zest-gradient px-3.5 py-1.5 rounded-full font-bold">+ Create Reel</button>
       </div>
       <div id="reelsContainer" class="space-y-4 px-2.5 pb-6">
@@ -163,7 +156,7 @@
       </div>
     </section>
 
-    <!-- 3. MESSAGES / DM INBOX TAB -->
+    <!-- 3. INSTAGRAM DM INBOX TAB -->
     <section id="chatTab" class="hidden flex-1 flex flex-col pb-16 min-h-screen bg-white">
       <header class="sticky top-0 z-40 bg-white px-4 py-3 flex items-center justify-between border-b border-slate-100">
         <button onclick="switchTab('profileTab')" class="p-1 text-slate-800">
@@ -215,7 +208,8 @@
       </header>
       <div id="privateMessagesBox" class="flex-1 overflow-y-auto p-4 space-y-2.5 bg-slate-50"></div>
       <div class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
-        <input id="privateMsgInput" type="text" placeholder="Write a message..." class="flex-1 bg-slate-100 text-sm px-4 py-2.5 rounded-full focus:outline-none" />
+        <button onclick="sendVoiceNoteDm()" class="p-2 rounded-full bg-slate-100 text-sm" title="Voice Note">🎙️</button>
+        <input id="privateMsgInput" type="text" placeholder="Message..." class="flex-1 bg-slate-100 text-sm px-4 py-2.5 rounded-full focus:outline-none" />
         <button id="sendPrivateMsgBtn" class="px-4 py-2 rounded-full zest-gradient text-white font-bold text-xs">Send</button>
       </div>
     </section>
@@ -236,7 +230,7 @@
       <div id="exploreGrid" class="grid grid-cols-3 gap-0.5 pt-0.5"></div>
     </section>
 
-    <!-- 5. OWN PROFILE TAB -->
+    <!-- 5. INSTAGRAM PROFILE TAB + FACEBOOK MONETIZATION DASHBOARD -->
     <section id="profileTab" class="hidden flex-1 pb-16 bg-white">
       <header class="sticky top-0 z-40 bg-white px-4 py-3 flex items-center justify-between border-b border-slate-100">
         <button onclick="openCreateStudio('REEL')" class="text-2xl font-light leading-none">+</button>
@@ -270,27 +264,29 @@
           <p id="profBio" class="text-xs text-slate-700 whitespace-pre-line">Creator on ZestUp ✨</p>
         </div>
 
-        <div onclick="openSubSetting('dashboard')" class="mt-3 bg-slate-100 rounded-2xl px-3.5 py-2.5 cursor-pointer flex items-center justify-between">
+        <!-- FACEBOOK-STYLE MONETIZATION & CREATOR EARNINGS DASHBOARD -->
+        <div onclick="openFbMonetizationHub()" class="mt-3 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 rounded-2xl px-3.5 py-2.5 cursor-pointer flex items-center justify-between">
           <div>
-            <p class="text-xs font-bold text-slate-900">Creator dashboard</p>
-            <p id="dashboardSummaryText" class="text-[11px] text-slate-500">↗ 0 engagements • Balance: ₹0</p>
+            <p class="text-xs font-extrabold text-indigo-900 flex items-center gap-1">💰 Creator Monetization & Earnings</p>
+            <p id="dashboardSummaryText" class="text-[11px] text-indigo-600 font-semibold">Balance: ₹0 • Stars, In-Stream Ads & Payouts</p>
           </div>
-          <span class="text-slate-400 text-sm">›</span>
+          <span class="text-indigo-500 font-bold text-sm">›</span>
         </div>
 
         <div class="grid grid-cols-2 gap-2 mt-3">
-          <button onclick="openEditBioModal()" class="py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Edit Bio & Profile</button>
-          <button onclick="openShareProfileSheet(currentUser.uid)" class="py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Share profile</button>
+          <button onclick="openEditBioModal()" class="py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Edit profile</button>
+          <button onclick="openShareSheet(null, currentUser.uid)" class="py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold text-xs text-slate-900">Share profile</button>
         </div>
 
-        <button id="adminPanelBtn" onclick="openAdminModal()" class="hidden w-full mt-2.5 py-2.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold text-xs flex items-center justify-center gap-1.5">
-          <span>🛡️ Founder Admin: Users, Strikes, Earnings & Help</span>
+        <button id="adminPanelBtn" onclick="openAdminModal()" class="hidden w-full mt-2.5 py-2.5 rounded-xl bg-zinc-900 text-white font-bold text-xs flex items-center justify-center gap-1.5">
+          <span>🛡️ Founder Admin: Users, Monetization, Strikes & Help</span>
         </button>
 
-        <div class="flex items-center gap-4 mt-4 overflow-x-auto no-scrollbar">
-          <div onclick="openCreateStudio('STORY')" class="flex flex-col items-center gap-1 cursor-pointer">
+        <!-- Instagram Story Highlights Row -->
+        <div id="highlightsRow" class="flex items-center gap-4 mt-4 overflow-x-auto no-scrollbar">
+          <div onclick="addNewHighlight()" class="flex flex-col items-center gap-1 shrink-0 cursor-pointer">
             <div class="w-14 h-14 rounded-full border border-slate-300 flex items-center justify-center text-xl font-light">+</div>
-            <span class="text-[11px] text-slate-700">New Story</span>
+            <span class="text-[11px] text-slate-700">New</span>
           </div>
         </div>
       </div>
@@ -343,7 +339,7 @@
         <div class="flex items-center gap-2 mt-4">
           <button id="otherFollowBtn" class="flex-1 py-2 rounded-xl font-bold text-xs transition">Follow</button>
           <button id="otherMessageBtn" class="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-xs text-slate-900">Message</button>
-          <button onclick="openShareProfileSheet(viewingUserId)" class="px-3 py-2 rounded-xl bg-slate-100 text-xs font-bold">Share</button>
+          <button onclick="sendCreatorStar(viewingUserId)" class="px-3 py-2 rounded-xl bg-amber-100 text-amber-800 text-xs font-bold">⭐ Star</button>
         </div>
       </div>
 
@@ -359,8 +355,8 @@
         <button onclick="openAboutAccountModal(viewingUserId)" class="w-full text-left py-1.5 text-slate-800 font-semibold">About this account</button>
         <button id="sheetHideStoryBtn" onclick="toggleHideStoryViewingUser()" class="w-full text-left py-1.5 text-slate-800">Hide your story</button>
         <button onclick="copyProfileLink(viewingUserId); document.getElementById('otherUserSheet').classList.add('hidden');" class="w-full text-left py-1.5 text-slate-800">Copy profile URL</button>
-        <button onclick="document.getElementById('otherUserSheet').classList.add('hidden'); openShareProfileSheet(viewingUserId);" class="w-full text-left py-1.5 text-slate-800">Share this profile</button>
-        <button onclick="showUserQrCode()" class="w-full text-left py-1.5 text-slate-800">QR code</button>
+        <button onclick="document.getElementById('otherUserSheet').classList.add('hidden'); openShareSheet(null, viewingUserId);" class="w-full text-left py-1.5 text-slate-800">Share this profile</button>
+        <button onclick="document.getElementById('otherUserSheet').classList.add('hidden'); openShareSheet(null, viewingUserId);" class="w-full text-left py-1.5 text-slate-800">QR code</button>
       </div>
     </div>
 
@@ -386,62 +382,151 @@
       <div id="followListContainer" class="flex-1 overflow-y-auto divide-y divide-slate-100"></div>
     </div>
 
-    <!-- SHARE PROFILE BOTTOM SHEET -->
-    <div id="shareProfileSheet" class="hidden fixed inset-0 z-50 bg-black/50 flex items-end justify-center" onclick="if(event.target===this)this.classList.add('hidden')">
-      <div class="bg-white w-full max-w-md rounded-t-3xl p-5 space-y-4">
+    <!-- ========================================================================= -->
+    <!-- INSTAGRAM-STYLE SHARE BOTTOM SHEET (DM Friends Grid + External Actions)   -->
+    <!-- ========================================================================= -->
+    <div id="instagramShareSheet" class="hidden fixed inset-0 z-50 bg-black/55 flex items-end justify-center" onclick="if(event.target===this)this.classList.add('hidden')">
+      <div class="bg-white w-full max-w-md rounded-t-3xl p-4 space-y-4 max-h-[82vh] flex flex-col">
         <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto"></div>
-        <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100">
-          <img id="shareSheetAvatar" class="w-12 h-12 rounded-full object-cover" />
-          <div>
-            <p id="shareSheetName" class="text-sm font-bold flex items-center gap-1">Name</p>
-            <p id="shareSheetUrlText" class="text-[11px] text-slate-400 truncate max-w-[230px]"></p>
-          </div>
+        
+        <!-- Search bar -->
+        <div class="relative">
+          <input id="shareSheetSearchInput" type="text" placeholder="Search friends to send..." class="w-full bg-slate-100 text-xs pl-9 pr-4 py-2.5 rounded-2xl focus:outline-none" />
+          <span class="absolute left-3.5 top-2.5 text-slate-400 text-xs">🔍</span>
         </div>
-        <p class="text-xs font-bold text-slate-500">Share profile via</p>
-        <div class="grid grid-cols-4 gap-3 text-center text-[11px] font-semibold">
-          <button id="shareWhatsAppBtn" class="flex flex-col items-center gap-1.5">
-            <span class="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-xl shadow-xs">💬</span>
+
+        <!-- 3-Column In-App Friends Grid -->
+        <div id="shareFriendsGrid" class="grid grid-cols-3 gap-3 overflow-y-auto max-h-52 py-1"></div>
+
+        <!-- Horizontal External Share & Action Icons -->
+        <div class="border-t border-slate-100 pt-3 flex items-center gap-4 overflow-x-auto no-scrollbar text-center text-[11px] font-semibold">
+          <button id="igShareStoryBtn" class="flex flex-col items-center gap-1.5 shrink-0">
+            <span class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-xl">⭕</span>
+            <span>Add to story</span>
+          </button>
+          <button id="igShareWhatsappBtn" class="flex flex-col items-center gap-1.5 shrink-0">
+            <span class="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xl">💬</span>
             <span>WhatsApp</span>
           </button>
-          <button id="shareWaStatusBtn" class="flex flex-col items-center gap-1.5">
-            <span class="w-12 h-12 rounded-2xl bg-teal-600 text-white flex items-center justify-center text-xl shadow-xs">⭕</span>
+          <button id="igShareWaStatusBtn" class="flex flex-col items-center gap-1.5 shrink-0">
+            <span class="w-12 h-12 rounded-full bg-teal-600 text-white flex items-center justify-center text-xl">🟢</span>
             <span>WA Status</span>
           </button>
-          <button id="shareSmsBtn" class="flex flex-col items-center gap-1.5">
-            <span class="w-12 h-12 rounded-2xl bg-sky-500 text-white flex items-center justify-center text-xl shadow-xs">✉️</span>
-            <span>SMS</span>
+          <button id="igShareCopyBtn" class="flex flex-col items-center gap-1.5 shrink-0">
+            <span class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-xl">🔗</span>
+            <span>Copy link</span>
           </button>
-          <button id="shareCopyBtn" class="flex flex-col items-center gap-1.5">
-            <span class="w-12 h-12 rounded-2xl bg-slate-800 text-white flex items-center justify-center text-xl shadow-xs">🔗</span>
-            <span>Copy Link</span>
+          <button id="igShareDownloadBtn" class="flex flex-col items-center gap-1.5 shrink-0">
+            <span class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-xl">⬇️</span>
+            <span>Download</span>
+          </button>
+          <button id="igShareNativeBtn" class="flex flex-col items-center gap-1.5 shrink-0">
+            <span class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-xl">📤</span>
+            <span>Share</span>
           </button>
         </div>
       </div>
     </div>
 
     <!-- ========================================================================= -->
-    <!-- 7. ALL-IN-ONE INSTAGRAM & FACEBOOK PRO CREATIVE STUDIO                    -->
+    <!-- FACEBOOK-STYLE A-TO-Z MONEY EARNING & MONETIZATION HUB                    -->
+    <!-- ========================================================================= -->
+    <section id="fbMonetizationModal" class="hidden fixed inset-0 z-50 bg-slate-50 max-w-md mx-auto flex flex-col overflow-y-auto">
+      <header class="sticky top-0 z-20 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
+        <button onclick="document.getElementById('fbMonetizationModal').classList.add('hidden')" class="text-xl font-bold">←</button>
+        <div>
+          <h3 class="font-extrabold text-base">Professional Dashboard</h3>
+          <p class="text-[11px] text-slate-500">ZestUp Creator Monetization</p>
+        </div>
+      </header>
+
+      <div class="p-4 space-y-4 pb-12">
+        <!-- Balance Card -->
+        <div class="p-5 rounded-3xl zest-gradient text-white shadow-md space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold uppercase tracking-wider opacity-90">Approximate Earnings</span>
+            <span class="text-[10px] bg-white/20 px-2.5 py-0.5 rounded-full font-bold" id="monetizeBadgeStatus">Active</span>
+          </div>
+          <p class="text-4xl font-extrabold" id="fbEarningsBalance">₹0.00</p>
+          <p class="text-[11px] opacity-85" id="fbEarningsStatsLine">0 Views • 0 Stars Received • 0 Engagements</p>
+          <div class="pt-2 flex gap-2">
+            <button onclick="setupPayoutMethod()" class="flex-1 py-2 rounded-xl bg-white text-indigo-700 font-extrabold text-xs">🏦 Payout Settings</button>
+            <button onclick="requestPayoutWithdraw()" class="flex-1 py-2 rounded-xl bg-black/30 text-white font-bold text-xs border border-white/25">💸 Withdraw</button>
+          </div>
+        </div>
+
+        <!-- Facebook Monetization Tools List -->
+        <div class="space-y-2">
+          <p class="text-xs font-extrabold text-slate-500 px-1">Monetization Tools</p>
+          <div class="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden">
+            <div class="p-4 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl">⭐</span>
+                <div>
+                  <p class="text-sm font-bold">Stars</p>
+                  <p class="text-[11px] text-slate-500">Earn money when fans send Stars on your Reels & Posts</p>
+                </div>
+              </div>
+              <span class="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">Active</span>
+            </div>
+
+            <div class="p-4 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl">🎬</span>
+                <div>
+                  <p class="text-sm font-bold">In-Stream Ads & Reels Bonus</p>
+                  <p class="text-[11px] text-slate-500">Earn from ad views & viral video plays</p>
+                </div>
+              </div>
+              <span id="inStreamStatusPill" class="text-xs font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full">Eligible</span>
+            </div>
+
+            <div class="p-4 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center text-xl">👑</span>
+                <div>
+                  <p class="text-sm font-bold">Fan Subscriptions</p>
+                  <p class="text-[11px] text-slate-500">Monthly recurring support from top followers</p>
+                </div>
+              </div>
+              <span class="text-xs font-bold text-slate-500">₹99/mo</span>
+            </div>
+
+            <div onclick="setupPayoutMethod()" class="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50">
+              <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl">🏦</span>
+                <div>
+                  <p class="text-sm font-bold">Payout Account (Bank / UPI)</p>
+                  <p id="payoutAccountDisplay" class="text-[11px] text-slate-500">Not linked — Tap to add UPI or Bank</p>
+                </div>
+              </div>
+              <span class="text-indigo-600 font-bold text-xs">Edit ›</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 7. INSTAGRAM FREE-DRAG & RESIZE STUDIO + YOUTUBE MUSIC & AUTO-CAPTIONS    -->
     <!-- ========================================================================= -->
     <section id="createScreen" class="hidden fixed inset-0 z-50 bg-zinc-950 text-white max-w-md mx-auto flex flex-col justify-between">
-      
-      <!-- Top Bar -->
       <header class="px-4 py-3 flex items-center justify-between border-b border-zinc-800/80">
         <button onclick="handleStudioBack()" class="text-xl font-bold text-zinc-200" id="studioBackBtn">✕</button>
         <h3 id="studioHeaderTitle" class="font-bold text-sm">New reel</h3>
         <div id="studioHeaderRight"></div>
       </header>
 
-      <!-- BODY AREA -->
       <div class="flex-1 overflow-y-auto flex flex-col">
 
-        <!-- A. STEP 1: MEDIA GALLERY / RECENTS PICKER (For POST, STORY, REEL) -->
+        <!-- STEP 1: PHONE GALLERY & MUSIC PICKER -->
         <div id="studioStep1Media" class="p-4 space-y-4 flex-1 flex flex-col justify-between">
           <div class="grid grid-cols-3 gap-2 text-center text-xs font-bold">
-            <div onclick="selectStudioAudio()" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-3 cursor-pointer hover:border-indigo-500">
-              <span class="text-xl block mb-1">🎵</span>Music
+            <div onclick="openMusicPickerModal()" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-3 cursor-pointer hover:border-indigo-500">
+              <span class="text-xl block mb-1">🎵</span>YouTube Music
             </div>
-            <div onclick="openCreateStudio('TEXT')" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-3 cursor-pointer hover:border-indigo-500">
-              <span class="text-xl block mb-1">Aa</span>Text Post
+            <div onclick="openCreateStudio('STORY')" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-3 cursor-pointer hover:border-indigo-500">
+              <span class="text-xl block mb-1">⭕</span>Story Studio
             </div>
             <div onclick="detectStudioLocation()" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-3 cursor-pointer hover:border-indigo-500">
               <span class="text-xl block mb-1">📍</span>Location
@@ -450,75 +535,93 @@
 
           <label class="flex-1 min-h-[260px] rounded-3xl border-2 border-dashed border-zinc-700 bg-zinc-900/70 flex flex-col items-center justify-center p-6 text-center cursor-pointer hover:border-indigo-500 transition">
             <span class="text-4xl mb-2">📲</span>
-            <p class="text-sm font-extrabold text-white">Select from Phone Gallery (Recents)</p>
-            <p class="text-xs text-zinc-400 mt-1">Choose Video, Reel, or Photo to open Full-Screen Editor</p>
-            <span class="mt-4 px-5 py-2 rounded-full bg-indigo-600 text-xs font-bold">Open Gallery</span>
+            <p class="text-sm font-extrabold text-white">Select Video, Reel or Photo</p>
+            <p class="text-xs text-zinc-400 mt-1">Drag & adjust Music Card, Lyrics Captions, Text & Stickers freely on screen</p>
+            <span class="mt-4 px-5 py-2 rounded-full zest-gradient text-xs font-bold">Open Phone Gallery</span>
             <input id="studioFileInput" type="file" accept="image/*,video/*" class="hidden" />
           </label>
         </div>
 
-        <!-- B. STEP 2: INSTAGRAM FULL-SCREEN EDITOR (Reels/Post & Story Vertical Toolbar) -->
+        <!-- STEP 2: FULL-SCREEN DRAGGABLE & RESIZABLE CANVAS EDITOR -->
         <div id="studioStep2Editor" class="hidden flex-1 flex flex-col justify-between relative bg-black">
-          <!-- Full-Screen Media Canvas -->
-          <div class="relative flex-1 flex items-center justify-center overflow-hidden">
-            <img id="editorImgPreview" class="hidden w-full h-full max-h-[65vh] object-contain filter-none" />
-            <video id="editorVidPreview" autoplay loop playsinline class="hidden w-full h-full max-h-[65vh] object-contain filter-none"></video>
+          <div id="editorCanvasArea" class="relative flex-1 flex items-center justify-center overflow-hidden bg-zinc-950">
+            <img id="editorImgPreview" class="hidden w-full h-full max-h-[64vh] object-contain filter-none pointer-events-none" />
+            <video id="editorVidPreview" autoplay loop playsinline class="hidden w-full h-full max-h-[64vh] object-contain filter-none pointer-events-none"></video>
 
-            <!-- Top Audio Pill -->
-            <div id="editorTopAudioPill" onclick="selectStudioAudio()" class="hidden absolute top-3 left-1/2 -translate-x-1/2 bg-black/75 backdrop-blur px-3.5 py-1.5 rounded-full text-xs font-bold text-white flex items-center gap-1.5 cursor-pointer border border-white/15">
-              <span>🎵</span><span id="editorAudioLabel">Add audio</span>
+            <!-- DRAGGABLE 1: MUSIC CARD (Can be hidden or dragged anywhere!) -->
+            <div id="dragMusicCard" onclick="selectActiveDragElement('dragMusicCard')" style="top: 16px; left: 20%; transform: scale(1);" class="hidden draggable-item bg-black/80 backdrop-blur-md border border-white/20 px-3 py-2 rounded-2xl flex items-center gap-2.5 shadow-lg z-20">
+              <img id="dragMusicThumb" src="https://ui-avatars.com/api/?name=M&background=EC4899&color=fff" class="w-9 h-9 rounded-lg object-cover pointer-events-none" />
+              <div class="text-left pointer-events-none max-w-[140px]">
+                <p id="dragMusicTitle" class="text-xs font-extrabold text-white truncate">Song Title</p>
+                <p id="dragMusicArtist" class="text-[10px] text-pink-300 truncate">YouTube / Audio</p>
+              </div>
+              <button onclick="event.stopPropagation(); toggleHideMusicCard()" class="text-[10px] bg-white/15 px-1.5 py-0.5 rounded text-zinc-300" title="Hide Title Card">👁️‍🗨️</button>
             </div>
 
-            <!-- Live Overlays -->
-            <div id="editorLocationBadge" class="hidden absolute top-12 left-3 bg-black/70 px-3 py-1 rounded-full text-xs font-bold text-white">📍 Location</div>
-            <div id="editorStickerBadge" class="hidden absolute top-1/3 right-14 text-5xl drop-shadow"></div>
-            <div id="editorTextBadge" class="hidden absolute bottom-20 inset-x-6 text-center font-extrabold text-xl text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]"></div>
-            <div id="editorCaptionOverlay" class="hidden absolute bottom-8 inset-x-6 text-center text-xs bg-black/75 text-yellow-300 font-bold px-3 py-1 rounded-lg"></div>
+            <!-- DRAGGABLE 2: OPTIONAL AUTO-CAPTIONS / SYNCED LYRICS -->
+            <div id="dragLyricsBox" onclick="selectActiveDragElement('dragLyricsBox')" style="bottom: 85px; left: 15%; transform: scale(1);" class="hidden draggable-item bg-black/70 backdrop-blur px-3.5 py-1.5 rounded-xl text-center max-w-[260px] z-20 border border-yellow-400/30">
+              <p id="dragLyricsText" class="text-sm font-extrabold text-yellow-300 drop-shadow pointer-events-none">♪ Auto-Lyrics Caption ♪</p>
+            </div>
 
-            <!-- STORY VERTICAL RIGHT TOOLBAR (Instagram Story Style) -->
-            <div id="storyVerticalTools" class="hidden absolute right-3 top-4 flex flex-col gap-3.5 bg-black/45 backdrop-blur-md p-2 rounded-2xl border border-white/10 text-center">
-              <button onclick="promptEditorText()" class="flex flex-col items-center text-[10px] font-bold"><span class="text-lg">Aa</span>Text</button>
-              <button onclick="openStickersTray()" class="flex flex-col items-center text-[10px] font-bold"><span class="text-lg">😊</span>Stickers</button>
-              <button onclick="selectStudioAudio()" class="flex flex-col items-center text-[10px] font-bold"><span class="text-lg">🎵</span>Music</button>
-              <button onclick="openFiltersTray()" class="flex flex-col items-center text-[10px] font-bold"><span class="text-lg">✨</span>Effects</button>
-              <button onclick="detectStudioLocation()" class="flex flex-col items-center text-[10px] font-bold"><span class="text-lg">📍</span>Location</button>
+            <!-- DRAGGABLE 3: CUSTOM TEXT OVERLAY -->
+            <div id="dragTextBox" onclick="selectActiveDragElement('dragTextBox')" style="top: 45%; left: 22%; transform: scale(1);" class="hidden draggable-item px-3 py-1 rounded-xl text-center font-extrabold text-xl text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)] z-20">
+              <span id="dragTextContent" class="pointer-events-none"></span>
+            </div>
+
+            <!-- DRAGGABLE 4: STICKER / POLL / QUIZ / LINK -->
+            <div id="dragStickerBox" onclick="selectActiveDragElement('dragStickerBox')" style="top: 28%; right: 20%; transform: scale(1);" class="hidden draggable-item z-20 text-center">
+              <span id="dragStickerContent" class="text-5xl drop-shadow pointer-events-none"></span>
+            </div>
+
+            <!-- Location Pill -->
+            <div id="editorLocationBadge" class="hidden absolute top-3 left-3 bg-black/70 px-2.5 py-1 rounded-full text-[11px] font-bold text-white z-10">📍 Location</div>
+
+            <!-- STORY VERTICAL RIGHT TOOLBAR -->
+            <div id="storyVerticalTools" class="hidden absolute right-2.5 top-3 flex flex-col gap-3 bg-black/50 backdrop-blur-md p-2 rounded-2xl border border-white/10 text-center z-30">
+              <button onclick="promptEditorText()" class="flex flex-col items-center text-[10px] font-bold"><span class="text-base">Aa</span>Text</button>
+              <button onclick="openStickersTray()" class="flex flex-col items-center text-[10px] font-bold"><span class="text-base">😊</span>Stickers</button>
+              <button onclick="openMusicPickerModal()" class="flex flex-col items-center text-[10px] font-bold"><span class="text-base">🎵</span>Music</button>
+              <button onclick="toggleAutoLyricsOption()" class="flex flex-col items-center text-[10px] font-bold"><span class="text-base">💬</span>Lyrics</button>
+              <button onclick="openFiltersTray()" class="flex flex-col items-center text-[10px] font-bold"><span class="text-base">✨</span>Effects</button>
             </div>
           </div>
 
-          <!-- Expandable Sub-trays (Filters / Stickers / Speed) -->
+          <!-- SIZE / SCALE ADJUST SLIDER BAR (For whichever item you tap on screen!) -->
+          <div id="elementResizeBar" class="hidden bg-zinc-900 border-t border-zinc-800 px-4 py-2 flex items-center justify-between gap-3 text-xs">
+            <span class="font-bold text-indigo-400 shrink-0">📐 Adjust Size:</span>
+            <input id="activeElementScaleSlider" type="range" min="0.5" max="2.0" step="0.1" value="1" class="flex-1 accent-indigo-500" />
+            <button onclick="hideActiveDragElement()" class="text-[11px] bg-rose-600/80 px-2 py-0.5 rounded font-bold">Hide</button>
+          </div>
+
           <div id="editorSubTray" class="hidden bg-zinc-900/95 border-t border-zinc-800 px-3 py-2.5"></div>
 
-          <!-- REELS / POST BOTTOM 5-TOOL DOCK + NEXT BUTTON -->
-          <div id="reelBottomDock" class="bg-zinc-950 px-3 pt-2.5 pb-3 border-t border-zinc-800 space-y-3">
-            <div class="grid grid-cols-5 gap-1 text-center text-[11px] font-semibold text-zinc-200">
-              <button onclick="selectStudioAudio()" class="flex flex-col items-center gap-1 py-1 rounded-xl hover:bg-zinc-900"><span class="text-lg">🎵</span>Audio</button>
-              <button onclick="promptEditorText()" class="flex flex-col items-center gap-1 py-1 rounded-xl hover:bg-zinc-900"><span class="text-lg">Aa</span>Text</button>
-              <button onclick="toggleVoiceover()" class="flex flex-col items-center gap-1 py-1 rounded-xl hover:bg-zinc-900"><span class="text-lg">🎙️</span>Voice</button>
-              <button onclick="promptAutoCaptions()" class="flex flex-col items-center gap-1 py-1 rounded-xl hover:bg-zinc-900"><span class="text-lg">💬</span>Captions</button>
-              <button onclick="openStickersTray()" class="flex flex-col items-center gap-1 py-1 rounded-xl hover:bg-zinc-900"><span class="text-lg">😊</span>Stickers</button>
+          <!-- REELS / POST BOTTOM DOCK -->
+          <div id="reelBottomDock" class="bg-zinc-950 px-3 pt-2 pb-3 border-t border-zinc-800 space-y-2.5">
+            <div class="grid grid-cols-5 gap-1 text-center text-[10px] font-semibold text-zinc-200">
+              <button onclick="openMusicPickerModal()" class="flex flex-col items-center gap-1 py-1 rounded-xl hover:bg-zinc-900"><span class="text-base">🎵</span>Audio</button>
+              <button onclick="toggleAutoLyricsOption()" class="flex flex-col items-center gap-1 py-1 rounded-xl hover:bg-zinc-900"><span class="text-base">💬</span>Captions</button>
+              <button onclick="promptEditorText()" class="flex flex-col items-center gap-1 py-1 rounded-xl hover:bg-zinc-900"><span class="text-base">Aa</span>Text</button>
+              <button onclick="openStickersTray()" class="flex flex-col items-center gap-1 py-1 rounded-xl hover:bg-zinc-900"><span class="text-base">😊</span>Stickers</button>
+              <button onclick="openFiltersTray()" class="flex flex-col items-center gap-1 py-1 rounded-xl hover:bg-zinc-900"><span class="text-base">✨</span>Filters</button>
             </div>
-            <div class="flex items-center justify-between gap-3">
-              <button onclick="openFiltersTray()" class="px-4 py-2.5 rounded-xl bg-zinc-800 text-xs font-bold text-white">✨ Edit / Filters</button>
+            <div class="flex items-center justify-between gap-2.5">
+              <button id="toggleMusicCardVisBtn" onclick="toggleHideMusicCard()" class="hidden px-3 py-2 rounded-xl bg-zinc-800 text-[11px] font-bold text-pink-300">👁️‍🗨️ Hide Title</button>
               <button onclick="goToStep3Publish()" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-extrabold text-white">Next →</button>
             </div>
           </div>
 
-          <!-- STORY BOTTOM SHARE DOCK (Your stories vs Close Friends) -->
-          <div id="storyBottomDock" class="hidden bg-zinc-950 px-3 pt-2 pb-3 border-t border-zinc-800 space-y-2.5">
+          <!-- STORY BOTTOM SHARE DOCK -->
+          <div id="storyBottomDock" class="hidden bg-zinc-950 px-3 pt-2 pb-3 border-t border-zinc-800 space-y-2">
             <input id="storyCaptionInput" type="text" placeholder="Add a caption..." class="w-full bg-zinc-900 border border-zinc-800 rounded-full px-4 py-2 text-xs text-white focus:outline-none" />
             <div class="flex items-center gap-2">
-              <button onclick="publishStoryNow('public')" class="flex-1 py-2.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-xs font-bold flex items-center justify-center gap-1.5">
-                <span>⭕</span> Your stories
-              </button>
-              <button onclick="publishStoryNow('close_friends')" class="flex-1 py-2.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-xs font-bold flex items-center justify-center gap-1.5">
-                <span class="w-4 h-4 rounded-full bg-emerald-500 text-white text-[10px] flex items-center justify-center">★</span> Close Friends
-              </button>
+              <button onclick="publishStoryNow('public')" class="flex-1 py-2.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-xs font-bold flex items-center justify-center gap-1.5"><span>⭕</span> Your stories</button>
+              <button onclick="publishStoryNow('close_friends')" class="flex-1 py-2.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-xs font-bold flex items-center justify-center gap-1.5"><span class="w-4 h-4 rounded-full bg-emerald-500 text-white text-[10px] flex items-center justify-center">★</span> Close Friends</button>
               <button onclick="publishStoryNow('public')" class="w-10 h-10 rounded-full bg-white text-black font-extrabold flex items-center justify-center">›</button>
             </div>
           </div>
         </div>
 
-        <!-- C. STEP 3: INSTAGRAM FINAL PUBLISH & SETTINGS PAGE (New post / New reel) -->
+        <!-- STEP 3: INSTAGRAM FINAL PUBLISH PAGE -->
         <div id="studioStep3Publish" class="hidden flex-1 bg-white text-slate-900 flex flex-col justify-between">
           <div class="p-4 space-y-4 overflow-y-auto">
             <div class="flex gap-3 items-start">
@@ -537,22 +640,15 @@
 
             <div class="divide-y divide-slate-100 border-t border-b border-slate-100 text-sm">
               <div onclick="promptTagPeople()" class="py-3 flex items-center justify-between cursor-pointer">
-                <span class="font-medium">👤 Tag people</span>
+                <span class="font-medium">👤 Tag collaborator / people</span>
                 <span id="step3TaggedText" class="text-xs text-slate-400">None ›</span>
               </div>
-              <div onclick="detectStudioLocation()" class="py-3 flex items-center justify-between cursor-pointer">
-                <span class="font-medium">📍 Location</span>
-                <span id="step3LocationText" class="text-xs text-indigo-600 font-semibold">Add ›</span>
-              </div>
-              <div onclick="selectStudioAudio()" class="py-3 flex items-center justify-between cursor-pointer">
-                <span class="font-medium">🎵 Rename / Select audio</span>
-                <span id="step3AudioText" class="text-xs text-slate-400">Original audio ›</span>
+              <div onclick="openMusicPickerModal()" class="py-3 flex items-center justify-between cursor-pointer">
+                <span class="font-medium">🎵 Music & Audio</span>
+                <span id="step3AudioText" class="text-xs text-indigo-600 font-bold">Select ›</span>
               </div>
               <div class="py-3 flex items-center justify-between">
-                <div>
-                  <p class="font-medium">✨ Add AI label</p>
-                  <p class="text-[11px] text-slate-400">Label if created or edited with AI</p>
-                </div>
+                <div><p class="font-medium">✨ Add AI label</p><p class="text-[11px] text-slate-400">Label if created with AI</p></div>
                 <input id="step3AiLabelToggle" type="checkbox" class="w-5 h-5 accent-indigo-600" />
               </div>
               <div class="py-3 flex items-center justify-between">
@@ -566,87 +662,12 @@
           </div>
 
           <div class="p-3 border-t border-slate-100 grid grid-cols-2 gap-2.5 bg-white">
-            <button onclick="alert('Saved to ZestUp Drafts!')" class="py-2.5 rounded-xl bg-slate-100 font-bold text-xs text-slate-800">Save draft</button>
+            <button onclick="alert('Saved to Drafts!')" class="py-2.5 rounded-xl bg-slate-100 font-bold text-xs text-slate-800">Save draft</button>
             <button id="finalShareBtn" onclick="publishFinalMediaPost()" class="py-2.5 rounded-xl bg-indigo-600 font-bold text-xs text-white">Share</button>
           </div>
         </div>
 
-        <!-- D. FACEBOOK-STYLE TEXT POST COMPOSER ("What's on your mind?") -->
-        <div id="studioTextMode" class="hidden flex-1 bg-white text-slate-900 flex flex-col justify-between">
-          <div class="p-4 space-y-3 flex-1 flex flex-col">
-            <div class="flex items-center gap-2.5">
-              <img id="textComposerAvatar" class="w-10 h-10 rounded-full object-cover" />
-              <div>
-                <p id="textComposerName" class="text-xs font-bold">User</p>
-                <span class="text-[10px] bg-indigo-50 text-indigo-600 font-bold px-2 py-0.5 rounded-md">🌐 Public ▾</span>
-              </div>
-            </div>
-
-            <!-- Colored Card Canvas -->
-            <div id="textCardCanvas" class="txt-bg-none rounded-2xl border border-slate-200 p-5 flex-1 min-h-[200px] flex items-center justify-center transition-all">
-              <textarea id="textPostInput" rows="5" placeholder="What's on your mind?" class="w-full bg-transparent text-center font-bold text-lg focus:outline-none resize-none placeholder-current/50"></textarea>
-            </div>
-
-            <!-- Background Color Palette -->
-            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
-              <button onclick="setTextBg('txt-bg-none')" class="w-8 h-8 rounded-lg border-2 border-slate-300 bg-white shrink-0"></button>
-              <button onclick="setTextBg('txt-bg-indigo')" class="w-8 h-8 rounded-lg txt-bg-indigo shrink-0"></button>
-              <button onclick="setTextBg('txt-bg-sunset')" class="w-8 h-8 rounded-lg txt-bg-sunset shrink-0"></button>
-              <button onclick="setTextBg('txt-bg-ocean')" class="w-8 h-8 rounded-lg txt-bg-ocean shrink-0"></button>
-              <button onclick="setTextBg('txt-bg-rose')" class="w-8 h-8 rounded-lg txt-bg-rose shrink-0"></button>
-              <button onclick="setTextBg('txt-bg-dark')" class="w-8 h-8 rounded-lg txt-bg-dark shrink-0"></button>
-            </div>
-
-            <!-- Quick Action Chips (Music, Tag, Location, Feeling) -->
-            <div class="grid grid-cols-2 gap-2 text-xs font-semibold text-slate-700 pt-1">
-              <button onclick="selectStudioAudio()" class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-left">🎵 Music</button>
-              <button onclick="promptTagPeople()" class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-left">👤 Tag people</button>
-              <button onclick="detectStudioLocation()" class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-left">📍 Location</button>
-              <button onclick="promptFeeling()" class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-left">😊 Feeling/activity</button>
-            </div>
-          </div>
-
-          <div class="p-3 border-t border-slate-100 flex justify-end">
-            <button onclick="openTextPostSettings()" class="w-full py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs">Next →</button>
-          </div>
-        </div>
-
-        <!-- E. FACEBOOK-STYLE "POST SETTINGS" BEFORE SHARING TEXT POST -->
-        <div id="studioTextSettings" class="hidden flex-1 bg-white text-slate-900 flex flex-col justify-between">
-          <div class="p-4 space-y-4 divide-y divide-slate-100 text-sm">
-            <div class="pb-2">
-              <h4 class="font-extrabold text-base">Post settings</h4>
-              <p class="text-xs text-slate-500">Choose who can see and interact with your post</p>
-            </div>
-            <div class="pt-3 flex items-center justify-between">
-              <div><p class="font-bold">🌐 Post audience</p><p class="text-xs text-slate-400">Anyone on ZestUp</p></div>
-              <select id="txtAudienceSel" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">
-                <option value="Public">Public</option>
-                <option value="Followers">Followers</option>
-              </select>
-            </div>
-            <div class="pt-3 flex items-center justify-between">
-              <div><p class="font-bold">💬 Who can comment</p><p class="text-xs text-slate-400">Control comments on this post</p></div>
-              <select class="text-xs font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg">
-                <option>Public</option>
-                <option>Followers</option>
-              </select>
-            </div>
-            <div class="pt-3 flex items-center justify-between">
-              <div><p class="font-bold">✨ Add AI label</p><p class="text-xs text-slate-400">Mark if written with AI</p></div>
-              <input id="txtAiToggle" type="checkbox" class="w-5 h-5 accent-indigo-600" />
-            </div>
-            <div class="pt-3 flex items-center justify-between">
-              <div><p class="font-bold">⭐ Creator Stars & Monetization</p><p class="text-xs text-slate-400">Allow supporters to send Stars</p></div>
-              <input type="checkbox" checked class="w-5 h-5 accent-indigo-600" />
-            </div>
-          </div>
-          <div class="p-3 border-t border-slate-100">
-            <button onclick="publishFinalTextPost()" class="w-full py-3 rounded-xl bg-indigo-600 text-white font-extrabold text-xs tracking-wider">SHARE</button>
-          </div>
-        </div>
-
-        <!-- F. LIVE STREAM CAMERA -->
+        <!-- LIVE STREAM -->
         <div id="studioLiveMode" class="hidden flex-1 p-4 flex-col items-center justify-center space-y-4 text-center">
           <div class="relative w-full h-80 bg-zinc-900 rounded-3xl overflow-hidden border border-zinc-800 flex items-center justify-center">
             <video id="liveCameraVideo" autoplay muted playsinline class="w-full h-full object-cover"></video>
@@ -655,23 +676,49 @@
           <input id="liveTitleInput" type="text" placeholder="Add a Live stream title..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white" />
           <button id="startLiveBtn" onclick="toggleGoLive()" class="w-full py-3 rounded-2xl zest-gradient font-bold text-sm">Go Live Now</button>
         </div>
-
       </div>
 
-      <!-- Bottom Mode Switcher Bar (POST | STORY | REEL | TEXT | LIVE) -->
       <div id="studioModeSwitcherBar" class="p-3 flex justify-center bg-zinc-950 border-t border-zinc-900">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-full px-3.5 py-2 flex items-center gap-3.5 text-[11px] font-extrabold tracking-wider">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-full px-4 py-2 flex items-center gap-5 text-xs font-extrabold tracking-wider">
           <button onclick="openCreateStudio('POST')" class="studio-mode-btn text-zinc-500" data-mode="POST">POST</button>
           <button onclick="openCreateStudio('STORY')" class="studio-mode-btn text-zinc-500" data-mode="STORY">STORY</button>
           <button onclick="openCreateStudio('REEL')" class="studio-mode-btn text-white" data-mode="REEL">REEL</button>
-          <button onclick="openCreateStudio('TEXT')" class="studio-mode-btn text-zinc-500" data-mode="TEXT">TEXT</button>
           <button onclick="openCreateStudio('LIVE')" class="studio-mode-btn text-zinc-500" data-mode="LIVE">LIVE</button>
         </div>
       </div>
     </section>
 
     <!-- ========================================================================= -->
-    <!-- 8. PREMIUM FACEBOOK-STYLE SETTINGS & PRIVACY PAGE                         -->
+    <!-- YOUTUBE MUSIC & PHONE AUDIO PICKER BOTTOM SHEET                           -->
+    <!-- ========================================================================= -->
+    <div id="musicPickerModal" class="hidden fixed inset-0 z-50 bg-black/70 flex items-end justify-center" onclick="if(event.target===this)this.classList.add('hidden')">
+      <div class="bg-zinc-900 text-white w-full max-w-md rounded-t-3xl p-4 space-y-3.5 max-h-[80vh] flex flex-col border-t border-zinc-800">
+        <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto"></div>
+        <div class="flex items-center justify-between">
+          <h4 class="font-extrabold text-sm">🎵 ZestUp Music & YouTube Audio</h4>
+          <button onclick="document.getElementById('musicPickerModal').classList.add('hidden')" class="text-xs text-zinc-400 font-bold">Done</button>
+        </div>
+
+        <!-- YouTube Link / Search Input -->
+        <div class="flex gap-2">
+          <input id="ytSongInput" type="text" placeholder="Paste YouTube Song Link or Song Name..." class="flex-1 bg-zinc-800 border border-zinc-700 text-xs px-3.5 py-2.5 rounded-xl text-white focus:outline-none" />
+          <button onclick="applyYouTubeSong()" class="px-3.5 py-2 rounded-xl bg-rose-600 font-bold text-xs shrink-0">▶ YouTube</button>
+        </div>
+
+        <!-- Upload MP3 from Phone -->
+        <label class="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-zinc-800 border border-zinc-700 text-xs font-bold cursor-pointer hover:bg-zinc-700">
+          <span>📁 Upload Song / Audio from Phone (.mp3)</span>
+          <input id="localAudioFileInput" type="file" accept="audio/*" class="hidden" />
+        </label>
+
+        <!-- Trending Built-in Real Audio Tracks -->
+        <p class="text-[11px] font-bold text-zinc-400">Trending Audio (Tap to Play & Select)</p>
+        <div id="trendingTracksList" class="space-y-2 overflow-y-auto flex-1"></div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 8. SETTINGS & PRIVACY PAGE                                                -->
     <!-- ========================================================================= -->
     <section id="settingsPage" class="hidden fixed inset-0 z-50 bg-slate-50 max-w-md mx-auto flex flex-col overflow-y-auto">
       <header class="sticky top-0 z-20 bg-white px-4 py-3 flex items-center gap-4 border-b border-slate-100">
@@ -680,85 +727,50 @@
       </header>
 
       <div class="p-4 space-y-5 pb-12">
-        <!-- Search Settings -->
         <div class="relative">
           <input id="settingsSearchInput" type="text" placeholder="Search settings..." class="w-full bg-white border border-slate-200 text-xs pl-9 pr-4 py-2.5 rounded-2xl focus:outline-none" />
           <span class="absolute left-3.5 top-2.5 text-slate-400 text-xs">🔍</span>
         </div>
 
-        <!-- ZestUp Accounts Center Card -->
         <div onclick="closeSettings(); openAccountsCenter();" class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs cursor-pointer space-y-1.5">
           <p class="text-xs font-extrabold text-indigo-600">ZestUp Accounts Center</p>
-          <p class="text-xs text-slate-600">Manage your connected mobile number, Gmail, date of birth, profile photo and account security.</p>
+          <p class="text-xs text-slate-600">Manage connected mobile number, Gmail, date of birth, profile photo and account security.</p>
           <p class="text-xs font-bold text-indigo-600 pt-1">See more in Accounts Center ›</p>
         </div>
 
-        <!-- Preferences -->
-        <div class="space-y-2 setting-group">
-          <p class="text-xs font-extrabold text-slate-500 px-1">Preferences</p>
+        <div class="space-y-2">
+          <p class="text-xs font-extrabold text-slate-500 px-1">Preferences & Monetization</p>
           <div class="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden text-sm">
+            <div onclick="closeSettings(); openFbMonetizationHub();" class="setting-item px-4 py-3.5 flex items-center justify-between cursor-pointer bg-indigo-50/50">
+              <div class="flex items-center gap-3"><span class="text-lg">💰</span><span class="font-bold text-indigo-700">Creator Monetization & Payouts</span></div>
+              <span class="text-indigo-600 font-bold">›</span>
+            </div>
             <div onclick="toggleDarkMode()" class="setting-item px-4 py-3.5 flex items-center justify-between cursor-pointer">
               <div class="flex items-center gap-3"><span class="text-lg">🌙</span><span class="font-medium">Dark mode</span></div>
               <span id="darkModeStatusText" class="text-xs font-bold text-indigo-600">Off ›</span>
             </div>
-            <div onclick="selectAppLanguage()" class="setting-item px-4 py-3.5 flex items-center justify-between cursor-pointer">
-              <div class="flex items-center gap-3"><span class="text-lg">🌐</span><span class="font-medium">Language & region</span></div>
-              <span id="appLangText" class="text-xs text-slate-400">English ›</span>
-            </div>
-            <div onclick="openSubSetting('timemanagement')" class="setting-item px-4 py-3.5 flex items-center justify-between cursor-pointer">
-              <div class="flex items-center gap-3"><span class="text-lg">⏱️</span><span class="font-medium">Time management</span></div>
-              <span class="text-slate-400">›</span>
-            </div>
             <div onclick="openSubSetting('saved')" class="setting-item px-4 py-3.5 flex items-center justify-between cursor-pointer">
-              <div class="flex items-center gap-3"><span class="text-lg">🔖</span><span class="font-medium">Saved posts & reels</span></div>
+              <div class="flex items-center gap-3"><span class="text-lg">🔖</span><span class="font-medium">Saved</span></div>
               <span id="savedCountBadge" class="text-xs text-slate-400">0 ›</span>
             </div>
-          </div>
-        </div>
-
-        <!-- Audience and Visibility -->
-        <div class="space-y-2 setting-group">
-          <p class="text-xs font-extrabold text-slate-500 px-1">Audience and visibility</p>
-          <div class="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden text-sm">
             <div onclick="toggleSettingPref('isPrivate')" class="setting-item px-4 py-3.5 flex items-center justify-between cursor-pointer">
-              <div class="flex items-center gap-3"><span class="text-lg">🔒</span><span class="font-medium">Profile locking</span></div>
-              <span id="pref_isPrivate" class="text-xs font-bold text-indigo-600">Unlocked ›</span>
-            </div>
-            <div onclick="toggleSettingPref('proMode')" class="setting-item px-4 py-3.5 flex items-center justify-between cursor-pointer">
-              <div class="flex items-center gap-3"><span class="text-lg">💼</span><span class="font-medium">Pro mode (Creator tools)</span></div>
-              <span id="pref_proMode" class="text-xs font-bold text-emerald-600">On ›</span>
+              <div class="flex items-center gap-3"><span class="text-lg">🔒</span><span class="font-medium">Account privacy</span></div>
+              <span id="pref_isPrivate" class="text-xs font-bold text-indigo-600">Public ›</span>
             </div>
             <div onclick="toggleSettingPref('hideActiveStatus')" class="setting-item px-4 py-3.5 flex items-center justify-between cursor-pointer">
-              <div class="flex items-center gap-3"><span class="text-lg">🟢</span><span class="font-medium">Active Status (Online dot)</span></div>
+              <div class="flex items-center gap-3"><span class="text-lg">🟢</span><span class="font-medium">Activity status</span></div>
               <span id="pref_activeStatus" class="text-xs font-bold text-emerald-600">On ›</span>
             </div>
             <div onclick="openSubSetting('blocked')" class="setting-item px-4 py-3.5 flex items-center justify-between cursor-pointer">
-              <div class="flex items-center gap-3"><span class="text-lg">🚫</span><span class="font-medium">Blocking</span></div>
+              <div class="flex items-center gap-3"><span class="text-lg">🚫</span><span class="font-medium">Blocked</span></div>
               <span id="blockedCountBadge" class="text-xs text-slate-400">0 ›</span>
             </div>
-          </div>
-        </div>
-
-        <!-- Payments, Activity & Help -->
-        <div class="space-y-2 setting-group">
-          <p class="text-xs font-extrabold text-slate-500 px-1">Your activity, Payouts & Help</p>
-          <div class="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden text-sm">
-            <div onclick="openSubSetting('dashboard')" class="setting-item px-4 py-3.5 flex items-center justify-between cursor-pointer">
-              <div class="flex items-center gap-3"><span class="text-lg">💰</span><span class="font-medium">Creator payouts & earnings</span></div>
-              <span class="text-slate-400">›</span>
-            </div>
             <div onclick="openSubSetting('profilestatus')" class="setting-item px-4 py-3.5 flex items-center justify-between cursor-pointer">
-              <div class="flex items-center gap-3"><span class="text-lg">🛡️</span><span class="font-medium">Profile status & Copyright strikes</span></div>
+              <div class="flex items-center gap-3"><span class="text-lg">🛡️</span><span class="font-medium">Account status & Strikes</span></div>
               <span class="text-slate-400">›</span>
             </div>
-            <div onclick="closeSettings(); openHelpAiModal();" class="setting-item px-4 py-3.5 flex items-center justify-between cursor-pointer bg-indigo-50/70">
-              <div class="flex items-center gap-3">
-                <span class="text-lg">🤖</span>
-                <div>
-                  <p class="font-bold text-indigo-700">Help (ZestUp Help AI)</p>
-                  <p class="text-[11px] text-indigo-500">24/7 AI support & ZestUp Team</p>
-                </div>
-              </div>
+            <div onclick="closeSettings(); openHelpAiModal();" class="setting-item px-4 py-3.5 flex items-center justify-between cursor-pointer">
+              <div class="flex items-center gap-3"><span class="text-lg">🤖</span><span class="font-bold text-indigo-700">Help (ZestUp Help AI)</span></div>
               <span class="text-indigo-600 font-bold">›</span>
             </div>
           </div>
@@ -781,12 +793,8 @@
 
         <div class="w-full space-y-4">
           <div class="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden shadow-xs">
-            <button onclick="editSingleField('name')" class="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium hover:bg-slate-50">
-              <span>Name</span><span class="text-slate-400">›</span>
-            </button>
-            <button onclick="editSingleField('username')" class="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium hover:bg-slate-50">
-              <span>Username</span><span class="text-slate-400">›</span>
-            </button>
+            <button onclick="editSingleField('name')" class="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium hover:bg-slate-50"><span>Name</span><span class="text-slate-400">›</span></button>
+            <button onclick="editSingleField('username')" class="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium hover:bg-slate-50"><span>Username</span><span class="text-slate-400">›</span></button>
             <label class="w-full px-4 py-3.5 flex items-center justify-between text-sm font-medium hover:bg-slate-50 cursor-pointer">
               <span>Profile picture</span><span class="text-slate-400">›</span>
               <input id="acPhotoUploadInput" type="file" accept="image/*" class="hidden" />
@@ -797,24 +805,15 @@
             <p class="text-xs font-bold text-slate-500 mb-1.5 px-1">Account Recovery & Personal Info (Private)</p>
             <div class="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden shadow-xs text-sm">
               <div onclick="linkOrEditContact('phone')" class="px-4 py-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50">
-                <div>
-                  <p class="font-semibold text-slate-800">Mobile Number (SIM SMS)</p>
-                  <p id="acLinkedPhoneText" class="text-xs text-emerald-600 font-medium mt-0.5">Not linked</p>
-                </div>
+                <div><p class="font-semibold text-slate-800">Mobile Number (SIM SMS)</p><p id="acLinkedPhoneText" class="text-xs text-emerald-600 font-medium mt-0.5">Not linked</p></div>
                 <span id="acPhoneActionBadge" class="text-xs font-bold text-indigo-600">Link ›</span>
               </div>
               <div onclick="linkOrEditContact('email')" class="px-4 py-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50">
-                <div>
-                  <p class="font-semibold text-slate-800">Gmail Address</p>
-                  <p id="acLinkedEmailText" class="text-xs text-emerald-600 font-medium mt-0.5">Not linked</p>
-                </div>
+                <div><p class="font-semibold text-slate-800">Gmail Address</p><p id="acLinkedEmailText" class="text-xs text-emerald-600 font-medium mt-0.5">Not linked</p></div>
                 <span id="acEmailActionBadge" class="text-xs font-bold text-indigo-600">Link ›</span>
               </div>
               <div onclick="editDateOfBirth()" class="px-4 py-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50">
-                <div>
-                  <p class="font-semibold text-slate-800">Date of Birth</p>
-                  <p id="acDobText" class="text-xs text-slate-500 mt-0.5">Not set</p>
-                </div>
+                <div><p class="font-semibold text-slate-800">Date of Birth</p><p id="acDobText" class="text-xs text-slate-500 mt-0.5">Not set</p></div>
                 <span class="text-xs font-bold text-indigo-600">Edit ›</span>
               </div>
             </div>
@@ -828,10 +827,7 @@
       <div class="bg-white w-full max-w-sm rounded-3xl p-5 space-y-3">
         <h3 class="font-bold text-base">Edit Profile Bio</h3>
         <div>
-          <div class="flex justify-between text-xs text-slate-500 mb-1">
-            <span>Bio (Max 149 characters)</span>
-            <span id="bioCharCount" class="font-bold text-indigo-600">0/149</span>
-          </div>
+          <div class="flex justify-between text-xs text-slate-500 mb-1"><span>Bio (Max 149 characters)</span><span id="bioCharCount" class="font-bold text-indigo-600">0/149</span></div>
           <textarea id="bioInputBox" maxlength="149" rows="4" placeholder="Write something about yourself..." class="w-full border border-slate-300 rounded-xl p-3 text-sm focus:outline-none focus:border-indigo-500"></textarea>
         </div>
         <div class="flex justify-end gap-2 pt-1">
@@ -854,7 +850,7 @@
     <section id="activityTab" class="hidden flex-1 pb-16 bg-white">
       <header class="sticky top-0 bg-white px-4 py-3 border-b border-slate-100 flex items-center gap-3">
         <button onclick="switchTab('homeTab')" class="text-lg font-bold">←</button>
-        <span class="font-bold text-base">Notifications & Activity</span>
+        <span class="font-bold text-base">Notifications</span>
       </header>
       <div id="notificationsList" class="p-4 space-y-2.5 text-xs text-slate-700"></div>
     </section>
@@ -905,17 +901,14 @@
       <div class="flex items-center gap-2.5">
         <button onclick="document.getElementById('helpAiModal').classList.add('hidden')" class="text-xl font-bold">←</button>
         <div class="w-8 h-8 rounded-full zest-gradient text-white flex items-center justify-center font-bold text-xs">AI</div>
-        <div>
-          <h3 class="font-bold text-sm">ZestUp Help AI</h3>
-          <p class="text-[10px] text-emerald-600 font-semibold">● Instant AI Support & ZestUp Team</p>
-        </div>
+        <div><h3 class="font-bold text-sm">ZestUp Help AI</h3><p class="text-[10px] text-emerald-600 font-semibold">● Instant AI Support & ZestUp Team</p></div>
       </div>
       <button onclick="escalateToHumanTeam()" class="text-[11px] font-bold bg-indigo-50 text-indigo-700 px-2.5 py-1.5 rounded-lg">Message Team</button>
     </header>
     <div id="helpAiChatBox" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50 text-xs">
       <div class="bg-white border border-slate-200 p-3 rounded-2xl max-w-[85%] space-y-1.5">
         <p class="font-bold text-indigo-600">ZestUp Help AI 🤖</p>
-        <p>Hello! I am <b>ZestUp Help AI</b>. Ask me anything about Account Recovery, Blue Tick, Copyright Strikes, Creator Earnings, or Video Uploads—or tap <b>Message Team</b> above to contact the ZestUp Owner directly!</p>
+        <p>Hello! I am <b>ZestUp Help AI</b>. Ask me anything about Account Recovery, Blue Tick, Copyright Strikes, Creator Monetization, or Music Uploads—or tap <b>Message Team</b> above to contact the ZestUp Owner directly!</p>
       </div>
     </div>
     <div class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
@@ -924,17 +917,20 @@
     </div>
   </div>
 
-  <!-- STORY VIEWER MODAL -->
+  <!-- STORY VIEWER MODAL (Plays Real Music & Shows Draggable Overlays!) -->
   <div id="storyViewer" class="hidden fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 text-white">
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between z-20">
       <div class="flex items-center gap-2">
         <img id="storyUserImg" class="w-8 h-8 rounded-full object-cover" />
         <span id="storyUserName" class="text-xs font-bold flex items-center gap-1">User</span>
       </div>
-      <button onclick="document.getElementById('storyViewer').classList.add('hidden')" class="text-xl font-bold">✕</button>
+      <button onclick="closeStoryViewer()" class="text-xl font-bold">✕</button>
     </div>
-    <img id="storyFullImg" class="max-h-[75vh] w-full object-contain rounded-xl my-auto" />
-    <p id="storyCaption" class="text-center text-sm pb-4"></p>
+    <div class="relative flex-1 flex items-center justify-center overflow-hidden my-2">
+      <img id="storyFullImg" class="max-h-[75vh] w-full object-contain rounded-xl" />
+      <div id="storyViewerOverlayLayer" class="absolute inset-0 pointer-events-none"></div>
+    </div>
+    <p id="storyCaption" class="text-center text-sm pb-4 z-20"></p>
   </div>
 
   <script type="module">
@@ -962,6 +958,14 @@
     const CLOUDINARY_CLOUD_NAME = "nnahwcuk";
     const CLOUDINARY_UPLOAD_PRESET = "zestup_upload";
 
+    // Built-in Royalty-Free Real Audio Tracks + YouTube Support
+    const BUILTIN_TRACKS = [
+      { id: 't1', title: 'Trending Lo-Fi Chill 🎧', artist: 'ZestUp Studio', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', lyrics: '♪ Vibing through the city lights tonight ♪' },
+      { id: 't2', title: 'ZestUp Viral Pop Beat 🔥', artist: 'ZestUp Hits', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', lyrics: '♪ Turn the volume up, feel the rhythm flow ♪' },
+      { id: 't3', title: 'Romantic Acoustic Melody 🎸', artist: 'Acoustic Soul', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', lyrics: '♪ Every moment feels like magic with you ♪' },
+      { id: 't4', title: 'Cinematic Epic Anthem 🎬', artist: 'Cinema Audio', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', lyrics: '♪ Rise above the horizon, chase your dreams ♪' }
+    ];
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -986,21 +990,51 @@
     let searchFilter = 'all';
     let liveStreamObj = null;
 
-    // Studio States
-    let studioMode = 'REEL';   // 'POST' | 'STORY' | 'REEL' | 'TEXT' | 'LIVE'
-    let studioStep = 1;        // 1 | 2 | 3
+    // Studio & Music States
+    let studioMode = 'REEL';
+    let studioStep = 1;
     let studioFile = null;
     let studioFilterClass = 'filter-none';
-    let studioAudio = '';
-    let studioSticker = '';
-    let studioOverlayText = '';
-    let studioCaptionsText = '';
     let studioLocation = '';
     let studioTaggedPeople = '';
-    let studioTextBgClass = 'txt-bg-none';
-    let studioFeeling = '';
+
+    // Music & Draggable Canvas States
+    let selectedMusicObj = null; // { title, artist, url, ytId, thumb, lyrics }
+    let showMusicCardOnScreen = true;
+    let showLyricsOnScreen = false;
+    let activeDragElementId = null;
 
     const defaultAvatar = (name) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Z')}&background=4F46E5&color=fff&bold=true`;
+
+    // --- GLOBAL REAL MUSIC & YOUTUBE AUDIO ENGINE ---
+    window.playTrackGlobally = (musicObj) => {
+      stopGlobalMusic();
+      if (!musicObj) return;
+      document.getElementById('stopMusicHeaderBtn').classList.remove('hidden');
+
+      if (musicObj.ytId) {
+        document.getElementById('globalYtContainer').innerHTML = `
+          <iframe width="200" height="200" src="https://www.youtube.com/embed/${musicObj.ytId}?autoplay=1&loop=1&playlist=${musicObj.ytId}" allow="autoplay; encrypted-media"></iframe>`;
+      } else if (musicObj.url) {
+        const audio = document.getElementById('globalAudioPlayer');
+        audio.src = musicObj.url;
+        audio.play().catch(() => {});
+      }
+    };
+
+    window.stopGlobalMusic = () => {
+      const audio = document.getElementById('globalAudioPlayer');
+      audio.pause();
+      audio.src = '';
+      document.getElementById('globalYtContainer').innerHTML = '';
+      document.getElementById('stopMusicHeaderBtn')?.classList.add('hidden');
+    };
+
+    function extractYouTubeId(urlOrText) {
+      const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+      const match = urlOrText.match(regExp);
+      return match ? match[1] : null;
+    }
 
     function isOwner(uid) {
       const u = usersMap[uid];
@@ -1029,19 +1063,9 @@
     function getFollowButtonState(targetUid) {
       const iFollowThem = (userProfileData.following || []).includes(targetUid);
       const theyFollowMe = (userProfileData.followers || []).includes(targetUid);
-      if (iFollowThem) return { text: 'Following', cls: 'text-slate-500' };
-      if (theyFollowMe) return { text: 'Follow back', cls: 'text-indigo-600' };
-      return { text: 'Follow', cls: 'text-indigo-600' };
-    }
-
-    function formatPostTime(ts) {
-      if (!ts || !ts.toMillis) return 'Just now';
-      const diff = Date.now() - ts.toMillis();
-      const mins = Math.max(1, Math.floor(diff / 60000));
-      if (mins < 60) return `${mins}m`;
-      const hrs = Math.floor(mins / 60);
-      if (hrs < 24) return `${hrs}h`;
-      return `${Math.floor(hrs / 24)}d`;
+      if (iFollowThem) return { text: 'Following', cls: 'bg-slate-100 text-slate-800' };
+      if (theyFollowMe) return { text: 'Follow back', cls: 'zest-gradient text-white' };
+      return { text: 'Follow', cls: 'zest-gradient text-white' };
     }
 
     function getPresenceInfo(u) {
@@ -1144,7 +1168,7 @@
         if (pass.length < 6) { errEl.textContent = "Enter your 6+ character password."; errEl.classList.remove('hidden'); return; }
         try {
           await signInWithEmailAndPassword(auth, `${phone}@zestup.phone`, pass);
-        } catch (e) {
+        } catch {
           errEl.textContent = "Incorrect password. Try 'SIM SMS OTP' to log in!";
           errEl.classList.remove('hidden');
         }
@@ -1203,7 +1227,7 @@
             await linkWithCredential(user, cred);
           } catch {}
         }
-      } catch (e) {
+      } catch {
         errEl.textContent = "Invalid or expired SMS OTP. Please check your SMS and try again.";
         errEl.classList.remove('hidden');
       } finally {
@@ -1213,6 +1237,7 @@
     };
 
     document.getElementById('logoutBtn').onclick = () => {
+      stopGlobalMusic();
       updateMyPresence(false);
       closeSettings();
       signOut(auth);
@@ -1251,12 +1276,14 @@
             isSuspended: false,
             copyrightStrikes: 0,
             earnings: 0,
-            monetized: isFounder,
-            proMode: true,
+            starsCount: 0,
+            payoutMethod: "",
+            monetized: true,
             warnings: [],
             followers: [],
             following: [],
-            closeFriends: [],
+            highlights: [],
+            pinnedPosts: [],
             savedPosts: [],
             blockedUsers: [],
             hiddenStoryFrom: [],
@@ -1365,7 +1392,6 @@
       document.getElementById('profBio').textContent = userProfileData.bio || "Creator on ZestUp ✨";
       document.getElementById('profAvatarImg').src = avatar;
       document.getElementById('navAvatarImg').src = avatar;
-      document.getElementById('homeComposerAvatar').src = avatar;
       document.getElementById('dmTopUsername').textContent = uname;
       document.getElementById('dmTopBadge').innerHTML = badge;
       document.getElementById('ownProfileRing').className = getProfileRingClass(currentUser.uid);
@@ -1374,155 +1400,211 @@
       document.getElementById('statFollowing').textContent = (userProfileData.following || []).length;
       document.getElementById('savedCountBadge').textContent = `${(userProfileData.savedPosts || []).length} ›`;
       document.getElementById('blockedCountBadge').textContent = `${(userProfileData.blockedUsers || []).length} ›`;
-      document.getElementById('pref_isPrivate').textContent = userProfileData.isPrivate ? 'Locked ›' : 'Unlocked ›';
-      document.getElementById('pref_proMode').textContent = userProfileData.proMode !== false ? 'On ›' : 'Off ›';
+      document.getElementById('pref_isPrivate').textContent = userProfileData.isPrivate ? 'Private ›' : 'Public ›';
       document.getElementById('pref_activeStatus').textContent = userProfileData.hideActiveStatus ? 'Off ›' : 'On ›';
+
+      // Highlights Render
+      const hlRow = document.getElementById('highlightsRow');
+      const highlights = userProfileData.highlights || [];
+      hlRow.innerHTML = `
+        <div onclick="addNewHighlight()" class="flex flex-col items-center gap-1 shrink-0 cursor-pointer">
+          <div class="w-14 h-14 rounded-full border border-slate-300 flex items-center justify-center text-xl font-light">+</div>
+          <span class="text-[11px] text-slate-700">New</span>
+        </div>` +
+        highlights.map(h => `
+          <div onclick="alert('Story Highlight: ${h.title}')" class="flex flex-col items-center gap-1 shrink-0 cursor-pointer">
+            <img src="${h.cover || avatar}" class="w-14 h-14 rounded-full object-cover border-2 border-slate-200" />
+            <span class="text-[11px] text-slate-700 max-w-[60px] truncate">${h.title}</span>
+          </div>`).join('');
     }
+
+    window.addNewHighlight = async () => {
+      const title = prompt("Enter Story Highlight Name (e.g. Travel, Reels, Memories):");
+      if (title && title.trim()) {
+        const myStory = allStories.find(s => s.authorId === currentUser.uid);
+        await updateDoc(doc(db, "users", currentUser.uid), {
+          highlights: arrayUnion({ title: title.trim(), cover: myStory?.mediaUrl || userProfileData.avatar || defaultAvatar(userProfileData.name) })
+        });
+      }
+    };
 
     function renderOwnProfileGrid() {
       const myPosts = allPosts.filter(p => p.authorId === currentUser.uid);
       document.getElementById('statPosts').textContent = myPosts.length;
-      const totalEng = myPosts.reduce((s, p) => s + (p.likes?.length || 0) + (p.comments?.length || 0), 0);
       const earnings = userProfileData.earnings || 0;
-      document.getElementById('dashboardSummaryText').textContent = `↗ ${totalEng} engagements • Earnings: ₹${earnings}`;
+      const stars = userProfileData.starsCount || 0;
+      document.getElementById('dashboardSummaryText').textContent = `Balance: ₹${earnings} • ⭐ ${stars} Stars • Payouts`;
 
-      document.getElementById('profileGrid').innerHTML = myPosts.map(p => p.mediaUrl
-        ? (p.mediaType === 'video'
-          ? `<video src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover bg-black ${p.filterClass || ''}"></video>`
-          : `<img src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover bg-slate-100 ${p.filterClass || ''}" />`)
-        : `<div class="aspect-[3/4] ${p.textBgClass || 'bg-slate-100'} p-2 flex items-center justify-center text-center text-[11px] font-bold">${p.text}</div>`
-      ).join('');
+      // Sort pinned posts first
+      const pinned = userProfileData.pinnedPosts || [];
+      const sortedPosts = [...myPosts].sort((a, b) => (pinned.includes(b.id) ? 1 : 0) - (pinned.includes(a.id) ? 1 : 0));
+
+      document.getElementById('profileGrid').innerHTML = sortedPosts.map(p => `
+        <div onclick="togglePinPost('${p.id}')" class="relative aspect-[3/4] bg-slate-100 overflow-hidden cursor-pointer">
+          ${p.mediaType === 'video'
+            ? `<video src="${p.mediaUrl}" class="w-full h-full object-cover bg-black ${p.filterClass || ''}"></video>`
+            : `<img src="${p.mediaUrl}" class="w-full h-full object-cover ${p.filterClass || ''}" />`}
+          ${pinned.includes(p.id) ? `<span class="absolute top-1.5 right-1.5 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded">📌</span>` : ''}
+        </div>`).join('');
     }
 
-    // --- 4. CLEAN FACEBOOK-STYLE POST CARD FEED ---
+    window.togglePinPost = async (postId) => {
+      const pinned = userProfileData.pinnedPosts || [];
+      const isPinned = pinned.includes(postId);
+      if (confirm(isPinned ? "Unpin this post from top of profile?" : "Pin this post to top of your profile?")) {
+        await updateDoc(doc(db, "users", currentUser.uid), {
+          pinnedPosts: isPinned ? arrayRemove(postId) : arrayUnion(postId)
+        });
+      }
+    };
+
+    // --- INSTAGRAM FEED WITH DOUBLE-TAP HEART, REAL AUDIO PLAYBACK & DRAGGED OVERLAYS ---
     function renderFeed() {
       const feed = document.getElementById('feedContainer');
       feed.innerHTML = "";
       const visiblePosts = allPosts.filter(p => !(userProfileData.blockedUsers || []).includes(p.authorId));
 
       if (!visiblePosts.length) {
-        feed.innerHTML = `<div class="bg-white p-12 text-center text-xs text-slate-400">No posts yet. Tap + or "What's on your mind?" to create one!</div>`;
+        feed.innerHTML = `<p class="text-center text-xs text-slate-400 py-14">No posts yet. Tap + to create your first post!</p>`;
         return;
       }
 
       visiblePosts.forEach(post => {
         const u = usersMap[post.authorId] || {};
-        const authorName = u.name || u.username || post.authorName;
+        const authorName = u.username || post.authorName;
         const authorAvatar = u.avatar || post.authorAvatar || defaultAvatar(authorName);
         const badge = getBadgeHTML(post.authorId);
         const isLiked = post.likes?.includes(currentUser.uid);
+        const isSaved = (userProfileData.savedPosts || []).includes(post.id);
         const isMine = post.authorId === currentUser.uid;
         const fState = getFollowButtonState(post.authorId);
-
-        const subMeta = [
-          post.isAiContent ? 'AI content' : '',
-          formatPostTime(post.createdAt),
-          post.location ? `📍 ${post.location}` : '🌐'
-        ].filter(Boolean).join(' · ');
+        const ov = post.overlays || {};
 
         const card = document.createElement('article');
-        card.className = "bg-white border-b border-slate-200/80 shadow-2xs";
+        card.className = "bg-white pb-3";
         card.innerHTML = `
-          <!-- TOP HEADER: Profile Photo + Profile Name + Blue Tick + Follow -->
-          <div class="flex items-center justify-between px-3.5 pt-3 pb-2">
-            <div class="flex items-center gap-2.5 min-w-0">
-              <div onclick="openOtherProfile('${post.authorId}')" class="${getProfileRingClass(post.authorId)} shrink-0 cursor-pointer">
-                <img src="${authorAvatar}" class="w-10 h-10 rounded-full object-cover border border-white" />
+          <!-- Header -->
+          <div class="flex items-center justify-between px-3 py-2.5">
+            <div onclick="openOtherProfile('${post.authorId}')" class="flex items-center gap-2.5 cursor-pointer">
+              <div class="${getProfileRingClass(post.authorId)}">
+                <img src="${authorAvatar}" class="w-8 h-8 rounded-full object-cover border border-white" />
               </div>
-              <div class="min-w-0">
-                <div class="flex items-center gap-1 flex-wrap">
-                  <span onclick="openOtherProfile('${post.authorId}')" class="text-sm font-bold text-slate-900 truncate cursor-pointer">${authorName}</span>
-                  ${badge}
-                  ${!isMine ? `<span class="text-slate-400 text-xs">·</span><button data-uid="${post.authorId}" class="follow-btn text-xs font-extrabold ${fState.cls}">${fState.text}</button>` : ''}
-                </div>
-                <p class="text-[11px] text-slate-500 leading-tight">${subMeta}</p>
+              <div>
+                <p class="text-xs font-bold leading-tight flex items-center gap-1">${authorName} ${badge}</p>
+                <p class="text-[10px] text-slate-500">
+                  ${[post.location ? `📍 ${post.location}` : '', post.music?.title ? `🎵 ${post.music.title}` : '', post.isAiContent ? 'AI content' : ''].filter(Boolean).join(' • ') || 'ZestUp'}
+                </p>
               </div>
             </div>
-            <div class="flex items-center gap-2 text-slate-500">
-              <button data-id="${post.id}" data-mine="${isMine}" class="post-dots-btn px-1.5 py-1 text-base font-bold leading-none">•••</button>
-              <button onclick="this.closest('article').remove()" class="px-1 py-1 text-base leading-none">✕</button>
+            <div class="flex items-center gap-2">
+              ${!isMine ? `<button data-uid="${post.authorId}" class="follow-btn text-xs font-bold px-3 py-1 rounded-xl ${fState.cls}">${fState.text}</button>` : ''}
+              <button data-id="${post.id}" data-mine="${isMine}" class="post-dots-btn text-slate-600 px-1.5 font-bold">•••</button>
             </div>
           </div>
 
-          <!-- MIDDLE: Caption + Media or Colored Text Card -->
+          <!-- Media with Double-Tap Heart & Custom Positioned Overlays -->
           ${post.mediaUrl ? `
-            ${post.text ? `<p class="px-3.5 pb-2.5 text-sm text-slate-900 whitespace-pre-line">${post.text}</p>` : ''}
-            <div class="relative overflow-hidden bg-black">
+            <div class="media-tap-zone relative overflow-hidden bg-black" data-id="${post.id}">
               ${post.mediaType === 'video'
                 ? `<video src="${post.mediaUrl}" controls playsinline class="w-full max-h-[480px] object-cover ${post.filterClass || ''}"></video>`
                 : `<img src="${post.mediaUrl}" class="w-full max-h-[480px] object-cover bg-slate-100 ${post.filterClass || ''}" />`}
-              ${post.sticker ? `<span class="absolute top-4 right-4 text-4xl drop-shadow">${post.sticker}</span>` : ''}
-              ${post.overlayText ? `<div class="absolute bottom-12 inset-x-4 text-center font-extrabold text-lg text-white drop-shadow-[0_2px_5px_rgba(0,0,0,0.95)]">${post.overlayText}</div>` : ''}
-              ${post.captionsText ? `<div class="absolute bottom-5 inset-x-6 text-center text-xs bg-black/75 text-yellow-300 font-bold px-2.5 py-1 rounded">${post.captionsText}</div>` : ''}
-              ${post.audioName ? `<div class="absolute bottom-2.5 left-2.5 bg-black/65 text-white text-[10px] px-2.5 py-1 rounded-full">🎵 ${post.audioName}</div>` : ''}
-            </div>`
-          : `
-            <div class="${post.textBgClass && post.textBgClass !== 'txt-bg-none' ? post.textBgClass + ' min-h-[210px] p-6 flex items-center justify-center text-center text-xl font-extrabold' : 'px-3.5 py-3 text-sm text-slate-900'} whitespace-pre-line">
-              ${post.text || ''}
-            </div>`
-          }
+              
+              <!-- Double-Tap Animated Heart -->
+              <span class="heart-burst hidden absolute top-1/2 left-1/2 text-6xl pointer-events-none z-30">❤️</span>
 
-          <!-- BOTTOM REACTION COUNTS -->
-          <div class="px-3.5 py-2 flex items-center justify-between text-xs text-slate-500 border-b border-slate-100">
-            <div class="flex items-center gap-1">
-              <span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-indigo-600 text-white text-[9px]">👍</span>
-              <span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] -ml-1.5">❤️</span>
-              <span class="font-semibold text-slate-600 ml-0.5">${(post.likes || []).length}</span>
+              <!-- Custom Positioned Music Card (Only if showMusicCard !== false) -->
+              ${post.music && post.showMusicCard !== false ? `
+                <div onclick="event.stopPropagation(); playTrackGlobally(${JSON.stringify(post.music).replace(/"/g, '&quot;')})" style="${ov.musicStyle || 'top:12px; left:12px;'}" class="absolute bg-black/75 backdrop-blur-md border border-white/20 px-2.5 py-1.5 rounded-xl flex items-center gap-2 cursor-pointer z-20">
+                  <img src="${post.music.thumb || authorAvatar}" class="w-7 h-7 rounded-md object-cover" />
+                  <div class="max-w-[130px]">
+                    <p class="text-[11px] font-bold text-white truncate">${post.music.title}</p>
+                    <p class="text-[9px] text-pink-300 truncate">▶ Tap to play song</p>
+                  </div>
+                </div>` : ''}
+
+              <!-- If Music Card was hidden by creator, show tiny subtle speaker icon to play -->
+              ${post.music && post.showMusicCard === false ? `
+                <button onclick="event.stopPropagation(); playTrackGlobally(${JSON.stringify(post.music).replace(/"/g, '&quot;')})" class="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-black/70 text-white text-xs flex items-center justify-center z-20" title="Play background audio">🔊</button>` : ''}
+
+              <!-- Optional Auto-Captions / Lyrics at Creator's exact position -->
+              ${post.showLyrics && post.music?.lyrics ? `
+                <div style="${ov.lyricsStyle || 'bottom:48px; left:15%;'}" class="absolute bg-black/70 px-3 py-1 rounded-lg text-xs font-extrabold text-yellow-300 z-20 pointer-events-none">${post.music.lyrics}</div>` : ''}
+
+              <!-- Custom Text at Creator's exact position -->
+              ${post.overlayText ? `
+                <div style="${ov.textStyle || 'top:42%; left:22%;'}" class="absolute font-extrabold text-lg text-white drop-shadow-[0_2px_5px_rgba(0,0,0,0.95)] z-20 pointer-events-none">${post.overlayText}</div>` : ''}
+
+              <!-- Custom Sticker at Creator's exact position -->
+              ${post.sticker ? `
+                <div style="${ov.stickerStyle || 'top:25%; right:18%;'}" class="absolute text-5xl drop-shadow z-20 pointer-events-none">${post.sticker}</div>` : ''}
+            </div>` : ''}
+
+          <!-- Instagram Action Icons -->
+          <div class="px-3 pt-2.5 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <button data-id="${post.id}" data-liked="${isLiked}" class="like-btn flex items-center gap-1 text-slate-800">
+                  <svg class="w-6 h-6 ${isLiked ? 'text-rose-500 fill-rose-500' : ''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                  <span class="text-xs font-bold">${(post.likes || []).length}</span>
+                </button>
+                <button onclick="this.closest('article').querySelector('.comment-input').focus()" class="flex items-center gap-1 text-slate-800">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                  <span class="text-xs font-bold">${(post.comments || []).length}</span>
+                </button>
+                <button onclick="openShareSheet('${post.id}', '${post.authorId}')" class="flex items-center gap-1 text-slate-800">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                </button>
+                ${!isMine ? `<button onclick="sendCreatorStar('${post.authorId}')" class="text-xs font-extrabold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">⭐ Star</button>` : ''}
+              </div>
+              <button data-id="${post.id}" data-saved="${isSaved}" class="save-btn text-slate-800">
+                <svg class="w-6 h-6 ${isSaved ? 'fill-slate-900' : ''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+              </button>
             </div>
-            <div class="flex items-center gap-3">
-              <span>${(post.comments || []).length} comments</span>
-              <span>${post.shares || 0} shares</span>
-            </div>
-          </div>
 
-          <!-- BOTTOM 3 EQUAL BUTTONS: LIKE | COMMENT | SHARE -->
-          <div class="grid grid-cols-3 py-1 text-xs font-bold text-slate-600">
-            <button data-id="${post.id}" data-liked="${isLiked}" class="like-btn py-2 flex items-center justify-center gap-1.5 hover:bg-slate-50 rounded-lg ${isLiked ? 'text-indigo-600' : ''}">
-              <span class="text-base">${isLiked ? '👍' : '👍🏻'}</span>
-              <span>Like</span>
-            </button>
-            <button onclick="this.closest('article').querySelector('.comment-section').classList.toggle('hidden'); this.closest('article').querySelector('.comment-input').focus();" class="py-2 flex items-center justify-center gap-1.5 hover:bg-slate-50 rounded-lg">
-              <span class="text-base">💬</span>
-              <span>Comment</span>
-            </button>
-            <button data-id="${post.id}" class="share-post-btn py-2 flex items-center justify-center gap-1.5 hover:bg-slate-50 rounded-lg">
-              <span class="text-base">↪️</span>
-              <span>Share</span>
-            </button>
-          </div>
+            ${post.text ? `<p class="text-xs pt-0.5"><span onclick="openOtherProfile('${post.authorId}')" class="font-bold mr-1 inline-flex items-center gap-0.5 cursor-pointer">${authorName} ${badge}</span>${post.text}</p>` : ''}
 
-          <!-- COLLAPSIBLE COMMENT SECTION -->
-          <div class="comment-section ${(post.comments || []).length ? '' : 'hidden'} px-3.5 pb-3 pt-1.5 bg-slate-50/70 border-t border-slate-100 space-y-1.5">
-            ${(post.comments || []).map(c => `<p class="text-xs text-slate-800"><span class="font-bold inline-flex items-center gap-0.5">${c.user} ${c.uid ? getBadgeHTML(c.uid) : ''}</span> ${c.text}</p>`).join('')}
-            <div class="flex items-center gap-2 pt-1">
-              <input type="text" placeholder="Write a comment..." class="comment-input flex-1 bg-white border border-slate-200 rounded-full px-3 py-1.5 text-xs focus:outline-none" />
-              <button data-id="${post.id}" class="comment-btn text-xs font-bold text-indigo-600 px-2">Post</button>
+            <div class="space-y-1 pt-1">
+              ${(post.comments || []).map(c => `<p class="text-xs text-slate-700"><span class="font-bold inline-flex items-center gap-0.5">${c.user} ${c.uid ? getBadgeHTML(c.uid) : ''}</span> ${c.text}</p>`).join('')}
+              <div class="flex items-center gap-2 pt-1">
+                <input type="text" placeholder="Add a comment..." class="comment-input flex-1 text-xs py-1 focus:outline-none" />
+                <button data-id="${post.id}" class="comment-btn text-xs font-bold text-indigo-600">Post</button>
+              </div>
             </div>
           </div>`;
         feed.appendChild(card);
       });
 
+      // Double-tap to Like handler
+      feed.querySelectorAll('.media-tap-zone').forEach(zone => {
+        let lastTap = 0;
+        zone.onclick = async () => {
+          const now = Date.now();
+          if (now - lastTap < 300) {
+            const heart = zone.querySelector('.heart-burst');
+            heart.classList.remove('hidden');
+            heart.classList.add('animate-heart-pop');
+            setTimeout(() => { heart.classList.add('hidden'); heart.classList.remove('animate-heart-pop'); }, 750);
+            await updateDoc(doc(db, "posts", zone.dataset.id), { likes: arrayUnion(currentUser.uid) });
+          }
+          lastTap = now;
+        };
+      });
+
       feed.querySelectorAll('.like-btn').forEach(btn => {
         btn.onclick = async () => {
           const liked = btn.dataset.liked === 'true';
-          await updateDoc(doc(db, "posts", btn.dataset.id), {
-            likes: liked ? arrayRemove(currentUser.uid) : arrayUnion(currentUser.uid)
-          });
+          await updateDoc(doc(db, "posts", btn.dataset.id), { likes: liked ? arrayRemove(currentUser.uid) : arrayUnion(currentUser.uid) });
         };
       });
 
-      feed.querySelectorAll('.share-post-btn').forEach(btn => {
+      feed.querySelectorAll('.save-btn').forEach(btn => {
         btn.onclick = async () => {
-          const p = allPosts.find(x => x.id === btn.dataset.id);
-          await updateDoc(doc(db, "posts", btn.dataset.id), { shares: (p?.shares || 0) + 1 });
-          const text = `Check out this post on ZestUp! ${window.location.href}`;
-          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+          const saved = btn.dataset.saved === 'true';
+          await updateDoc(doc(db, "users", currentUser.uid), { savedPosts: saved ? arrayRemove(btn.dataset.id) : arrayUnion(btn.dataset.id) });
         };
       });
 
-      feed.querySelectorAll('.follow-btn').forEach(btn => {
-        btn.onclick = () => toggleFollowUser(btn.dataset.uid);
-      });
+      feed.querySelectorAll('.follow-btn').forEach(btn => { btn.onclick = () => toggleFollowUser(btn.dataset.uid); });
 
       feed.querySelectorAll('.comment-btn').forEach(btn => {
         btn.onclick = async () => {
@@ -1540,14 +1622,337 @@
           if (btn.dataset.mine === 'true' || isOwner(currentUser.uid)) {
             if (confirm("Delete this post?")) await deleteDoc(doc(db, "posts", btn.dataset.id));
           } else {
-            await updateDoc(doc(db, "users", currentUser.uid), { savedPosts: arrayUnion(btn.dataset.id) });
-            alert("Saved to your Saved Posts!");
+            openShareSheet(btn.dataset.id, null);
           }
         };
       });
     }
 
-    // --- 2 & 3. ALL-IN-ONE CREATIVE STUDIO (POST, STORY, REEL, TEXT, LIVE) ---
+    // --- INSTAGRAM SHARE BOTTOM SHEET (DM Friends Grid + External Actions) ---
+    window.openShareSheet = (postId, profileUid) => {
+      const sheet = document.getElementById('instagramShareSheet');
+      const grid = document.getElementById('shareFriendsGrid');
+      const searchBox = document.getElementById('shareSheetSearchInput');
+      const postObj = postId ? allPosts.find(p => p.id === postId) : null;
+      const targetUser = profileUid ? usersMap[profileUid] : null;
+
+      const shareUrl = profileUid
+        ? `${window.location.origin}${window.location.pathname}?user=${profileUid}`
+        : window.location.href;
+      const shareText = postObj
+        ? `Check out @${postObj.authorName}'s post on ZestUp! ✨ ${shareUrl}`
+        : `Check out @${targetUser?.username || 'creator'} on ZestUp! ✨ ${shareUrl}`;
+
+      const renderFriends = () => {
+        const q = searchBox.value.toLowerCase().trim();
+        const friends = Object.values(usersMap).filter(u => u.uid !== currentUser.uid && (!q || (u.name || '').toLowerCase().includes(q) || (u.username || '').toLowerCase().includes(q)));
+        grid.innerHTML = friends.slice(0, 9).map(u => `
+          <div onclick="sendPostInDm('${u.uid}', '${postId || ''}', '${profileUid || ''}')" class="flex flex-col items-center gap-1 cursor-pointer group">
+            <img src="${u.avatar || defaultAvatar(u.name)}" class="w-14 h-14 rounded-full object-cover border border-slate-200 group-hover:scale-105 transition" />
+            <span class="text-[11px] font-semibold text-slate-800 max-w-[80px] truncate">${u.username || u.name}</span>
+          </div>`).join('') || `<p class="col-span-3 text-center text-xs text-slate-400 py-4">No friends found</p>`;
+      };
+
+      searchBox.value = '';
+      searchBox.oninput = renderFriends;
+      renderFriends();
+
+      document.getElementById('igShareStoryBtn').onclick = async () => {
+        if (postObj?.mediaUrl) {
+          await addDoc(collection(db, "stories"), {
+            mediaUrl: postObj.mediaUrl,
+            caption: `Shared @${postObj.authorName}'s post`,
+            authorId: currentUser.uid,
+            authorName: userProfileData.username || userProfileData.name,
+            authorAvatar: userProfileData.avatar || defaultAvatar(userProfileData.name),
+            createdAt: serverTimestamp()
+          });
+          sheet.classList.add('hidden');
+          alert("Added to Your Story!");
+        } else {
+          sheet.classList.add('hidden');
+          openCreateStudio('STORY');
+        }
+      };
+
+      document.getElementById('igShareWhatsappBtn').onclick = () => {
+        sheet.classList.add('hidden');
+        window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+      };
+
+      document.getElementById('igShareWaStatusBtn').onclick = () => {
+        navigator.clipboard?.writeText(shareText);
+        sheet.classList.add('hidden');
+        window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+      };
+
+      document.getElementById('igShareCopyBtn').onclick = () => {
+        navigator.clipboard?.writeText(shareUrl);
+        sheet.classList.add('hidden');
+        alert("Link copied to clipboard!");
+      };
+
+      document.getElementById('igShareDownloadBtn').onclick = () => {
+        if (postObj?.mediaUrl) {
+          const a = document.createElement('a');
+          a.href = postObj.mediaUrl;
+          a.download = 'ZestUp_Media';
+          a.target = '_blank';
+          a.click();
+        } else {
+          alert("Media ready to save!");
+        }
+        sheet.classList.add('hidden');
+      };
+
+      document.getElementById('igShareNativeBtn').onclick = () => {
+        sheet.classList.add('hidden');
+        if (navigator.share) {
+          navigator.share({ title: 'ZestUp', text: shareText, url: shareUrl }).catch(() => {});
+        } else {
+          navigator.clipboard?.writeText(shareText);
+          alert("Share link copied!");
+        }
+      };
+
+      sheet.classList.remove('hidden');
+    };
+
+    window.sendPostInDm = async (receiverUid, postId, profileUid) => {
+      const msgText = postId ? `Shared a ZestUp post with you 🎬` : `Shared @${usersMap[profileUid]?.username}'s profile 👤`;
+      await addDoc(collection(db, "directMessages"), {
+        senderId: currentUser.uid,
+        receiverId: receiverUid,
+        text: msgText,
+        createdAt: serverTimestamp()
+      });
+      document.getElementById('instagramShareSheet').classList.add('hidden');
+      alert(`Sent to @${usersMap[receiverUid]?.username || 'friend'}!`);
+    };
+
+    // --- FACEBOOK-STYLE MONEY EARNING & MONETIZATION HUB ---
+    window.openFbMonetizationHub = () => {
+      const myPosts = allPosts.filter(p => p.authorId === currentUser.uid);
+      const totalLikes = myPosts.reduce((s, p) => s + (p.likes?.length || 0), 0);
+      const totalViews = (totalLikes * 14) + (myPosts.length * 45);
+      const earnings = userProfileData.earnings || 0;
+      const stars = userProfileData.starsCount || 0;
+
+      document.getElementById('fbEarningsBalance').textContent = `₹${earnings.toFixed(2)}`;
+      document.getElementById('fbEarningsStatsLine').textContent = `${totalViews} Views • ⭐ ${stars} Stars • ${totalLikes} Engagements`;
+      document.getElementById('payoutAccountDisplay').textContent = userProfileData.payoutMethod
+        ? `✔ Linked: ${userProfileData.payoutMethod}`
+        : "Not linked — Tap to add UPI ID or Bank Account";
+      document.getElementById('fbMonetizationModal').classList.remove('hidden');
+    };
+
+    window.setupPayoutMethod = async () => {
+      const upi = prompt("Enter your UPI ID (e.g. name@okicici) or Bank Account for ZestUp Creator Payouts:", userProfileData.payoutMethod || "");
+      if (upi && upi.trim()) {
+        await updateDoc(doc(db, "users", currentUser.uid), { payoutMethod: upi.trim() });
+        openFbMonetizationHub();
+        alert("Payout account saved successfully!");
+      }
+    };
+
+    window.requestPayoutWithdraw = async () => {
+      const bal = userProfileData.earnings || 0;
+      if (bal < 100) {
+        alert(`Minimum payout threshold is ₹100. Your current balance is ₹${bal}. Keep creating Reels & earning Stars!`);
+        return;
+      }
+      if (!userProfileData.payoutMethod) {
+        alert("Please add your UPI ID or Bank Account in Payout Settings first!");
+        return;
+      }
+      await addDoc(collection(db, "supportTickets"), {
+        type: "PAYOUT_REQUEST",
+        fromUid: currentUser.uid,
+        fromName: userProfileData.username || userProfileData.name,
+        message: `Payout withdrawal request of ₹${bal} to ${userProfileData.payoutMethod}`,
+        createdAt: serverTimestamp()
+      });
+      alert(`Withdrawal request for ₹${bal} submitted to ZestUp Payouts Team!`);
+    };
+
+    window.sendCreatorStar = async (creatorUid) => {
+      const u = usersMap[creatorUid] || {};
+      if (confirm(`Send ⭐ 10 Creator Stars (₹10 support) to @${u.username || u.name}?`)) {
+        await updateDoc(doc(db, "users", creatorUid), {
+          starsCount: (u.starsCount || 0) + 10,
+          earnings: (u.earnings || 0) + 10,
+          monetized: true
+        });
+        alert(`⭐ 10 Stars sent to @${u.username || u.name}!`);
+      }
+    };
+
+    // --- INSTAGRAM CREATIVE STUDIO + YOUTUBE MUSIC + DRAG & RESIZE ---
+    function enableTouchDrag(el) {
+      let startX = 0, startY = 0, origLeft = 0, origTop = 0;
+      el.addEventListener('pointerdown', (e) => {
+        if (e.target.tagName === 'BUTTON') return;
+        selectActiveDragElement(el.id);
+        startX = e.clientX;
+        startY = e.clientY;
+        origLeft = el.offsetLeft;
+        origTop = el.offsetTop;
+        el.setPointerCapture(e.pointerId);
+      });
+      el.addEventListener('pointermove', (e) => {
+        if (!el.hasPointerCapture(e.pointerId)) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        el.style.left = `${origLeft + dx}px`;
+        el.style.top = `${origTop + dy}px`;
+        el.style.bottom = 'auto';
+        el.style.right = 'auto';
+      });
+    }
+
+    ['dragMusicCard', 'dragLyricsBox', 'dragTextBox', 'dragStickerBox'].forEach(id => {
+      enableTouchDrag(document.getElementById(id));
+    });
+
+    window.selectActiveDragElement = (elId) => {
+      activeDragElementId = elId;
+      const el = document.getElementById(elId);
+      const bar = document.getElementById('elementResizeBar');
+      const slider = document.getElementById('activeElementScaleSlider');
+      bar.classList.remove('hidden');
+      const currentScale = parseFloat(el.dataset.scale || "1");
+      slider.value = currentScale;
+      slider.oninput = (e) => {
+        el.dataset.scale = e.target.value;
+        el.style.transform = `scale(${e.target.value})`;
+      };
+    };
+
+    window.hideActiveDragElement = () => {
+      if (!activeDragElementId) return;
+      if (activeDragElementId === 'dragMusicCard') {
+        toggleHideMusicCard();
+      } else if (activeDragElementId === 'dragLyricsBox') {
+        showLyricsOnScreen = false;
+        document.getElementById('dragLyricsBox').classList.add('hidden');
+      } else {
+        document.getElementById(activeDragElementId).classList.add('hidden');
+      }
+      document.getElementById('elementResizeBar').classList.add('hidden');
+    };
+
+    window.openMusicPickerModal = () => {
+      const list = document.getElementById('trendingTracksList');
+      list.innerHTML = BUILTIN_TRACKS.map(t => `
+        <div onclick="selectBuiltInMusic('${t.id}')" class="p-3 rounded-2xl bg-zinc-800 hover:bg-zinc-700 flex items-center justify-between cursor-pointer">
+          <div class="flex items-center gap-3">
+            <span class="w-9 h-9 rounded-xl zest-gradient flex items-center justify-center text-sm font-bold">▶</span>
+            <div>
+              <p class="text-xs font-extrabold text-white">${t.title}</p>
+              <p class="text-[10px] text-zinc-400">${t.artist}</p>
+            </div>
+          </div>
+          <span class="text-xs font-bold text-indigo-400">Use</span>
+        </div>`).join('');
+      document.getElementById('musicPickerModal').classList.remove('hidden');
+    };
+
+    window.selectBuiltInMusic = (trackId) => {
+      const t = BUILTIN_TRACKS.find(x => x.id === trackId);
+      if (!t) return;
+      applySelectedMusic({
+        title: t.title,
+        artist: t.artist,
+        url: t.url,
+        ytId: null,
+        thumb: defaultAvatar(t.artist),
+        lyrics: t.lyrics
+      });
+      document.getElementById('musicPickerModal').classList.add('hidden');
+    };
+
+    window.applyYouTubeSong = () => {
+      const raw = document.getElementById('ytSongInput').value.trim();
+      if (!raw) return;
+      const ytId = extractYouTubeId(raw);
+      const songName = ytId ? `YouTube Track (${ytId})` : raw;
+      const lyricsSample = prompt("Optional Auto-Lyrics Caption for this song (leave empty if you only want audio):", `♪ ${songName} ♪`);
+
+      applySelectedMusic({
+        title: songName,
+        artist: "YouTube Music",
+        url: ytId ? "" : BUILTIN_TRACKS[0].url,
+        ytId: ytId || null,
+        thumb: ytId ? `https://img.youtube.com/vi/${ytId}/default.jpg` : defaultAvatar("YT"),
+        lyrics: lyricsSample ? lyricsSample.trim() : ""
+      });
+      document.getElementById('musicPickerModal').classList.add('hidden');
+    };
+
+    document.getElementById('localAudioFileInput').onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const localUrl = URL.createObjectURL(file);
+      applySelectedMusic({
+        title: file.name.replace(/\.[^/.]+$/, ""),
+        artist: "My Audio",
+        url: localUrl,
+        ytId: null,
+        thumb: defaultAvatar("Audio"),
+        lyrics: `♪ ${file.name.replace(/\.[^/.]+$/, "")} ♪`
+      });
+      document.getElementById('musicPickerModal').classList.add('hidden');
+      // Upload audio in background so others hear it too
+      const cloudAudioUrl = await uploadToCloudinary(file);
+      if (cloudAudioUrl && selectedMusicObj) selectedMusicObj.url = cloudAudioUrl;
+    };
+
+    function applySelectedMusic(musicObj) {
+      selectedMusicObj = musicObj;
+      showMusicCardOnScreen = true;
+      playTrackGlobally(musicObj);
+
+      const card = document.getElementById('dragMusicCard');
+      document.getElementById('dragMusicTitle').textContent = musicObj.title;
+      document.getElementById('dragMusicArtist').textContent = musicObj.artist;
+      document.getElementById('dragMusicThumb').src = musicObj.thumb;
+      card.classList.remove('hidden');
+
+      document.getElementById('toggleMusicCardVisBtn')?.classList.remove('hidden');
+      document.getElementById('step3AudioText').textContent = musicObj.title + ' ›';
+
+      if (musicObj.lyrics) {
+        document.getElementById('dragLyricsText').textContent = musicObj.lyrics;
+      }
+    }
+
+    window.toggleHideMusicCard = () => {
+      showMusicCardOnScreen = !showMusicCardOnScreen;
+      document.getElementById('dragMusicCard').classList.toggle('hidden', !showMusicCardOnScreen);
+      const btn = document.getElementById('toggleMusicCardVisBtn');
+      if (btn) btn.textContent = showMusicCardOnScreen ? '👁️‍🗨️ Hide Title' : '👁️ Show Title';
+    };
+
+    window.toggleAutoLyricsOption = () => {
+      if (!selectedMusicObj) {
+        alert("Please select a song in Audio first to enable Auto-Captions / Lyrics!");
+        return;
+      }
+      showLyricsOnScreen = !showLyricsOnScreen;
+      const box = document.getElementById('dragLyricsBox');
+      if (showLyricsOnScreen) {
+        const customLyr = prompt("Edit Auto-Captions / Lyrics text:", selectedMusicObj.lyrics || `♪ ${selectedMusicObj.title} ♪`);
+        if (customLyr !== null) {
+          selectedMusicObj.lyrics = customLyr.trim();
+          document.getElementById('dragLyricsText').textContent = selectedMusicObj.lyrics;
+          box.classList.remove('hidden');
+          selectActiveDragElement('dragLyricsBox');
+        }
+      } else {
+        box.classList.add('hidden');
+      }
+    };
+
     window.openCreateStudio = async (mode = 'REEL') => {
       studioMode = mode;
       studioStep = 1;
@@ -1558,20 +1963,13 @@
         b.classList.toggle('text-zinc-500', b.dataset.mode !== mode);
       });
 
-      ['studioStep1Media', 'studioStep2Editor', 'studioStep3Publish', 'studioTextMode', 'studioTextSettings', 'studioLiveMode'].forEach(id => {
+      ['studioStep1Media', 'studioStep2Editor', 'studioStep3Publish', 'studioLiveMode'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
       });
-      document.getElementById('studioHeaderRight').innerHTML = '';
       document.getElementById('studioBackBtn').textContent = '✕';
       document.getElementById('studioModeSwitcherBar').classList.remove('hidden');
 
-      if (mode === 'TEXT') {
-        document.getElementById('studioHeaderTitle').textContent = 'Create post';
-        document.getElementById('textComposerAvatar').src = userProfileData.avatar || defaultAvatar(userProfileData.name);
-        document.getElementById('textComposerName').textContent = userProfileData.name || 'User';
-        document.getElementById('studioTextMode').classList.remove('hidden');
-        stopLiveCamera();
-      } else if (mode === 'LIVE') {
+      if (mode === 'LIVE') {
         document.getElementById('studioHeaderTitle').textContent = 'Go Live';
         document.getElementById('studioLiveMode').classList.remove('hidden');
         try {
@@ -1587,11 +1985,11 @@
     };
 
     window.handleStudioBack = () => {
+      stopGlobalMusic();
       if (studioStep === 3) {
         studioStep = 2;
         document.getElementById('studioStep3Publish').classList.add('hidden');
         document.getElementById('studioStep2Editor').classList.remove('hidden');
-        document.getElementById('studioHeaderTitle').textContent = studioMode === 'REEL' ? 'Edit reel' : 'Edit post';
       } else if (studioStep === 2) {
         openCreateStudio(studioMode);
       } else {
@@ -1605,19 +2003,16 @@
       studioFile = null;
       studioStep = 1;
       studioFilterClass = 'filter-none';
-      studioAudio = '';
-      studioSticker = '';
-      studioOverlayText = '';
-      studioCaptionsText = '';
       studioLocation = '';
       studioTaggedPeople = '';
-      studioTextBgClass = 'txt-bg-none';
-      studioFeeling = '';
-      document.getElementById('editorTopAudioPill').classList.add('hidden');
-      document.getElementById('editorLocationBadge').classList.add('hidden');
-      document.getElementById('editorStickerBadge').classList.add('hidden');
-      document.getElementById('editorTextBadge').classList.add('hidden');
-      document.getElementById('editorCaptionOverlay').classList.add('hidden');
+      selectedMusicObj = null;
+      showMusicCardOnScreen = true;
+      showLyricsOnScreen = false;
+      ['dragMusicCard', 'dragLyricsBox', 'dragTextBox', 'dragStickerBox', 'editorLocationBadge', 'elementResizeBar'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById('dragTextContent').textContent = '';
+      document.getElementById('dragStickerContent').textContent = '';
     }
 
     document.getElementById('studioFileInput').onchange = (e) => {
@@ -1630,7 +2025,6 @@
       document.getElementById('studioStep2Editor').classList.remove('hidden');
       document.getElementById('studioModeSwitcherBar').classList.add('hidden');
       document.getElementById('studioBackBtn').textContent = '←';
-      document.getElementById('editorTopAudioPill').classList.remove('hidden');
 
       const isVideo = studioFile.type.startsWith('video');
       document.getElementById('editorVidPreview').classList.toggle('hidden', !isVideo);
@@ -1645,38 +2039,14 @@
       document.getElementById('reelBottomDock').classList.toggle('hidden', isStory);
     };
 
-    window.selectStudioAudio = () => {
-      const tracks = ["Trending Lo-Fi Beats 🎧", "ZestUp Viral Pop 🔥", "Romantic Acoustic 🎸", "Cinematic Epic 🎬"];
-      const choice = prompt(`Choose or type Audio Track:\n1. ${tracks[0]}\n2. ${tracks[1]}\n3. ${tracks[2]}\n4. ${tracks[3]}`, studioAudio || tracks[0]);
-      if (choice && choice.trim()) {
-        studioAudio = choice.trim();
-        document.getElementById('editorAudioLabel').textContent = studioAudio;
-        document.getElementById('editorTopAudioPill').classList.remove('hidden');
-        document.getElementById('step3AudioText').textContent = studioAudio + ' ›';
-      }
-    };
-
     window.promptEditorText = () => {
-      const txt = prompt("Enter overlay text:", studioOverlayText);
+      const box = document.getElementById('dragTextBox');
+      const content = document.getElementById('dragTextContent');
+      const txt = prompt("Enter text (Drag anywhere on screen & adjust size below):", content.textContent);
       if (txt !== null) {
-        studioOverlayText = txt.trim();
-        const badge = document.getElementById('editorTextBadge');
-        badge.textContent = studioOverlayText;
-        badge.classList.toggle('hidden', !studioOverlayText);
-      }
-    };
-
-    window.toggleVoiceover = () => {
-      alert("🎙️ Voiceover Mic Ready! Speak while recording or add voice notes to your reel.");
-    };
-
-    window.promptAutoCaptions = () => {
-      const cap = prompt("Enter Auto-Captions / Subtitles text:", studioCaptionsText);
-      if (cap !== null) {
-        studioCaptionsText = cap.trim();
-        const el = document.getElementById('editorCaptionOverlay');
-        el.textContent = studioCaptionsText;
-        el.classList.toggle('hidden', !studioCaptionsText);
+        content.textContent = txt.trim();
+        box.classList.toggle('hidden', !txt.trim());
+        if (txt.trim()) selectActiveDragElement('dragTextBox');
       }
     };
 
@@ -1684,17 +2054,18 @@
       const tray = document.getElementById('editorSubTray');
       tray.classList.remove('hidden');
       tray.innerHTML = `
-        <div class="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar text-2xl">
-          ${['🔥','❤️','✨','😎','🎉','👑','💯','📍'].map(em => `<button onclick="setEditorSticker('${em}')" class="p-1.5 bg-zinc-800 rounded-xl">${em}</button>`).join('')}
-          <button onclick="setEditorSticker('')" class="px-2.5 py-1 bg-rose-600 text-xs font-bold rounded-lg">Clear</button>
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar text-2xl">
+          ${['🔥','❤️','✨','😎','🎉','👑','📊 Poll','❓ Quiz','⏳ Countdown'].map(em => `<button onclick="setEditorSticker('${em}')" class="px-2.5 py-1.5 bg-zinc-800 rounded-xl text-sm shrink-0">${em}</button>`).join('')}
+          <button onclick="setEditorSticker('')" class="px-2.5 py-1 bg-rose-600 text-xs font-bold rounded-lg shrink-0">Clear</button>
         </div>`;
     };
 
     window.setEditorSticker = (em) => {
-      studioSticker = em;
-      const el = document.getElementById('editorStickerBadge');
-      el.textContent = em;
-      el.classList.toggle('hidden', !em);
+      const box = document.getElementById('dragStickerBox');
+      const content = document.getElementById('dragStickerContent');
+      content.textContent = em;
+      box.classList.toggle('hidden', !em);
+      if (em) selectActiveDragElement('dragStickerBox');
     };
 
     window.openFiltersTray = () => {
@@ -1707,25 +2078,22 @@
       tray.innerHTML = `
         <div class="flex items-center gap-2 overflow-x-auto no-scrollbar text-xs font-bold">
           ${filters.map(([cls, lbl]) => `<button onclick="applyStudioFilter('${cls}')" class="px-3 py-1.5 bg-zinc-800 rounded-lg shrink-0">${lbl}</button>`).join('')}
-          <button onclick="document.getElementById('editorVidPreview').playbackRate=0.5" class="px-2.5 py-1.5 bg-indigo-900 rounded-lg shrink-0">0.5x</button>
-          <button onclick="document.getElementById('editorVidPreview').playbackRate=1.5" class="px-2.5 py-1.5 bg-indigo-900 rounded-lg shrink-0">1.5x</button>
         </div>`;
     };
 
     window.applyStudioFilter = (cls) => {
       studioFilterClass = cls;
-      document.getElementById('editorImgPreview').className = `w-full h-full max-h-[65vh] object-contain ${cls} ${document.getElementById('editorImgPreview').classList.contains('hidden') ? 'hidden' : ''}`;
-      document.getElementById('editorVidPreview').className = `w-full h-full max-h-[65vh] object-contain ${cls} ${document.getElementById('editorVidPreview').classList.contains('hidden') ? 'hidden' : ''}`;
+      document.getElementById('editorImgPreview').className = `w-full h-full max-h-[64vh] object-contain pointer-events-none ${cls} ${document.getElementById('editorImgPreview').classList.contains('hidden') ? 'hidden' : ''}`;
+      document.getElementById('editorVidPreview').className = `w-full h-full max-h-[64vh] object-contain pointer-events-none ${cls} ${document.getElementById('editorVidPreview').classList.contains('hidden') ? 'hidden' : ''}`;
     };
 
     window.detectStudioLocation = () => {
-      const loc = prompt("Enter Location (or leave default):", studioLocation || "Mumbai, India");
+      const loc = prompt("Enter Location:", studioLocation || "Mumbai, India");
       if (loc !== null) {
         studioLocation = loc.trim();
         const badge = document.getElementById('editorLocationBadge');
         badge.textContent = `📍 ${studioLocation}`;
         badge.classList.toggle('hidden', !studioLocation);
-        document.getElementById('step3LocationText').textContent = studioLocation || 'Add ›';
       }
     };
 
@@ -1759,11 +2127,24 @@
       }
     };
 
+    function captureOverlayPositions() {
+      const m = document.getElementById('dragMusicCard');
+      const l = document.getElementById('dragLyricsBox');
+      const t = document.getElementById('dragTextBox');
+      const s = document.getElementById('dragStickerBox');
+      return {
+        musicStyle: `top:${m.style.top}; left:${m.style.left}; transform:${m.style.transform};`,
+        lyricsStyle: `top:${l.style.top || 'auto'}; bottom:${l.style.bottom || '48px'}; left:${l.style.left}; transform:${l.style.transform};`,
+        textStyle: `top:${t.style.top}; left:${t.style.left}; transform:${t.style.transform};`,
+        stickerStyle: `top:${s.style.top}; left:${s.style.left || 'auto'}; right:${s.style.right || 'auto'}; transform:${s.style.transform};`
+      };
+    }
+
     async function uploadToCloudinary(file) {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-      const type = file.type.startsWith("video") ? "video" : "image";
+      const type = file.type.startsWith("video") ? "video" : (file.type.startsWith("audio") ? "video" : "image");
       const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${type}/upload`, { method: "POST", body: formData });
       const data = await res.json();
       return data.secure_url || "";
@@ -1787,20 +2168,23 @@
           mediaType,
           isReel: studioMode === 'REEL',
           filterClass: studioFilterClass,
-          audioName: studioAudio,
-          sticker: studioSticker,
-          overlayText: studioOverlayText,
-          captionsText: studioCaptionsText,
+          music: selectedMusicObj,
+          showMusicCard: showMusicCardOnScreen,
+          showLyrics: showLyricsOnScreen,
+          overlayText: document.getElementById('dragTextContent').textContent,
+          sticker: document.getElementById('dragStickerContent').textContent,
+          overlays: captureOverlayPositions(),
           location: studioLocation,
           isAiContent: document.getElementById('step3AiLabelToggle').checked,
           audience: document.getElementById('step3AudienceSelect').value,
           authorId: currentUser.uid,
-          authorName: userProfileData.name || userProfileData.username,
+          authorName: userProfileData.username || userProfileData.name,
           authorAvatar: userProfileData.avatar || defaultAvatar(userProfileData.name),
           likes: [], comments: [], shares: 0,
           createdAt: serverTimestamp()
         });
 
+        stopGlobalMusic();
         document.getElementById('createScreen').classList.add('hidden');
         resetStudioStates();
       } catch (e) {
@@ -1821,65 +2205,25 @@
           caption: cap,
           audienceType,
           filterClass: studioFilterClass,
-          audioName: studioAudio,
+          music: selectedMusicObj,
+          showMusicCard: showMusicCardOnScreen,
+          showLyrics: showLyricsOnScreen,
+          overlayText: document.getElementById('dragTextContent').textContent,
+          sticker: document.getElementById('dragStickerContent').textContent,
+          overlays: captureOverlayPositions(),
           location: studioLocation,
           authorId: currentUser.uid,
           authorName: userProfileData.username || userProfileData.name,
           authorAvatar: userProfileData.avatar || defaultAvatar(userProfileData.name),
           createdAt: serverTimestamp()
         });
+        stopGlobalMusic();
         document.getElementById('createScreen').classList.add('hidden');
         resetStudioStates();
         alert(audienceType === 'close_friends' ? "Shared to Close Friends ★!" : "Shared to Your Story!");
       } catch (e) {
         alert("Story upload failed: " + e.message);
       }
-    };
-
-    // Text Post Methods
-    window.setTextBg = (cls) => {
-      studioTextBgClass = cls;
-      document.getElementById('textCardCanvas').className = `${cls} rounded-2xl border border-slate-200 p-5 flex-1 min-h-[200px] flex items-center justify-center transition-all`;
-    };
-
-    window.promptFeeling = () => {
-      const f = prompt("How are you feeling? (e.g. Happy 😊, Blessed ✨, Excited 🔥)", studioFeeling);
-      if (f) studioFeeling = f.trim();
-    };
-
-    window.openTextPostSettings = () => {
-      const txt = document.getElementById('textPostInput').value.trim();
-      if (!txt) { alert("Please write something first!"); return; }
-      document.getElementById('studioTextMode').classList.add('hidden');
-      document.getElementById('studioTextSettings').classList.remove('hidden');
-      document.getElementById('studioHeaderTitle').textContent = 'Post settings';
-    };
-
-    window.publishFinalTextPost = async () => {
-      let txt = document.getElementById('textPostInput').value.trim();
-      if (!txt) return;
-      if (studioFeeling) txt += `\n— feeling ${studioFeeling}`;
-      if (studioTaggedPeople) txt += ` with @${studioTaggedPeople}`;
-
-      await addDoc(collection(db, "posts"), {
-        text: txt,
-        mediaUrl: "",
-        mediaType: "text",
-        textBgClass: studioTextBgClass,
-        audioName: studioAudio,
-        location: studioLocation,
-        isAiContent: document.getElementById('txtAiToggle').checked,
-        audience: document.getElementById('txtAudienceSel').value,
-        authorId: currentUser.uid,
-        authorName: userProfileData.name || userProfileData.username,
-        authorAvatar: userProfileData.avatar || defaultAvatar(userProfileData.name),
-        likes: [], comments: [], shares: 0,
-        createdAt: serverTimestamp()
-      });
-
-      document.getElementById('textPostInput').value = "";
-      document.getElementById('createScreen').classList.add('hidden');
-      resetStudioStates();
     };
 
     function stopLiveCamera() {
@@ -1909,7 +2253,7 @@
       }
     };
 
-    // --- STORIES RENDERING ---
+    // --- STORIES RENDER & REAL AUDIO VIEWER ---
     function renderStories() {
       const row = document.getElementById('storiesRow');
       const myAvatar = userProfileData.avatar || defaultAvatar(userProfileData.name);
@@ -1934,7 +2278,7 @@
         const el = document.createElement('div');
         el.className = "flex flex-col items-center gap-1 shrink-0 cursor-pointer";
         el.innerHTML = `
-          <div class="${s.audienceType === 'close_friends' ? 'p-[2.5px] rounded-full bg-emerald-500' : (isOwner(s.authorId) ? 'ring-owner' : 'ring-story')}">
+          <div class="${s.audienceType === 'close_friends' ? 'ring-close' : (isOwner(s.authorId) ? 'ring-owner' : 'ring-story')}">
             <img src="${avatar}" class="w-[60px] h-[60px] rounded-full object-cover border-2 border-white" />
           </div>
           <span class="text-[11px] text-slate-800 max-w-[70px] truncate flex items-center gap-0.5">${name} ${badge}</span>`;
@@ -1944,13 +2288,28 @@
           document.getElementById('storyFullImg').src = s.mediaUrl;
           document.getElementById('storyFullImg').className = `max-h-[75vh] w-full object-contain rounded-xl my-auto ${s.filterClass || ''}`;
           document.getElementById('storyCaption').textContent = [s.location ? `📍 ${s.location}` : '', s.caption || ''].filter(Boolean).join(' • ');
+
+          const ov = s.overlays || {};
+          const layer = document.getElementById('storyViewerOverlayLayer');
+          layer.innerHTML = `
+            ${s.music && s.showMusicCard !== false ? `<div style="${ov.musicStyle || 'top:16px; left:16px;'}" class="absolute bg-black/75 border border-white/20 px-3 py-1.5 rounded-xl flex items-center gap-2"><span class="text-sm">🎵</span><span class="text-xs font-bold">${s.music.title}</span></div>` : ''}
+            ${s.showLyrics && s.music?.lyrics ? `<div style="${ov.lyricsStyle || 'bottom:60px; left:15%;'}" class="absolute bg-black/70 px-3 py-1 rounded-lg text-xs font-extrabold text-yellow-300">${s.music.lyrics}</div>` : ''}
+            ${s.overlayText ? `<div style="${ov.textStyle || 'top:45%; left:20%;'}" class="absolute font-extrabold text-xl text-white drop-shadow">${s.overlayText}</div>` : ''}
+            ${s.sticker ? `<div style="${ov.stickerStyle || 'top:25%; right:20%;'}" class="absolute text-5xl">${s.sticker}</div>` : ''}`;
+
+          if (s.music) playTrackGlobally(s.music);
           document.getElementById('storyViewer').classList.remove('hidden');
         };
         row.appendChild(el);
       });
     }
 
-    // --- ACCOUNTS CENTER, FOLLOW LISTS, SHARE SHEET & ABOUT ACCOUNT ---
+    window.closeStoryViewer = () => {
+      stopGlobalMusic();
+      document.getElementById('storyViewer').classList.add('hidden');
+    };
+
+    // --- ACCOUNTS CENTER, FOLLOW LISTS, OTHER PROFILE, DM, REELS, SETTINGS, ADMIN & HELP AI ---
     window.openAccountsCenter = () => {
       document.getElementById('acAvatarImg').src = userProfileData.avatar || defaultAvatar(userProfileData.name);
       document.getElementById('acFullName').textContent = userProfileData.name || "User";
@@ -2079,27 +2438,9 @@
                 <p class="text-[11px] text-slate-500">${u.name || ''}</p>
               </div>
             </div>
-            ${!isMe ? `<button onclick="toggleFollowUser('${id}'); setTimeout(()=>switchFollowListTab('${tab}'), 300)" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-slate-100 ${fState.cls}">${fState.text}</button>` : ''}
+            ${!isMe ? `<button onclick="toggleFollowUser('${id}'); setTimeout(()=>switchFollowListTab('${tab}'), 300)" class="text-xs font-bold px-3.5 py-1.5 rounded-xl ${fState.cls}">${fState.text}</button>` : ''}
           </div>`;
       }).join('');
-    };
-
-    window.openShareProfileSheet = (uid) => {
-      const targetUid = uid || currentUser.uid;
-      const u = usersMap[targetUid] || {};
-      const profileUrl = `${window.location.origin}${window.location.pathname}?user=${targetUid}`;
-      const shareText = `Check out ${u.name || u.username}'s profile on ZestUp! ✨ ${profileUrl}`;
-
-      document.getElementById('shareSheetAvatar').src = u.avatar || defaultAvatar(u.name);
-      document.getElementById('shareSheetName').innerHTML = `${u.name || u.username} ${getBadgeHTML(targetUid)}`;
-      document.getElementById('shareSheetUrlText').textContent = profileUrl;
-
-      document.getElementById('shareWhatsAppBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
-      document.getElementById('shareWaStatusBtn').onclick = () => { navigator.clipboard?.writeText(shareText); window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank'); };
-      document.getElementById('shareSmsBtn').onclick = () => window.location.href = `sms:?body=${encodeURIComponent(shareText)}`;
-      document.getElementById('shareCopyBtn').onclick = () => { navigator.clipboard?.writeText(profileUrl); alert("Profile link copied!"); document.getElementById('shareProfileSheet').classList.add('hidden'); };
-
-      document.getElementById('shareProfileSheet').classList.remove('hidden');
     };
 
     window.copyProfileLink = (uid) => { navigator.clipboard?.writeText(`${window.location.origin}${window.location.pathname}?user=${uid}`); alert("Profile URL copied!"); };
@@ -2128,14 +2469,14 @@
       const fState = getFollowButtonState(uid);
       const fBtn = document.getElementById('otherFollowBtn');
       fBtn.textContent = fState.text;
-      fBtn.className = `flex-1 py-2 rounded-xl font-bold text-xs transition ${(userProfileData.following || []).includes(uid) ? 'bg-slate-100 text-slate-800' : 'zest-gradient text-white'}`;
+      fBtn.className = `flex-1 py-2 rounded-xl font-bold text-xs transition ${fState.cls}`;
       fBtn.onclick = () => toggleFollowUser(uid);
 
       document.getElementById('otherMessageBtn').onclick = () => { closeOtherProfile(); openPrivateChat(uid); };
 
       document.getElementById('otherProfileGrid').innerHTML = userPosts.map(p => p.mediaUrl
         ? (p.mediaType === 'video' ? `<video src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover bg-black ${p.filterClass || ''}"></video>` : `<img src="${p.mediaUrl}" class="aspect-[3/4] w-full object-cover ${p.filterClass || ''}" />`)
-        : `<div class="aspect-[3/4] ${p.textBgClass || 'bg-slate-100'} p-2 text-[11px] flex items-center justify-center text-center font-bold">${p.text}</div>`
+        : `<div class="aspect-[3/4] bg-slate-100 p-2 text-[11px] flex items-center justify-center text-center">${p.text}</div>`
       ).join('');
 
       document.getElementById('otherProfileView').classList.remove('hidden');
@@ -2185,8 +2526,6 @@
       alert(isHidden ? "Story unhidden." : "Your story is now hidden from this user.");
     };
 
-    window.showUserQrCode = () => { document.getElementById('otherUserSheet').classList.add('hidden'); openShareProfileSheet(viewingUserId); };
-
     window.openReportUserModal = async (targetUid) => {
       const target = usersMap[targetUid] || {};
       const reason = prompt(`Why are you reporting @${target.username || target.name}?`);
@@ -2205,7 +2544,6 @@
       await updateDoc(doc(db, "users", targetUid), { followers: isFollowing ? arrayRemove(currentUser.uid) : arrayUnion(currentUser.uid) });
     };
 
-    // --- DM INBOX, REELS & SEARCH ---
     window.setDmFilter = (filterName) => {
       dmFilter = filterName;
       document.querySelectorAll('.dm-filter-btn').forEach(btn => {
@@ -2308,10 +2646,15 @@
       const convo = allMessages.filter(m => (m.senderId === currentUser.uid && m.receiverId === activeChatPartnerId) || (m.senderId === activeChatPartnerId && m.receiverId === currentUser.uid));
       box.innerHTML = convo.length ? convo.map(m => {
         const isMe = m.senderId === currentUser.uid;
-        return `<div class="flex ${isMe ? 'justify-end' : 'justify-start'}"><div class="px-3.5 py-2 rounded-2xl text-xs max-w-[75%] ${isMe ? 'zest-gradient text-white' : 'bg-white border border-slate-200 text-slate-800'}">${m.text}</div></div>`;
+        return `<div ondblclick="alert('❤️ Heart reaction added!')" class="flex ${isMe ? 'justify-end' : 'justify-start'}"><div class="px-3.5 py-2 rounded-2xl text-xs max-w-[75%] ${isMe ? 'zest-gradient text-white' : 'bg-white border border-slate-200 text-slate-800'}">${m.text}</div></div>`;
       }).join('') : `<p class="text-center text-xs text-slate-400 py-10">Say hi to start a private conversation!</p>`;
       box.scrollTop = box.scrollHeight;
     }
+
+    window.sendVoiceNoteDm = async () => {
+      if (!activeChatPartnerId) return;
+      await addDoc(collection(db, "directMessages"), { senderId: currentUser.uid, receiverId: activeChatPartnerId, text: "🎙️ Voice message (0:08)", createdAt: serverTimestamp() });
+    };
 
     document.getElementById('sendPrivateMsgBtn').onclick = async () => {
       const input = document.getElementById('privateMsgInput');
@@ -2328,12 +2671,10 @@
       container.innerHTML = videos.map(v => `
         <div class="relative rounded-2xl overflow-hidden bg-zinc-900">
           <video src="${v.mediaUrl}" controls loop playsinline class="w-full h-[72vh] object-cover ${v.filterClass || ''}"></video>
-          ${v.sticker ? `<span class="absolute top-5 right-5 text-4xl">${v.sticker}</span>` : ''}
-          ${v.overlayText ? `<div class="absolute top-1/3 inset-x-4 text-center font-extrabold text-lg text-white drop-shadow">${v.overlayText}</div>` : ''}
+          ${v.music ? `<button onclick="playTrackGlobally(${JSON.stringify(v.music).replace(/"/g, '&quot;')})" class="absolute top-3 left-3 bg-black/70 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">🎵 ${v.music.title}</button>` : ''}
           <div onclick="openOtherProfile('${v.authorId}')" class="p-3 bg-gradient-to-t from-black/90 to-transparent absolute bottom-0 inset-x-0 cursor-pointer">
             <p class="text-xs font-bold flex items-center gap-1">@${v.authorName} ${getBadgeHTML(v.authorId)}</p>
             <p class="text-xs text-zinc-200 mt-0.5">${v.text || ''}</p>
-            ${v.audioName ? `<p class="text-[10px] text-pink-300 mt-0.5">🎵 ${v.audioName}</p>` : ''}
           </div>
         </div>`).join('');
     }
@@ -2373,7 +2714,7 @@
                   <p class="text-[11px] text-slate-500">${u.name || ''} • ${(u.followers || []).length} followers</p>
                 </div>
               </div>
-              ${!isMe ? `<button onclick="toggleFollowUser('${u.uid}')" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-slate-100 ${fState.cls}">${fState.text}</button>` : ''}
+              ${!isMe ? `<button onclick="toggleFollowUser('${u.uid}')" class="text-xs font-bold px-3.5 py-1.5 rounded-xl ${fState.cls}">${fState.text}</button>` : ''}
             </div>`;
         }).join('');
       } else accountsBox.innerHTML = "";
@@ -2389,7 +2730,7 @@
 
     document.getElementById('searchInput').oninput = () => renderSearchAndExplore();
 
-    // --- 5. PREMIUM SETTINGS & PRIVACY FUNCTIONS ---
+    // --- SETTINGS ---
     window.openSettings = () => document.getElementById('settingsPage').classList.remove('hidden');
     window.closeSettings = () => document.getElementById('settingsPage').classList.add('hidden');
 
@@ -2403,11 +2744,6 @@
     window.toggleDarkMode = () => {
       const isDark = document.body.classList.toggle('dark-mode');
       document.getElementById('darkModeStatusText').textContent = isDark ? 'On ›' : 'Off ›';
-    };
-
-    window.selectAppLanguage = () => {
-      const lang = prompt("Choose ZestUp Language (English, বাংলা, हिन्दी):", "English");
-      if (lang) document.getElementById('appLangText').textContent = lang + " ›";
     };
 
     window.toggleSettingPref = async (key) => {
@@ -2426,32 +2762,14 @@
         body.innerHTML = saved.length
           ? `<div class="grid grid-cols-3 gap-1">${saved.map(p => p.mediaUrl ? `<img src="${p.mediaUrl}" class="aspect-square object-cover rounded" />` : `<div class="aspect-square bg-slate-100 p-2 text-xs flex items-center justify-center text-center">${p.text}</div>`).join('')}</div>`
           : `<p class="text-slate-400 text-center py-12">No saved posts yet.</p>`;
-      } else if (type === 'timemanagement') {
-        title.textContent = "Time Management";
-        body.innerHTML = `<div class="p-4 bg-slate-50 rounded-2xl space-y-2"><p class="font-bold">Daily Time on ZestUp</p><p class="text-2xl font-extrabold text-indigo-600">24 mins today</p><p class="text-xs text-slate-500">Manage your daily screen time and reminders.</p></div>`;
       } else if (type === 'blocked') {
         title.textContent = "Blocked Accounts";
         const blocked = (userProfileData.blockedUsers || []).map(id => usersMap[id]).filter(Boolean);
         body.innerHTML = blocked.length
           ? blocked.map(u => `<div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl"><span class="font-bold text-xs">${u.username || u.name}</span><button onclick="updateDoc(doc(db,'users',currentUser.uid),{blockedUsers:arrayRemove('${u.uid}')})" class="text-xs text-indigo-600 font-bold">Unblock</button></div>`).join('')
           : `<p class="text-slate-400 text-center py-12">No blocked accounts.</p>`;
-      } else if (type === 'dashboard') {
-        title.textContent = "Creator Payouts & Earnings";
-        const myPosts = allPosts.filter(p => p.authorId === currentUser.uid);
-        const totalLikes = myPosts.reduce((s, p) => s + (p.likes?.length || 0), 0);
-        const totalComments = myPosts.reduce((s, p) => s + (p.comments?.length || 0), 0);
-        body.innerHTML = `
-          <div class="p-4 rounded-2xl zest-gradient text-white space-y-1">
-            <p class="text-xs opacity-90">Total Creator Earnings</p>
-            <p class="text-3xl font-extrabold">₹${userProfileData.earnings || 0}</p>
-            <p class="text-[11px] opacity-85">Monetization Status: ${userProfileData.monetized ? 'Active ✔' : 'Standard Creator'}</p>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100"><p class="text-xs text-slate-500">Total Likes</p><p class="text-xl font-extrabold mt-1">${totalLikes}</p></div>
-            <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100"><p class="text-xs text-slate-500">Total Comments</p><p class="text-xl font-extrabold mt-1">${totalComments}</p></div>
-          </div>`;
       } else {
-        title.textContent = "Profile Status & Strikes";
+        title.textContent = "Account Status & Strikes";
         const strikes = userProfileData.copyrightStrikes || 0;
         const warnings = userProfileData.warnings || [];
         body.innerHTML = `
@@ -2469,7 +2787,7 @@
       if (!box) return;
       let html = `<div class="p-3 bg-indigo-50/70 rounded-xl text-indigo-800 font-medium">👋 Welcome to ZestUp, <b>${userProfileData.name || 'Creator'}</b>!</div>`;
       (userProfileData.warnings || []).forEach(w => { html += `<div class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700">⚠️ <b>ZestUp Safety Notice:</b> ${w}</div>`; });
-      if ((userProfileData.earnings || 0) > 0) html += `<div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800">💰 <b>Creator Reward:</b> Your ZestUp Earnings balance is <b>₹${userProfileData.earnings}</b>!</div>`;
+      if ((userProfileData.earnings || 0) > 0) html += `<div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800">💰 <b>Creator Monetization:</b> Your ZestUp Earnings balance is <b>₹${userProfileData.earnings}</b>!</div>`;
 
       if (isOwner(currentUser.uid)) {
         Object.values(usersMap).filter(u => u.uid !== currentUser.uid).forEach(u => {
@@ -2530,10 +2848,10 @@
       if (!box) return;
       box.innerHTML = allSupportTickets.length ? allSupportTickets.map(t => `
         <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
-          <div class="flex justify-between text-[10px] font-bold"><span class="text-indigo-600">${t.type === 'USER_REPORT' ? '🚨 User Report' : '🆘 Help Request'}</span><span class="text-slate-400">From: @${t.fromName}</span></div>
+          <div class="flex justify-between text-[10px] font-bold"><span class="text-indigo-600">${t.type}</span><span class="text-slate-400">From: @${t.fromName}</span></div>
           ${t.targetName ? `<p class="text-xs font-bold text-rose-600">Reported User: @${t.targetName}</p>` : ''}
           <p class="text-xs text-slate-800">${t.message}</p>
-        </div>`).join('') : `<p class="text-center text-xs text-slate-400 py-12">No reports or support messages yet.</p>`;
+        </div>`).join('') : `<p class="text-center text-xs text-slate-400 py-12">No reports or payout tickets yet.</p>`;
     }
 
     window.toggleVerifyUser = async (uid, current) => { await updateDoc(doc(db, "users", uid), { verified: !current }); };
@@ -2571,7 +2889,7 @@
       let reply = "I understand! You can check your Settings & privacy or tap <b>Message Team</b> at the top right so the ZestUp Owner & Support Team can help you directly.";
       if (lower.includes("password") || lower.includes("login") || lower.includes("otp")) reply = "🔑 <b>Login & Recovery:</b> Go to <b>Settings → ZestUp Accounts Center</b> and link both your Mobile Number (SIM SMS) and Gmail.";
       else if (lower.includes("blue") || lower.includes("tick")) reply = "☑️ <b>Blue Tick:</b> Keep posting original Reels & Posts—the ZestUp Founder reviews active creators and grants the Blue Tick!";
-      else if (lower.includes("earn") || lower.includes("money")) reply = "💰 <b>Creator Earnings:</b> Check your balance inside <b>Settings → Creator payouts & earnings</b>.";
+      else if (lower.includes("earn") || lower.includes("money") || lower.includes("star") || lower.includes("payout")) reply = "💰 <b>Creator Monetization:</b> Open <b>Profile → Creator Monetization & Earnings</b> to view your Stars, In-Stream Ads balance, and link your UPI/Bank payout account!";
       setTimeout(() => {
         box.innerHTML += `<div class="bg-white border border-slate-200 p-3 rounded-2xl max-w-[85%] space-y-1"><p class="font-bold text-indigo-600">ZestUp Help AI 🤖</p><p>${reply}</p></div>`;
         box.scrollTop = box.scrollHeight;
