@@ -45,7 +45,6 @@
 <body class="min-h-screen flex flex-col items-center bg-slate-50 text-slate-900">
 
   <div id="recaptcha-container"></div>
-  <!-- Ad-Free Hybrid Audio Engine (Direct MP3 + Built-in Synth Beat Guarantee!) -->
   <audio id="globalAudioPlayer" loop preload="auto" crossorigin="anonymous" class="hidden"></audio>
 
   <!-- INSTAGRAM FLOATING TOAST PILL -->
@@ -69,7 +68,7 @@
     </div>
   </div>
 
-  <!-- 1. AUTH SCREEN -->
+  <!-- 1. AUTH SCREEN (Instant Free Mobile + Password & Gmail Auth!) -->
   <main id="authSection" class="hidden w-full max-w-md px-5 py-8 flex-1 flex flex-col justify-center bg-white min-h-screen">
     <div class="border border-slate-200/80 rounded-3xl p-6 shadow-sm bg-white">
       <div class="flex flex-col items-center mb-4">
@@ -87,7 +86,7 @@
           <path d="M46 46H74L46 74H74" stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <h1 class="text-3xl font-extrabold tracking-tight zest-text-gradient">ZestUp</h1>
-        <p class="text-xs text-slate-500 mt-1 text-center">Create account or log in securely</p>
+        <p class="text-xs text-slate-500 mt-1 text-center">Create account or log in instantly</p>
       </div>
 
       <div class="grid grid-cols-2 bg-slate-100 p-1 rounded-xl mb-3 text-xs font-extrabold">
@@ -96,7 +95,7 @@
       </div>
 
       <div class="flex items-center justify-center gap-4 mb-3 text-xs font-bold border-b border-slate-100 pb-2">
-        <button id="channelPhoneBtn" onclick="setAuthChannel('phone')" class="text-indigo-600 border-b-2 border-indigo-600 pb-1">📱 Mobile (SIM SMS)</button>
+        <button id="channelPhoneBtn" onclick="setAuthChannel('phone')" class="text-indigo-600 border-b-2 border-indigo-600 pb-1">📱 Mobile Number</button>
         <button id="channelGmailBtn" onclick="setAuthChannel('gmail')" class="text-slate-400 pb-1">✉️ Gmail</button>
       </div>
 
@@ -109,23 +108,11 @@
         <div id="gmailInputBox" class="hidden">
           <input id="emailInput" type="email" placeholder="Enter your Gmail (e.g. name@gmail.com)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
         </div>
-        <div id="loginMethodRow" class="flex items-center justify-between text-[11px] px-1">
-          <span class="text-slate-500">Login via:</span>
-          <div class="flex gap-3 font-bold">
-            <button id="loginViaOtpBtn" onclick="setLoginSubType('otp')" class="text-indigo-600 underline">SIM SMS OTP</button>
-            <button id="loginViaPassBtn" onclick="setLoginSubType('password')" class="text-slate-400">Password</button>
-          </div>
-        </div>
-        <div id="passwordFieldBox" class="hidden">
+        <div id="passwordFieldBox">
           <input id="passwordInput" type="password" placeholder="Enter Password" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-indigo-500" />
         </div>
-        <div id="otpBox" class="hidden space-y-2 pt-1">
-          <p id="otpHintText" class="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl text-center">📩 Real SMS OTP sent to your SIM!</p>
-          <input id="otpCodeInput" type="tel" maxlength="6" placeholder="Enter 6-digit SMS OTP" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-indigo-300 text-center tracking-[0.4em] font-bold text-base focus:outline-none" />
-        </div>
         <p id="authError" class="text-xs text-rose-500 font-medium hidden"></p>
-        <button id="primaryAuthBtn" class="w-full py-2.5 rounded-xl zest-gradient font-bold text-white text-sm shadow-sm">Send SMS OTP to SIM</button>
-        <button id="verifyOtpAuthBtn" class="hidden w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-bold text-white text-sm shadow-sm">Verify SIM OTP & Continue</button>
+        <button id="primaryAuthBtn" class="w-full py-2.5 rounded-xl zest-gradient font-bold text-white text-sm shadow-sm">Log In</button>
       </div>
 
       <div class="mt-4 pt-3 border-t border-slate-100 flex justify-center">
@@ -294,7 +281,6 @@
           <p id="profBannerText" class="hidden text-[11px] font-semibold text-slate-600 pt-0.5">🎵 Profile Banner</p>
         </div>
 
-        <!-- FACEBOOK-STYLE PROFESSIONAL DASHBOARD -->
         <div onclick="openFbMonetizationHub()" class="mt-3 bg-slate-100 hover:bg-slate-200/80 rounded-2xl px-3.5 py-2.5 cursor-pointer flex items-center justify-between">
           <div>
             <p class="text-xs font-extrabold text-slate-900">Professional dashboard</p>
@@ -312,7 +298,6 @@
           <span>🛡️ Founder Admin: Invites, Users, Strikes & Reset Balance</span>
         </button>
 
-        <!-- Instagram Story Highlights Row -->
         <div id="highlightsRow" class="flex items-center gap-4 mt-4 overflow-x-auto no-scrollbar"></div>
       </div>
 
@@ -531,7 +516,7 @@
       <div id="followListContainer" class="flex-1 overflow-y-auto divide-y divide-slate-100"></div>
     </div>
 
-    <!-- MULTI-PLATFORM SOCIAL MEDIA SHARE BOTTOM SHEET (Instagram, Facebook, WhatsApp, Telegram & All Apps!) -->
+    <!-- MULTI-PLATFORM SOCIAL MEDIA SHARE BOTTOM SHEET -->
     <div id="instagramShareSheet" class="hidden fixed inset-0 z-50 bg-black/55 flex items-end justify-center" onclick="if(event.target===this)this.classList.add('hidden')">
       <div class="bg-white w-full max-w-md rounded-t-3xl p-4 space-y-4 max-h-[85vh] flex flex-col">
         <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto"></div>
@@ -987,7 +972,7 @@
           <p class="text-xs font-bold text-slate-500 mb-1.5 px-1">Account Recovery & Personal Info (Private)</p>
           <div class="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden shadow-xs text-sm">
             <div onclick="linkOrEditContact('phone')" class="px-4 py-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50">
-              <div><p class="font-semibold text-slate-800">Mobile Number (SIM SMS)</p><p id="acLinkedPhoneText" class="text-xs text-emerald-600 font-medium mt-0.5">Not linked</p></div>
+              <div><p class="font-semibold text-slate-800">Mobile Number</p><p id="acLinkedPhoneText" class="text-xs text-emerald-600 font-medium mt-0.5">Not linked</p></div>
               <span id="acPhoneActionBadge" class="text-xs font-bold text-indigo-600">Link ›</span>
             </div>
             <div onclick="linkOrEditContact('email')" class="px-4 py-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50">
@@ -1100,7 +1085,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, linkWithPhoneNumber, EmailAuthProvider, linkWithCredential, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getFirestore, collection, addDoc, setDoc, getDoc, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, arrayUnion, arrayRemove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     if ('serviceWorker' in navigator) {
@@ -1123,14 +1108,13 @@
     const CLOUDINARY_CLOUD_NAME = "nnahwcuk";
     const CLOUDINARY_UPLOAD_PRESET = "zestup_upload";
 
-    // 100% AD-FREE AUDIO LIBRARY (With Built-in Synth Beat Backup so Music ALWAYS Plays!)
     const ZESTUP_ADFREE_TRACKS = [
-      { id: "zest_orig_1", title: "🔥 ZestUp Original Viral Beat (Official)", artist: "ZestUp Original Audio • Pinned", cat: "Original", url: "https://actions.google.com/sounds/v1/ambiences/arcade_room.ogg", synthNotes: [261.63, 329.63, 392.00, 523.25], lyrics: "♪ ZestUp Original Viral Beat ♪", isPinned: true },
-      { id: "track_bolly_1", title: "Dil Se Romantic Melody (Hindi Vibe)", artist: "ZestUp Bollywood • Ad-Free", cat: "Trending", url: "https://actions.google.com/sounds/v1/musical_instruments/acoustic_guitar_chord_01.ogg", synthNotes: [293.66, 369.99, 440.00, 587.33], lyrics: "♪ Dil se dil tak yeh kahani ♪" },
-      { id: "track_bengali_1", title: "Moner Manush Acoustic (Bengali Vibe)", artist: "ZestUp Bangla • Ad-Free", cat: "For you", url: "https://actions.google.com/sounds/v1/musical_instruments/piano_note_c4.ogg", synthNotes: [329.63, 392.00, 493.88, 659.25], lyrics: "♪ Amar sonar bangla sur ♪" },
-      { id: "track_lofi_1", title: "Midnight Lo-Fi Chill Reels", artist: "ZestUp Studio • Ad-Free", cat: "For you", url: "https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg", synthNotes: [220.00, 261.63, 329.63, 392.00], lyrics: "♪ Late night city lights & vibes ♪" },
-      { id: "track_dance_1", title: "Desi Swag Viral Reels Beat", artist: "ZestUp Hits • Ad-Free", cat: "Trending", url: "https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg", synthNotes: [349.23, 440.00, 523.25, 698.46], lyrics: "♪ Dance to the ZestUp rhythm ♪" },
-      { id: "track_epic_1", title: "Cinematic Hero Entry Theme", artist: "ZestUp Cinema • Ad-Free", cat: "Trending", url: "https://actions.google.com/sounds/v1/science_fiction/sci_fi_drone.ogg", synthNotes: [196.00, 246.94, 293.66, 392.00], lyrics: "♪ Rise above the ordinary ♪" }
+      { id: "zest_orig_1", title: "🔥 ZestUp Original Viral Beat (Official)", artist: "ZestUp Original Audio • Pinned", cat: "Original", url: "", synthNotes: [261.63, 329.63, 392.00, 523.25], lyrics: "♪ ZestUp Original Viral Beat ♪", isPinned: true },
+      { id: "track_bolly_1", title: "Dil Se Romantic Melody (Hindi Vibe)", artist: "ZestUp Bollywood • Ad-Free", cat: "Trending", url: "", synthNotes: [293.66, 369.99, 440.00, 587.33], lyrics: "♪ Dil se dil tak yeh kahani ♪" },
+      { id: "track_bengali_1", title: "Moner Manush Acoustic (Bengali Vibe)", artist: "ZestUp Bangla • Ad-Free", cat: "For you", url: "", synthNotes: [329.63, 392.00, 493.88, 659.25], lyrics: "♪ Amar sonar bangla sur ♪" },
+      { id: "track_lofi_1", title: "Midnight Lo-Fi Chill Reels", artist: "ZestUp Studio • Ad-Free", cat: "For you", url: "", synthNotes: [220.00, 261.63, 329.63, 392.00], lyrics: "♪ Late night city lights & vibes ♪" },
+      { id: "track_dance_1", title: "Desi Swag Viral Reels Beat", artist: "ZestUp Hits • Ad-Free", cat: "Trending", url: "", synthNotes: [349.23, 440.00, 523.25, 698.46], lyrics: "♪ Dance to the ZestUp rhythm ♪" },
+      { id: "track_epic_1", title: "Cinematic Hero Entry Theme", artist: "ZestUp Cinema • Ad-Free", cat: "Trending", url: "", synthNotes: [196.00, 246.94, 293.66, 392.00], lyrics: "♪ Rise above the ordinary ♪" }
     ];
 
     const QR_GRADIENTS = [
@@ -1147,8 +1131,6 @@
 
     let authMode = 'login';
     let authChannel = 'phone';
-    let loginSubType = 'otp';
-    let confirmationResult = null;
 
     let currentUser = null;
     let userProfileData = {};
@@ -1185,7 +1167,6 @@
 
     const defaultAvatar = (name) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Z')}&background=4F46E5&color=fff&bold=true`;
 
-    // --- INSTAGRAM FLOATING TOAST & CUSTOM DIALOG ENGINE ---
     let toastTimer = null;
     window.showToast = (msg) => {
       const el = document.getElementById('igToast');
@@ -1220,7 +1201,6 @@
       modal.classList.remove('hidden');
     };
 
-    // --- HYBRID AD-FREE AUDIO ENGINE (Direct Audio + Built-in Synth Beat Guarantee!) ---
     function startBuiltInMelody(notes = [261.63, 329.63, 392.00, 523.25]) {
       stopBuiltInMelody();
       try {
@@ -1337,33 +1317,14 @@
     document.addEventListener('visibilitychange', () => { if (currentUser) updateMyPresence(!document.hidden); });
     window.addEventListener('beforeunload', () => { if (currentUser) updateMyPresence(false); });
 
-    // --- REAL SIM SMS OTP & PASSWORD AUTH ---
-    function initRecaptcha() {
-      if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
-      }
-    }
-
+    // --- 100% FREE INSTANT MOBILE + PASSWORD & GMAIL AUTH ---
     window.setAuthMode = (mode) => {
       authMode = mode;
       document.getElementById('modeLoginBtn').className = mode === 'login' ? 'py-2 rounded-lg bg-white text-indigo-600 shadow-sm' : 'py-2 rounded-lg text-slate-500';
       document.getElementById('modeSignupBtn').className = mode === 'signup' ? 'py-2 rounded-lg bg-white text-indigo-600 shadow-sm' : 'py-2 rounded-lg text-slate-500';
       document.getElementById('authFullName').classList.toggle('hidden', mode !== 'signup');
-      document.getElementById('loginMethodRow').classList.toggle('hidden', mode === 'signup' || authChannel === 'gmail');
-
-      const showPassword = (mode === 'signup') || (authChannel === 'gmail') || (mode === 'login' && loginSubType === 'password');
-      document.getElementById('passwordFieldBox').classList.toggle('hidden', !showPassword);
-      document.getElementById('passwordInput').placeholder = mode === 'signup' ? 'Create a New Password (min 6 chars)' : 'Enter Password';
-
-      if (authChannel === 'phone') {
-        document.getElementById('primaryAuthBtn').textContent = (mode === 'signup' || loginSubType === 'otp') ? 'Send SMS OTP to SIM' : 'Log In with Password';
-      } else {
-        document.getElementById('primaryAuthBtn').textContent = mode === 'signup' ? 'Create Gmail Account' : 'Log In with Gmail';
-      }
-
-      document.getElementById('otpBox').classList.add('hidden');
-      document.getElementById('primaryAuthBtn').classList.remove('hidden');
-      document.getElementById('verifyOtpAuthBtn').classList.add('hidden');
+      document.getElementById('passwordInput').placeholder = mode === 'signup' ? 'Create a Password (min 6 chars)' : 'Enter Password';
+      document.getElementById('primaryAuthBtn').textContent = mode === 'signup' ? 'Create Account Now' : 'Log In';
     };
 
     window.setAuthChannel = (ch) => {
@@ -1375,110 +1336,67 @@
       setAuthMode(authMode);
     };
 
-    window.setLoginSubType = (sub) => {
-      loginSubType = sub;
-      document.getElementById('loginViaOtpBtn').className = sub === 'otp' ? 'text-indigo-600 underline' : 'text-slate-400';
-      document.getElementById('loginViaPassBtn').className = sub === 'password' ? 'text-indigo-600 underline' : 'text-slate-400';
-      document.getElementById('passwordFieldBox').classList.toggle('hidden', sub === 'otp');
-      document.getElementById('primaryAuthBtn').textContent = sub === 'otp' ? 'Send SMS OTP to SIM' : 'Log In with Password';
-    };
-
     document.getElementById('primaryAuthBtn').onclick = async () => {
       const errEl = document.getElementById('authError');
       errEl.classList.add('hidden');
       const btn = document.getElementById('primaryAuthBtn');
 
-      const phone = document.getElementById('phoneInput').value.trim();
+      const phone = document.getElementById('phoneInput').value.trim().replace(/\D/g, '');
       const email = document.getElementById('emailInput').value.trim().toLowerCase();
       const pass = document.getElementById('passwordInput').value.trim();
       const fullName = document.getElementById('authFullName').value.trim();
 
-      if (authChannel === 'gmail') {
-        if (!email.includes('@')) { errEl.textContent = "Please enter a valid Gmail address."; errEl.classList.remove('hidden'); return; }
-        if (pass.length < 6) { errEl.textContent = "Password must be at least 6 characters."; errEl.classList.remove('hidden'); return; }
-        try {
-          if (authMode === 'signup') {
-            if (!fullName) { errEl.textContent = "Please enter your Full Name."; errEl.classList.remove('hidden'); return; }
-            const cred = await createUserWithEmailAndPassword(auth, email, pass);
-            await updateProfile(cred.user, { displayName: fullName });
-          } else {
-            await signInWithEmailAndPassword(auth, email, pass);
-          }
-        } catch (e) { errEl.textContent = e.message; errEl.classList.remove('hidden'); }
-        return;
-      }
-
-      if (phone.length !== 10) { errEl.textContent = "Please enter a valid 10-digit Mobile Number."; errEl.classList.remove('hidden'); return; }
-
-      if (authMode === 'login' && loginSubType === 'password') {
-        if (pass.length < 6) { errEl.textContent = "Enter your 6+ character password."; errEl.classList.remove('hidden'); return; }
-        try {
-          await signInWithEmailAndPassword(auth, `${phone}@zestup.phone`, pass);
-        } catch {
-          errEl.textContent = "Incorrect password. Try 'SIM SMS OTP' to log in!";
+      let authEmail = '';
+      if (authChannel === 'phone') {
+        if (phone.length !== 10) {
+          errEl.textContent = "Please enter a valid 10-digit Mobile Number.";
           errEl.classList.remove('hidden');
+          return;
         }
+        authEmail = `${phone}@zestup.phone`;
+      } else {
+        if (!email.includes('@')) {
+          errEl.textContent = "Please enter a valid Gmail address.";
+          errEl.classList.remove('hidden');
+          return;
+        }
+        authEmail = email;
+      }
+
+      if (pass.length < 6) {
+        errEl.textContent = "Password must be at least 6 characters.";
+        errEl.classList.remove('hidden');
         return;
       }
 
-      if (authMode === 'signup') {
-        if (!fullName) { errEl.textContent = "Please enter your Full Name."; errEl.classList.remove('hidden'); return; }
-        if (pass.length < 6) { errEl.textContent = "Create a New Password (min 6 chars) before verifying OTP."; errEl.classList.remove('hidden'); return; }
+      if (authMode === 'signup' && !fullName) {
+        errEl.textContent = "Please enter your Full Name.";
+        errEl.classList.remove('hidden');
+        return;
       }
 
+      btn.disabled = true;
+      btn.textContent = authMode === 'signup' ? "Creating Account..." : "Logging In...";
+
       try {
-        btn.textContent = "Sending Real SMS OTP...";
-        btn.disabled = true;
-        initRecaptcha();
-        confirmationResult = await signInWithPhoneNumber(auth, `+91${phone}`, window.recaptchaVerifier);
-        document.getElementById('otpHintText').textContent = `📩 Real SMS OTP sent to +91 ${phone}! Check your messages.`;
-        document.getElementById('otpBox').classList.remove('hidden');
-        btn.classList.add('hidden');
-        document.getElementById('verifyOtpAuthBtn').classList.remove('hidden');
+        if (authMode === 'signup') {
+          const cred = await createUserWithEmailAndPassword(auth, authEmail, pass);
+          await updateProfile(cred.user, { displayName: fullName });
+        } else {
+          await signInWithEmailAndPassword(auth, authEmail, pass);
+        }
       } catch (e) {
-        errEl.textContent = "SMS Error: " + e.message;
-        errEl.classList.remove('hidden');
-        if (window.recaptchaVerifier) { window.recaptchaVerifier.clear(); window.recaptchaVerifier = null; }
-      } finally {
-        btn.textContent = "Send SMS OTP to SIM";
-        btn.disabled = false;
-      }
-    };
-
-    document.getElementById('verifyOtpAuthBtn').onclick = async () => {
-      const code = document.getElementById('otpCodeInput').value.trim();
-      const errEl = document.getElementById('authError');
-      errEl.classList.add('hidden');
-      if (code.length !== 6 || !confirmationResult) {
-        errEl.textContent = "Please enter the 6-digit OTP received on your SIM.";
-        errEl.classList.remove('hidden');
-        return;
-      }
-
-      const verifyBtn = document.getElementById('verifyOtpAuthBtn');
-      verifyBtn.textContent = "Verifying OTP...";
-      verifyBtn.disabled = true;
-
-      try {
-        const result = await confirmationResult.confirm(code);
-        const user = result.user;
-        const phone = document.getElementById('phoneInput').value.trim();
-        const pass = document.getElementById('passwordInput').value.trim();
-        const fullName = document.getElementById('authFullName').value.trim();
-
-        if (fullName) await updateProfile(user, { displayName: fullName });
-        if (authMode === 'signup' && pass.length >= 6 && phone.length === 10) {
-          try {
-            const cred = EmailAuthProvider.credential(`${phone}@zestup.phone`, pass);
-            await linkWithCredential(user, cred);
-          } catch {}
+        if (e.code === 'auth/email-already-in-use') {
+          errEl.textContent = "This Mobile/Gmail already has an account! Switch to 'Log In' above.";
+        } else if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') {
+          errEl.textContent = "Incorrect Mobile/Gmail or Password. If new, tap 'Sign Up (New)' above!";
+        } else {
+          errEl.textContent = e.message;
         }
-      } catch {
-        errEl.textContent = "Invalid or expired SMS OTP. Please check your SMS and try again.";
         errEl.classList.remove('hidden');
       } finally {
-        verifyBtn.textContent = "Verify SIM OTP & Continue";
-        verifyBtn.disabled = false;
+        btn.disabled = false;
+        btn.textContent = authMode === 'signup' ? 'Create Account Now' : 'Log In';
       }
     };
 
@@ -1497,9 +1415,7 @@
         const rawEmail = (user.email || "").toLowerCase();
         const isSyntheticPhoneEmail = rawEmail.endsWith("@zestup.phone");
         const realEmail = isSyntheticPhoneEmail ? "" : rawEmail;
-        const realPhone = user.phoneNumber
-          ? user.phoneNumber.replace("+91", "+91 ")
-          : (isSyntheticPhoneEmail ? "+91 " + rawEmail.split("@")[0] : "");
+        const realPhone = isSyntheticPhoneEmail ? "+91 " + rawEmail.split("@")[0] : "";
         const isFounder = (realEmail === FOUNDER_EMAIL);
 
         const userRef = doc(db, "users", user.uid);
@@ -1694,7 +1610,6 @@
           </div>`).join('');
     }
 
-    // --- FULL INSTAGRAM "EDIT PROFILE" PAGE ---
     window.openFullEditProfile = () => {
       document.getElementById('epAvatarPreview').src = userProfileData.avatar || defaultAvatar(userProfileData.name);
       document.getElementById('epNameInput').value = userProfileData.name || '';
@@ -1741,7 +1656,6 @@
       showToast("Profile saved!");
     };
 
-    // --- COLOR-CHANGING QR CODE "SHARE PROFILE" PAGE ---
     window.openQrShareProfile = (uid) => {
       const u = usersMap[uid] || userProfileData;
       const profileUrl = `${window.location.origin}${window.location.pathname}?user=${uid}`;
@@ -1828,7 +1742,6 @@
       });
     };
 
-    // --- INSTAGRAM FEED ---
     function renderFeed() {
       const feed = document.getElementById('feedContainer');
       feed.innerHTML = "";
@@ -1999,7 +1912,6 @@
       });
     }
 
-    // --- FULL-SCREEN INSTAGRAM REELS FEED ---
     function renderReels() {
       const container = document.getElementById('reelsContainer');
       const videos = allPosts.filter(p => p.mediaType === 'video' && p.mediaUrl);
@@ -2048,7 +1960,6 @@
       await updateDoc(doc(db, "posts", postId), { likes: liked ? arrayRemove(currentUser.uid) : arrayUnion(currentUser.uid) });
     };
 
-    // --- MULTI-PLATFORM SOCIAL MEDIA SHARE SHEET (Instagram, Facebook, WhatsApp, Telegram & All Apps!) ---
     window.openShareSheet = (postId, profileUid) => {
       const sheet = document.getElementById('instagramShareSheet');
       const grid = document.getElementById('shareFriendsGrid');
@@ -2157,7 +2068,6 @@
       showToast(`Sent to @${usersMap[receiverUid]?.username || 'friend'}!`);
     };
 
-    // --- FACEBOOK MONETIZATION HUB ---
     function getCreatorMetrics() {
       const myPosts = allPosts.filter(p => p.authorId === currentUser.uid);
       const totalLikes = myPosts.reduce((s, p) => s + (p.likes?.length || 0), 0);
@@ -2370,7 +2280,6 @@
       });
     };
 
-    // --- AD-FREE AUDIO PICKER ---
     window.setMusicTab = (cat) => {
       currentMusicCat = cat;
       document.querySelectorAll('.music-cat-btn').forEach(b => {
@@ -2482,7 +2391,6 @@
       if (musicObj.lyrics) document.getElementById('dragLyricsText').textContent = musicObj.lyrics;
     }
 
-    // --- TOUCH DRAG & RESIZE STUDIO ---
     function enableTouchDrag(el) {
       let startX = 0, startY = 0, origLeft = 0, origTop = 0;
       el.addEventListener('pointerdown', (e) => {
@@ -2961,7 +2869,6 @@
       }
     };
 
-    // --- STORIES RENDER & VIEWER ---
     function renderStories() {
       const row = document.getElementById('storiesRow');
       const myAvatar = userProfileData.avatar || defaultAvatar(userProfileData.name);
@@ -3017,7 +2924,6 @@
       document.getElementById('storyViewer').classList.add('hidden');
     };
 
-    // --- FOLLOWERS / FOLLOWING / SUBSCRIPTIONS PAGE ---
     window.openFollowListModal = (uid, initialTab) => {
       if (!uid) return;
       followModalTargetUid = uid;
@@ -3091,7 +2997,6 @@
       showToast("Follower removed");
     };
 
-    // --- ACCOUNTS CENTER, OTHER PROFILE, DM, SEARCH, SETTINGS, ADMIN & HELP AI ---
     window.openAccountsCenter = () => {
       document.getElementById('acAvatarImg').src = userProfileData.avatar || defaultAvatar(userProfileData.name);
       document.getElementById('acFullName').textContent = userProfileData.name || "User";
@@ -3104,7 +3009,7 @@
         phoneEl.className = "text-xs text-emerald-600 font-bold mt-0.5";
         phoneBadge.textContent = "Change ›";
       } else {
-        phoneEl.textContent = "⚠️ Not linked — Link now via SIM SMS OTP";
+        phoneEl.textContent = "⚠️ Not linked — Tap to add Mobile Number";
         phoneEl.className = "text-xs text-rose-500 font-semibold mt-0.5";
         phoneBadge.textContent = "Add ›";
       }
@@ -3128,28 +3033,14 @@
     window.linkOrEditContact = (type) => {
       if (type === 'phone') {
         openIgDialog({
-          title: "Link Mobile Number",
-          subtitle: "We will send a real 6-digit SMS OTP to verify your SIM",
+          title: "Save Mobile Number",
           fields: [{ id: "num", label: "10-digit Mobile Number", type: "tel", value: (userProfileData.phone || "").replace("+91 ", "") }],
-          confirmText: "Send SMS OTP",
+          confirmText: "Save Number",
           onConfirm: async ({ num }) => {
-            if (num && num.trim().length === 10) {
-              try {
-                initRecaptcha();
-                const confirmRes = await linkWithPhoneNumber(currentUser, `+91${num.trim()}`, window.recaptchaVerifier);
-                openIgDialog({
-                  title: "Verify SIM SMS OTP",
-                  subtitle: `Enter the 6-digit OTP sent to +91 ${num.trim()}`,
-                  fields: [{ id: "code", label: "6-Digit OTP", type: "tel" }],
-                  confirmText: "Verify",
-                  onConfirm: async ({ code }) => {
-                    await confirmRes.confirm(code.trim());
-                    await updateDoc(doc(db, "users", currentUser.uid), { phone: "+91 " + num.trim() });
-                    openAccountsCenter();
-                    showToast("Mobile Number verified & linked!");
-                  }
-                });
-              } catch (e) { showToast("SMS Error: " + e.message); }
+            if (num && num.trim().replace(/\D/g, '').length === 10) {
+              await updateDoc(doc(db, "users", currentUser.uid), { phone: "+91 " + num.trim().replace(/\D/g, '') });
+              openAccountsCenter();
+              showToast("Mobile Number saved!");
             }
           }
         });
@@ -3711,7 +3602,7 @@
       box.innerHTML += `<div class="flex justify-end"><div class="px-3.5 py-2 rounded-2xl zest-gradient text-white max-w-[80%]">${q}</div></div>`;
       const lower = q.toLowerCase();
       let reply = "I understand! You can check your Settings & privacy or tap <b>Message Team</b> at the top right so the ZestUp Owner & Team can help you directly.";
-      if (lower.includes("password") || lower.includes("login") || lower.includes("otp")) reply = "🔑 <b>Login & Recovery:</b> Go to <b>Settings → ZestUp Accounts Center</b> and link both your Mobile Number (SIM SMS) and Gmail.";
+      if (lower.includes("password") || lower.includes("login") || lower.includes("otp")) reply = "🔑 <b>Login & Recovery:</b> Enter your 10-digit Mobile Number (or Gmail) and Password to log in or create an account immediately!";
       else if (lower.includes("blue") || lower.includes("tick")) reply = "☑️ <b>Blue Tick:</b> Keep posting original Reels & Posts—the ZestUp Founder reviews active creators and grants the Blue Tick!";
       else if (lower.includes("earn") || lower.includes("money") || lower.includes("star") || lower.includes("bank") || lower.includes("invite")) reply = "💰 <b>Monetize & Payouts:</b> Open <b>Profile → Professional dashboard</b> to view your Stars missions (500 followers + 18+ age), Content Monetization invite status, and add your Bank Account & IFSC Code!";
       setTimeout(() => {
