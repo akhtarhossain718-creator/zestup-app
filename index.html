@@ -4,7 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#ffffff" />
-  <title>ZestUp</title>
+  <meta name="google-site-verification" content="bGyxbIYNhKiPyhPQMR3xJPgtZt6_B_qoY5h2O4GXhAc" />
+  <title>ZestUp App — Official Social Media, Reels, Stories & Creator Platform</title>
+  <meta name="description" content="ZestUp App is the official social media platform to share Reels, Stories, Photos, Chat with friends, and earn money through Creator Monetization." />
+  <meta name="keywords" content="ZestUp, ZestUp App, ZestUp Official, ZestUp Social Media, Reels App, Stories, Creator Monetization" />
+  <meta property="og:title" content="ZestUp App — Official Social Media & Creator Platform" />
+  <meta property="og:description" content="Join ZestUp App to share Reels, Stories, Photos, Chat with friends, and unlock Creator Monetization." />
+  <meta property="og:url" content="https://zestupapp.netlify.app/" />
+  <meta property="og:type" content="website" />
+  <link rel="canonical" href="https://zestupapp.netlify.app/" />
   <link rel="manifest" href="manifest.json" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -1067,9 +1075,8 @@
     </div>
   </div>
 
-  <!-- AUTHENTIC INSTAGRAM STORY VIEWER MODAL (Activity, Viewers, Heart Likes, More Menu & DM Reply!) -->
+  <!-- AUTHENTIC INSTAGRAM STORY VIEWER MODAL -->
   <div id="storyViewer" class="hidden fixed inset-0 z-50 bg-black max-w-md mx-auto flex flex-col justify-between text-white">
-    <!-- Top Progress Bar & Author Header -->
     <div class="p-3 pt-2.5 space-y-2.5 z-30 bg-gradient-to-b from-black/80 to-transparent">
       <div class="w-full h-0.5 bg-white/30 rounded-full overflow-hidden">
         <div class="h-full bg-white w-full"></div>
@@ -1086,14 +1093,12 @@
       </div>
     </div>
 
-    <!-- Story Media & Overlays -->
     <div class="relative flex-1 flex items-center justify-center overflow-hidden">
       <img id="storyFullImg" class="max-h-full w-full object-contain" />
       <div id="storyViewerOverlayLayer" class="absolute inset-0 pointer-events-none"></div>
       <p id="storyCaption" class="absolute bottom-4 inset-x-4 text-center text-sm font-semibold drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] z-20"></p>
     </div>
 
-    <!-- Bottom Controls: OWN STORY (Activity, Share on, Boost, Send, Mention, More) -->
     <div id="ownStoryBottomControls" class="hidden px-3 py-3 bg-gradient-to-t from-black via-black/90 to-transparent flex items-center justify-between z-30">
       <button onclick="openStoryActivityModal()" class="flex flex-col items-center gap-1">
         <div id="storyActivityMiniAvatars" class="flex -space-x-2 items-center h-6"></div>
@@ -1123,7 +1128,6 @@
       </div>
     </div>
 
-    <!-- Bottom Controls: OTHER USER STORY (Send message + Heart Like + Share) -->
     <div id="otherStoryBottomControls" class="hidden px-3 py-3 bg-gradient-to-t from-black via-black/90 to-transparent flex items-center gap-2.5 z-30">
       <input id="storyReplyInput" type="text" placeholder="Send message..." class="flex-1 bg-transparent border border-white/40 rounded-full px-4 py-2.5 text-xs text-white placeholder-white/75 focus:outline-none focus:border-white" />
       <button onclick="sendStoryReplyMessage()" class="text-xs font-bold text-indigo-400 px-1">Send</button>
@@ -1131,7 +1135,6 @@
       <button onclick="openShareSheet(null, activeViewingStoryObj?.authorId)" class="text-xl leading-none px-1">➤</button>
     </div>
 
-    <!-- WHO VIEWED YOUR STORY (ACTIVITY SHEET) -->
     <div id="storyActivityModal" class="hidden fixed inset-0 z-[70] bg-white text-slate-900 max-w-md mx-auto flex flex-col">
       <header class="px-4 py-3 flex items-center justify-between border-b border-slate-100">
         <button onclick="document.getElementById('storyActivityModal').classList.add('hidden')" class="text-xl font-bold">←</button>
@@ -1154,7 +1157,6 @@
       </div>
     </div>
 
-    <!-- STORY "MORE (⋮)" BOTTOM SHEET (Delete, Archive, Save, Highlight, Edit AI label, Share) -->
     <div id="storyMoreSheet" class="hidden fixed inset-0 z-[80] bg-black/60 flex items-end justify-center" onclick="if(event.target===this)this.classList.add('hidden')">
       <div class="bg-white text-slate-900 w-full max-w-md rounded-t-3xl p-5 space-y-4 text-sm font-semibold">
         <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto"></div>
